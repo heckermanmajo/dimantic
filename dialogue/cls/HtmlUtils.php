@@ -19,12 +19,31 @@ class HtmlUtils {
       <!--<script src="https://kit.fontawesome.com/ac3fc65406.js" crossorigin="anonymous"></script>-->
       <link rel="stylesheet" href="/res/w3.css">
       <link rel="stylesheet" href="/res/main.css">
+
+      <?php
+      # import all js files from /js/
+      # one file per function
+      $js_folder = $_SERVER["DOCUMENT_ROOT"] . "/js/";
+      foreach (scandir($js_folder) as $file) {
+        if (is_file($js_folder . $file)) {
+          ?>
+          <script src="/js/<?= $file ?>"></script>
+          <?php
+        }
+      }
+      ?>
       <style>
           body {
               background-color: #1d1e20;
               color: whitesmoke;
               overflow: hidden;
+
+            <?php if(!FN_IS_MOBILE()): ?>
+              margin-left: 20%;
+              margin-right: 20%;
+            <?php endif; ?>
           }
+
 
           <?=$style?>
       </style>

@@ -1,3 +1,16 @@
+- delete news entries 
+- add order
+- add links & images to messages
+- dont be able to start a dialogue with yourself
+- dont start a dialogue, when th doialoge desc is empty
+
+## Bugs
+- nicht dieselbe message zweimal abschicken
+- Warum ist da json in den messages ab der dritten?
+- Erklärung des Runden-verhaltens
+- einklappen der info-boxes bei default, außer bei den ersten 2 logins
+- Count number of logins per account
+- Create 2 needed users dialoge bug
 
 ### Querverweise von Dialogen
 
@@ -111,10 +124,4 @@
 ### Test-Suite
 - test dataclasses: Create test-dataclass-twin-file
 
-## Bugs 
-- nicht dieselbe message zweimal abschicken
-- Warum ist da json in den messages ab der dritten?
-- Erklärung des Runden-verhaltens
-- einklappen der info-boxes bei default, außer bei den ersten 2 logins
-- Count number of logins per account
-- Create 2 needed users dialoge bug
+

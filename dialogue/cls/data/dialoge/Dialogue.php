@@ -89,6 +89,12 @@ class Dialogue extends DataClass {
    */
   var int $dead = 0;
 
+  /**
+   * If the dialogue is a vault-dialogue, this is the id of the vault.
+   * If 0 -> not a vault dialogue.
+   */
+  var int $vault_id = 0;
+
   #################################
   ###### Joined Values      #######
   #################################

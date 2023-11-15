@@ -99,7 +99,7 @@ You only want (and are allowed) to run it locally.
 
 Just run:
 
-    path_to_directory_of_dimantic$ cd app && php -S localhost:8000
+    path_to_directory_of_dimantic$ cd dialogue && php -S localhost:8000
 
 Make sure to start the server after c-d ing into the "app" directory.
 
