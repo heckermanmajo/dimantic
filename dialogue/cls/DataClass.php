@@ -34,6 +34,7 @@ abstract class DataClass implements JsonSerializable {
    * !Should not be changed manually.
    */
   var int $id = 0;
+  private bool $___DONT_SAVE_SINCE_IT_IS_SAVE_COPY = false;
 
   public function __construct(array $data_from_db = []) {
     # set the created_at field in case it exists
@@ -67,7 +68,7 @@ abstract class DataClass implements JsonSerializable {
    * @throws Exception
    */
   static function create_table(PDO $pdo): void {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $log("Create Table: " . static::class);
     #var_dump($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
     $is_mysql = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === "mysql";
@@ -229,8 +230,12 @@ abstract class DataClass implements JsonSerializable {
   }
 
   function save(PDO $db): void {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
-
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+    if ($this->___DONT_SAVE_SINCE_IT_IS_SAVE_COPY) {
+      $err("DONT_SAVE_SINCE_IT_IS_SAVE_COPY");
+      $err("Save of instance not done, since you try to save a html-escaped_copy");
+      return;
+    }
     if ($this->id === 0) {
       $this->insert($db);
       $log("Inserted instance of " . static::class . " with id: " . $this->id);
@@ -335,7 +340,7 @@ abstract class DataClass implements JsonSerializable {
    * @throws Exception
    */
   static function get_count(PDO $pdo, string $sql, array $params = []): int {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     if (!str_starts_with($sql, "SELECT COUNT(*)")) {
       $err("get_count called with sql that does not start with SELECT COUNT(*)");
       $err("sql: $sql");
@@ -394,7 +399,19 @@ abstract class DataClass implements JsonSerializable {
    * @return void
    */
   function delete(PDO $pdo): void {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+    if ($this->id === 0) {
+      $err("Delete called on instance with id 0");
+      $err("This is not allowed, since we don't know what to delete");
+      throw new Exception("Delete called on instance with id 0");
+    }
+
+    if ($this->___DONT_SAVE_SINCE_IT_IS_SAVE_COPY) {
+      $err("DONT_SAVE_SINCE_IT_IS_SAVE_COPY");
+      $err("Delete of instance not done, since you try to delete a html-escaped_copy");
+      return;
+    }
+
     $log("Delete instance of " . static::class . " with id: " . $this->id);
     $table_name = (new ReflectionClass(static::class))->getShortName();
     $sql = "DELETE FROM `$table_name` WHERE `id` = :id";
@@ -411,7 +428,7 @@ abstract class DataClass implements JsonSerializable {
    * @return $this
    */
   function get_html_escaped_copy(): static {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $warn("get_html_escaped_copy not overwritten, but used in " . static::class);
     $warn("this is potentially a security risk, since we don't escape the values");
     return clone $this;
@@ -442,7 +459,7 @@ abstract class DataClass implements JsonSerializable {
    * @return array
    */
   function get_client_save_values(App $app): array {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $warn("get_client_save_values not overwritten, but used in " . static::class);
     return get_object_vars($this);
   }
@@ -458,11 +475,22 @@ abstract class DataClass implements JsonSerializable {
    * @return string|null
    */
   static function check_value(string $field_name, string $value, App $app): string|null {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $warn("check_value not overwritten, but used in " . static::class);
     $warn("field_name: $field_name, value: $value");
     $warn("this is potentially a security risk, since we don't check the value");
     return null;
+  }
+
+
+  function get_escaped_copy_instance(): static {
+    $copy = clone $this;
+    foreach (get_object_vars($copy) as $key => $value) {
+      if (is_string($value)) {
+        $copy->$key = Interpreter::parse($value);
+      }
+    }
+    return $copy;
   }
 
 }

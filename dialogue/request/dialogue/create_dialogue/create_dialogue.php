@@ -18,7 +18,7 @@ function create_dialogue(
   App   $app,
   array $post_data,
 ): Dialogue|RequestError {
-  [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+  [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   #if (!isset($post_data["username_or_email"])) {
   #  return new RequestError(
   #    dev_message: "\$post_data[\"username_or_email\"] not set",
@@ -31,7 +31,7 @@ function create_dialogue(
   $dialogue->content = "";
   $dialogue->state = Dialogue::STATE_NOT_YET_STARTED;
   $dialogue->author_id = $app->get_currently_logged_in_account()->id;
-  $dialogue->number_of_needed_members = 1; # todo: change later ...
+  $dialogue->number_of_needed_members = 2; # todo: change later ...
   $dialogue->create_date = date("Y-m-d H:i:s");
   $dialogue->save($app->get_database());
 

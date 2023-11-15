@@ -17,7 +17,7 @@ function write_message(
   App   $app,
   array $post_data,
 ): DialogueMessage|RequestError {
-  [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+  [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   # todo: check input and rights ...
 
   $dialogue_id = $post_data["dialogue_id"] ?? throw new Exception("dialogue_id");

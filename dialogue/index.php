@@ -14,7 +14,7 @@ try {
   $app = App::get();
   $app->init_database();
   [$log, $warn, $err, $todo]
-    = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
 
   switch ($_POST["action"] ?? "") {
@@ -118,19 +118,19 @@ try {
 
   <?php
   if ($app->somebody_logged_in()) {
-    HtmlUtils::main_header();
     # main content ... -> my active dialoges
     ?>
-    <nav class="w3-card-4 w3-margin w3-padding">
+    <nav class="w3-margin">
       <a class="button" href="/">Home</a>
       <a class="button" href="/index.php?tab=my_news">News</a>
       <a class="button" href="/index.php?tab=explore">Explore</a>
       <a class="button" href="/index.php?tab=members">Members</a>
+      <a class="button" href="/index.php?tab=interest">Interests</a>
       <a class="button" href="/index.php?tab=settings">Account-Settings</a>
 
       <!-- TODO: logout does not work -->
-      <a class="button" href="/index.php?tab=logout">Logout</a>
       <div class="w3-right">
+        <a class="delete-button" href="/index.php?tab=logout">Logout</a>
         <a class="button" style="border-color: #8bc34a; color: #8bc34a" href="/project.php"> Project-Info </a>
       </div>
     </nav>
@@ -150,7 +150,7 @@ try {
         ?>
         <div class="w3-margin">
           <a class="button" href="/index.php?tab=explore&filter=closed">Finished</a>
-          <a class="button" href="/index.php?tab=explore&filter=active">Open</a>
+          <a class="button" href="/index.php?tab=explore&filter=active">Ongoing</a>
           <a class="button" href="/index.php?tab=explore&filter=new">New</a>
 
           <?php
@@ -179,7 +179,7 @@ try {
 
 
               ?>
-              <h3>Open Dialoges</h3>
+              <h3>Ongoing Dialoges</h3>
               <?php
               $dialoges = Dialogue::get_dialogues_by_state(
                 offset: 0,
@@ -224,14 +224,15 @@ try {
         ?>
         <div class="info-card">
 
-          <p> <img src="/res/info.png" width="60"> Your Profile </p>
+          <p><img src="/res/info.png" width="60"> Your Profile </p>
           <p>Write some text about you:</p>
           <ul>
             <li>What topics dou you want to talk about?</li>
             <li>What is your intellectual mission?</li>
             <li>What is your expertise?</li>
           </ul>
-          <p> For your <b>Profile-Image</b> use Gravatar: <a style="color: dodgerblue" href="https://de.gravatar.com/">https://de.gravatar.com/</a> </p>
+          <p> For your <b>Profile-Image</b> use Gravatar: <a style="color: dodgerblue" href="https://de.gravatar.com/">https://de.gravatar.com/</a>
+          </p>
           <p> There you can provide a profile image and associate it with your email. </p>
           <p> Wordpress and GitHub use it too. </p>
         </div>
@@ -242,11 +243,11 @@ try {
             <span style="margin-bottom: 10px;display: inline-block">
               <i>Profile Description (can be read by everybody) - don't forget to click save: </i></span>
             <br>
-          <textarea rows="10" cols="100"
-                    name="content"><?= $app->get_currently_logged_in_account()->content ?></textarea>
+            <textarea rows="10" cols="100"
+                      name="content"><?= $app->get_currently_logged_in_account()->content ?></textarea>
           </label>
           <br>
-          <button class="button" type="submit"> Save ✅ </button>
+          <button class="button" type="submit"> Save ✅</button>
         </form>
         <?php
 
@@ -259,6 +260,24 @@ try {
         }
 
         break;
+
+
+
+      ####################################################################
+      #
+      #
+      #
+      #
+      #
+      ####################################################################
+      case "interest":
+        ?>
+        <h3 class="w3-card w3-padding w3-margin">Interests</h3>
+        <?php
+
+        break;
+
+
 
       ####################################################################
       #
@@ -291,17 +310,30 @@ try {
         # open/closed
         ?>
         <div>
-          <a class="button w3-margin" href="/dialogue.php"> Create Dialoge </a>
-          <hr>
-          <a class="button w3-margin w3-padding" href="/index.php?mode=my_ongoing_dialogues">
-            My currently ongoing dialogues
-          </a>
-          <a class="button w3-margin w3-padding" href="/index.php?mode=my_invitations">
-            Dialogues I am invited to
-          </a>
-          <a class="button w3-margin w3-padding" href="/index.php?mode=accepted_but_not_started">
-            Dialogues ready to start
-          </a>
+          <!--<a class="button w3-margin" href="/dialogue.php"> Create Dialoge </a>
+          <hr>-->
+          <div class="w3-margin">
+            <a
+              style="font-size: 80%"
+              class="button"
+              href="/index.php?mode=my_ongoing_dialogues">
+              My currently ongoing dialogues
+            </a>
+            <a
+              class="button"
+              href="/index.php?mode=my_invitations"
+              style="font-size: 80%"
+            >
+              Dialogues I am invited to
+            </a>
+            <a
+              class="button"
+              href="/index.php?mode=accepted_but_not_started"
+              style="font-size: 80%"
+            >
+              Dialogues ready to start
+            </a>
+          </div>
           <?php
           if (isset($_GET["mode"]) && $_GET["mode"] == "my_invitations") {
             $dialoges = Dialogue::get_dialogues_i_am_invited_to(0, 50, $app);
@@ -336,7 +368,7 @@ try {
         <div class="w3-card-4 w3-margin w3-padding">
           <h3>Dialoge</h3>
 
-          <?=$_SERVER["DOCUMENT_ROOT"]?>
+          <?= $_SERVER["DOCUMENT_ROOT"] ?>
         </div>
       </div>
       <div class="w3-rest">

@@ -11,6 +11,8 @@ App::init_context(basename(__FILE__));
 
 $app = App::get();
 
+[$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+
 $majo2 = \cls\data\account\Account::get_by_id(
   $app->get_database(), 3
 );
@@ -57,3 +59,5 @@ $membership->dialogue_id = $dialogue->id;
 $membership->type = DialogueMembership::TYPE_JOIN_REQUEST;
 $membership->state = DialogueMembership::STATE_PENDING;
 $membership->save($app->get_database());
+
+App::dump_logs();

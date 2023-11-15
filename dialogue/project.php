@@ -11,9 +11,11 @@ try {
 
   HtmlUtils::head();
   ?>
+  <br>
   <a class="button w3-margin w3-padding" href="/index.php"> ZURÜCK </a>
-  <h2>Project information </h2>
-  <pre>
+  <div class="w3-margin">
+    <h2>Project information </h2>
+    <pre>
 
     - how to participate in the project (open source coding)
     - how to participate in the project (conceptually / feedback)
@@ -30,6 +32,7 @@ try {
 
 
   </pre>
+  </div>
   <?php
   HtmlUtils::footer($app);
 }

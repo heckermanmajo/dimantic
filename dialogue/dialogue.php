@@ -11,7 +11,7 @@ include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 try {
   App::init_context(basename(__FILE__));
   $app = App::get();
-  [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+  [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
   if (!$app->somebody_logged_in()) {
     header("Location: /index.php");
@@ -127,13 +127,12 @@ try {
 
   ?>
   <br>
-  <a class="button w3-margin w3-padding" href="/index.php"> ZURÜCK </a>
+  <a class="button w3-margin w3-padding" href="/index.php"> Back to main menu </a>
 
   <?php
   if ($dialogue->author_id == $app->get_currently_logged_in_account()->id && $dialogue->state == Dialogue::STATE_NOT_YET_STARTED) {
     ?>
-    <a class="button w3-margin w3-padding" href="/dialogue.php?id=<?= $dialogue->id ?>&tab=edit_dialoge"> DIALOG
-      BEARBEITEN </a>
+    <a class="button w3-margin w3-padding" href="/dialogue.php?id=<?= $dialogue->id ?>&tab=edit_dialoge"> Edit Dialogue </a>
     <?php
   }
   ?>
@@ -185,6 +184,15 @@ try {
 
     case "edit_dialoge":
       ?>
+      <div class="info-card">
+
+        <p> <img src="/res/info.png" width="60"> <b>Edit Dialogue</b> </p>
+        <ul>
+          <li>What topic dou you want to talk about?</li>
+          <li>What is the broad goal?</li>
+          <li>Do you want some special rules?</li>
+        </ul>
+      </div>
       <form method="post" class="w3-card w3-margin w3-padding">
         <input type="hidden" name="action" value="edit_dialogue">
         <input type="hidden" name="dialogue_id" value="<?= $dialogue->id ?>">
@@ -197,8 +205,9 @@ try {
         <input type="number" name="message_cooldown_in_hours" value="<?= $dialogue->message_cooldown_in_hours ?>">
       </label>-->
         <label>
-          <textarea name="content"><?= $dialogue->content ?></textarea>
+          <textarea rows="10" cols="80" name="content" placeholder="Describe Dialogue"><?= $dialogue->content ?></textarea>
         </label>
+        <br><br>
         <button class="button">Edit Dialogue</button>
       </form>
 

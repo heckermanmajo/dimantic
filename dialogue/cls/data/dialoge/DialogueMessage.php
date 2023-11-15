@@ -6,7 +6,7 @@ namespace cls\data\dialoge;
 use cls\App;
 use cls\DataClass;
 
-class DialogueMessage extends DataClass {
+class  DialogueMessage extends DataClass {
   ###########################################################################
   #                                                                         #
   #  Properties & Property-functions                                        #
@@ -78,6 +78,8 @@ class DialogueMessage extends DataClass {
 
     $mem = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
 
+    $save_instance = $this->get_escaped_copy_instance();
+
     # if i am member and active
     # i want my messages on the left whatever
     if ($mem) {
@@ -85,17 +87,17 @@ class DialogueMessage extends DataClass {
         if ($this->account_id == $app->get_currently_logged_in_account()->id) {
           ?>
           <div class="w3-card-4 w3-margin w3-padding" style="margin-right: 20% !important;">
-            <pre><?= $this->content ?></pre>
-            <pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>
+            <pre><?= $save_instance->content ?></pre>
+            <!--<pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>-->
           </div>
           <?php
           goto end;
         }
         else {
           ?>
-          <div class="w3-card-4 w3-margin w3-padding" style="margin-left: 20% !important;">
-            <pre><?= $this->content ?></pre>
-            <pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>
+          <div class="w3-card-4 w3-margin w3-padding" style="margin-left: 20% !important; border-color: #69ff7a">
+            <pre><?= $save_instance->content ?></pre>
+            <!--<pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>-->
           </div>
           <?php
           goto end;
@@ -107,16 +109,16 @@ class DialogueMessage extends DataClass {
     if ($dialogue->author_id == $this->account_id) {
       ?>
       <div class="w3-card-4 w3-margin w3-padding" style="margin-right: 20% !important;">
-        <pre><?= $this->content ?></pre>
-        <pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>
+        <pre><?= $save_instance->content ?></pre>
+        <!--<pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>-->
       </div>
       <?php
     }
     else {
       ?>
-      <div class="w3-card-4 w3-margin w3-padding" style="margin-left: 20% !important;">
-        <pre><?= $this->content ?></pre>
-        <pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>
+      <div class="w3-card-4 w3-margin w3-padding" style="margin-left: 20% !important; border-color: #69ff7a">
+        <pre><?= $save_instance->content ?></pre>
+        <!--<pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>-->
       </div>
       <?php
     }

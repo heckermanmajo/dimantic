@@ -62,6 +62,9 @@ function FN_IS_DEBUG(): bool {
   return false;
 }
 
+# set init to mbstring
+#mb_internal_encoding(encoding: "UTF-8");
+
 
 error_reporting(error_level: E_ALL);
 if (FN_IS_DEBUG()) {
@@ -178,7 +181,7 @@ class App {
    */
   static function get_test_instance(): App { }
 
-  static function init_cli_test_context(): void {}
+  static function init_cli_test_context(): void { }
 
   /**
    * Init context is called at the start of each page and each request (if the request is called directly).
@@ -187,7 +190,7 @@ class App {
   static function init_context(
     string $basename_file,
   ): void {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     #$log("init_context");
     #$warn("init_context");
     #$err("init_context");
@@ -198,7 +201,7 @@ class App {
     string $db_type = "sqlite",
     ?array $session = null
   ) {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     if ($session == null) {
       $log("read session from global variable", $_SESSION);
       $this->session = &$_SESSION;
@@ -210,13 +213,13 @@ class App {
   }
 
   function set_session_field(string $name, mixed $value): void {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $log("set_session_field", [$name, $value]);
     $this->session[$name] = $value;
   }
 
   function get_session_field(string $name, mixed $default = null): mixed {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $log("get_session_field", [$name, $this->session[$name] ?? $default]);
     return $this->session[$name] ?? $default;
   }
@@ -266,7 +269,7 @@ class App {
    * Currently only sqlite is supported.
    */
   function get_database(): PDO {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     if ($this->db == null) {
       $log("connection to sqlite-database at " . $_SERVER["DOCUMENT_ROOT"] . "/../dimantic.sqlite");
       $this->db = new PDO("sqlite:" . $_SERVER["DOCUMENT_ROOT"] . "/../dimantic.sqlite");
@@ -286,7 +289,7 @@ class App {
    * @throws ReflectionException
    */
   function init_database(): void {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $log("Creates all tables and updates them if they already exist.");
     $db = $this->get_database();
 
@@ -309,15 +312,20 @@ class App {
    *
    * Use the array destructuring syntax to get the functions.
    *
-   * @example
-   * [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
-   *
    * @param string $class __CLASS__ - magic constant of the calling class
    * @param string $function __FUNCTION__ - magic constant of the calling function
    * @return array<callable>
+   * @example
+   * [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__);
+   *
    */
-  static function get_logging_functions(string $class, string $function): array {
-    App::$logs[] = "[$class:$function]";
+  static function get_logging_functions(
+    string $class,
+    string $function,
+    string $file = "",
+    int    $line = 0
+  ): array {
+    App::$logs[] = "($file:::$line)[$class:$function]";
     return [
       function (string $message, null|array|string $data = null) use ($class, $function) {
         static::$logs[] = "[$class:$function] $message";
@@ -374,17 +382,19 @@ class App {
    * @see index.php (at the end of the file) (and any other page)
    */
   static function dump_logs(?\Throwable $t = null): void {
-    if(!FN_IS_DEBUG()) return; # no logs in production mode
+    if (!FN_IS_DEBUG()) return; # no logs in production mode
     if ($t != null) {
-      echo "<pre class='w3-card'>";
+      echo "<pre class='w3-card w3-margin w3-padding'>";
       echo "<b style='color: #9c27b0'>";
       echo $t->getMessage();
       echo "</b>";
       echo "<br><br>";
+      echo $t->getFile() . ":<b>" . $t->getLine() . "</b>";
+      echo "<br><br>";
       echo $t->getTraceAsString();
       echo "</pre>";
     }
-    echo "<hr><pre style='background-color: #3a3a3a'>";
+    echo "<hr><pre style='background-color: #3a3a3a'  class='w3-card w3-margin w3-padding'>";
     foreach (static::$logs as $log) {
       # todo:  echo "\033[0;31m"; in cli mode
       if (str_contains($log, "ERROR")) {

@@ -15,7 +15,7 @@ function register(
   App   $app,
   array $post_data,
 ): Account|RequestError {
-
+  [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   if (!isset($post_data["username"])) {
     return new RequestError(
       dev_message: "\$post_data[\"username\"] not set",

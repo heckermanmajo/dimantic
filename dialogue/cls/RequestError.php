@@ -15,7 +15,9 @@ class RequestError {
     public string      $user_message = "",
     public array      $extra_data = [],
     public ?\Throwable $e = null
-  ) {}
+  ) {
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+  }
     // ...
   function return_json_protocol(): string {
     # in debug mode add logs

@@ -298,6 +298,13 @@ class Dialogue extends DataClass {
 #                                                                         #
 ###########################################################################
 
+  /**
+   * We want alternating turns of messages.
+   *
+   * @param App $app
+   * @return bool
+   * @throws \Exception
+   */
   function next_turn_is_my_turn(App $app): bool {
     $messages = $this->get_all_messages($app);
     if (count($messages) == 0) {
@@ -417,12 +424,12 @@ class Dialogue extends DataClass {
     ?>
 
     <div class="w3-card w3-margin w3-padding">
-      <p><?= $this->get_header_bar($app) ?></p>
+      <small><?= $this->get_header_bar($app) ?></small>
       <a style="text-decoration: none" href="/dialogue.php?id=<?= $this->id ?>">
         <?php if (trim($this->content) == ""): ?>
-          <h4>Untitled Dialogue</h4>
+          <h6>Untitled Dialogue</h6>
         <?php else: ?>
-          <h4><?= $this->content ?></h4>
+          <h6s><?= $this->content ?></h6s>
         <?php endif; ?>
         <!--<div>
           <small>created: <?= $this->create_date ?></small>
@@ -450,5 +457,5 @@ class Dialogue extends DataClass {
     return null;
   }
 
-  function get_dialoge_card() { }
+  #function get_dialoge_card() { }
 }
