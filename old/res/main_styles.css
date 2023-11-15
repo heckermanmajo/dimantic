@@ -1,0 +1,220 @@
+.jstree-clicked {
+    background-color: inherit !important;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffd205;
+}
+
+.jstree-hovered {
+    background-color: inherit !important;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffd205;
+}
+
+.jstree li > a > .jstree-icon {
+    display: none !important;
+}
+
+.jstree{
+    padding-right: 20px !important;
+}
+
+.jstree-anchor{
+
+    border-radius: 20px 20px 20px 20px;
+    padding-right: 15px !important;
+    padding-left: 15px !important;
+}
+
+/*
+The left button to expand an collapse.
+ */
+.jstree-ocl{
+    background-color: rgba(176, 176, 176, 0.53) !important;
+    border-radius: 20px 20px 20px 20px;
+    /*border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;*/
+}
+.vakata-context,.jstree-contextmenu{
+    border-style: none !important;
+    box-shadow: none !important;
+}
+
+.jstree-default-contextmenu{
+    border-style: none !important;
+    box-shadow: none !important;
+}
+
+.vakata-context-hover{
+    background-color: #191919 !important;
+    color: #3f51b5 !important;
+}
+
+.vakata-context-hover:hover{
+    background-color: #191919 !important;
+}
+
+.tree_menu_item{
+    background-color: #1a1a1a !important;
+    color: #ffd205 !important;
+}
+.tree_menu_item:hover{
+    color: #1c1c1c !important;
+}
+
+.label_text_context_menu_tree{
+    color: #ffd205 !important;
+    text-shadow: none !important
+}
+
+.label_text_context_menu_tree:hover{
+    color: #000000 !important;
+    text-shadow: none !important
+}
+
+
+
+
+
+
+.overlay {
+    position: fixed; /* Sit on top of the page content */
+    display: none; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer; /* Add a pointer on hover */
+    overscroll-behavior: contain;
+}
+
+.overlay-text {
+    overflow: scroll;
+    overscroll-behavior: contain;
+}
+
+
+
+
+.w3-card {
+    border-color: #ffdb00;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.w3-card-4 {
+    border-color: #ffd205;
+    border-style: solid;
+    border-width: 1px;
+}
+
+
+
+input{
+    background-color: #3a3a3a;
+    border-style: none;
+    border-bottom: solid 1px #ffd205;
+    color: whitesmoke;
+}
+
+input:focus{
+    outline: none;
+    border-bottom: solid 3px #ffd205;
+}
+
+
+textarea {
+    background-color: #3a3a3a;
+    border-style: none;
+    border-bottom: solid 1px #ffd205;
+    color: whitesmoke;
+}
+
+
+
+
+.button {
+    border-color: #ffd205;
+    border-style: solid;
+    border-width: 1px;
+    padding: 4px 8px 4px 8px;
+    color: #ffd205;
+    background-color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    border-color: #004e85;
+    border-style: solid;
+    color: #005475;
+}
+
+
+.delete-button{
+    border-color: #e67878;
+    border-style: solid;
+    color: #e67878;
+    background-color: inherit;
+}
+
+.delete-button:hover {
+    border-color: #ff0000;
+    border-style: solid;
+    color: #ff0000;
+    cursor: pointer;
+}
+
+.main-nav-button{
+    border-color: #ffd205;
+    border-style: solid;
+    border-width: 1px;
+    color: #ffd205;
+    padding: 4px 8px 4px 8px;
+    background-color: inherit;
+    text-decoration: none;
+}
+
+.main-nav-button:hover {
+    border-color: #004e85;
+    border-style: solid;
+    color: #005475;
+}
+
+.observe-button{
+    border-style: none;
+    background-color: inherit;
+    color: #ffd205;
+    cursor: pointer;
+}
+
+.unobserve-button{
+    border-style: none;
+    background-color: inherit;
+    color: #9c27b0;
+    cursor: pointer;
+}
+
+
+.infobox{
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffd205;
+    background-color: #1a1a1a;
+    color: #ffd205;
+    padding: 4px 8px 4px 8px;
+    text-decoration: none;
+}
+
+
+
+
+pre{
+    /* line break */
+    white-space: pre-wrap;
+}
