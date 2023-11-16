@@ -10,6 +10,7 @@ use cls\RequestError;
 
 include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 try {
+
   App::init_context(basename(__FILE__));
   $app = App::get();
   $app->init_database();
@@ -18,6 +19,7 @@ try {
 
 
   switch ($_POST["action"] ?? "") {
+
 
     case "register":
       $log("register new account");
@@ -63,6 +65,7 @@ try {
       }
       break;
 
+
     case "decline_invitation":
       $log("decline invitation");
       $result = (require($_SERVER["DOCUMENT_ROOT"] . "/request/dialogue/decline_invitation/decline_invitation.php"))(
@@ -76,6 +79,7 @@ try {
         # pass since all user dependent data is used beneath
       }
       break;
+
 
     case "edit_profile":
       $log("edit profile");
@@ -91,6 +95,7 @@ try {
       }
       break;
 
+
     case "accept_dialogue_invitation":
       $result = (require($_SERVER["DOCUMENT_ROOT"] . "/request/dialogue/accept_dialogue_invitation/accept_dialogue_invitation.php"))(
         $app, $_POST
@@ -103,6 +108,7 @@ try {
         # pass since all user dependent data is used beneath
       }
       break;
+
 
     default:
       if (isset($_POST["action"])) {
@@ -121,14 +127,10 @@ try {
     # main content ... -> my active dialoges
     ?>
     <nav class="w3-margin">
-      <a class="button" href="/">Home</a>
-      <a class="button" href="/index.php?tab=my_news">News</a>
-      <a class="button" href="/index.php?tab=explore">Explore</a>
-      <a class="button" href="/index.php?tab=members">Members</a>
-      <a class="button" href="/index.php?tab=interest">Interests</a>
-      <a class="button" href="/index.php?tab=vaults">Vaults</a>
-      <a class="button" href="/index.php?tab=concepts">Concepts</a>
-      <a class="button" href="/index.php?tab=settings">Account-Settings</a>
+      <a class="button" href="/home.php">Home</a>
+      <a class="button" href="/my_news.php">News</a>
+      <a class="button" href="/members.php">Members</a>
+      <a class="button" href="/account_settings.php">Account-Settings</a>
 
       <!-- TODO: logout does not work -->
       <div class="w3-right">
@@ -139,22 +141,13 @@ try {
     <?php
 
     match ($_GET["tab"] ?? "") {
-      "explore" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/explore.php")(
-        app: $app
-      ),
       "settings" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/settings.php")(
         app: $app
       ),
       "members" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/members.php")(
         app: $app
       ),
-      "interest" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/interest.php")(
-        app: $app
-      ),
       "my_news" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/my_news.php")(
-        app: $app
-      ),
-      "vaults" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/vaults.php")(
         app: $app
       ),
       "concepts" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/concepts.php")(
