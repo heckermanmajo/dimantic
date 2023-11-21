@@ -44,6 +44,7 @@ try {
   }
 
   HtmlUtils::head();
+  HtmlUtils::main_header();
 
 
   $my_news = NewsEntry::get_my_news($app);

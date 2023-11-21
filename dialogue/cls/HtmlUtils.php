@@ -38,10 +38,9 @@ class HtmlUtils {
               color: whitesmoke;
               overflow: hidden;
 
-            <?php if(!FN_IS_MOBILE()): ?>
-              margin-left: 20%;
+          <?php if(!FN_IS_MOBILE()): ?> margin-left: 20%;
               margin-right: 20%;
-            <?php endif; ?>
+          <?php endif; ?>
           }
 
 
@@ -68,6 +67,26 @@ class HtmlUtils {
     ?>
     </body>
     </html>
+    <?php
+  }
+
+  static function main_header() {
+    ?>
+    <nav class="w3-margin">
+      <a class="button" href="/home.php">Home</a>
+      <a class="button" href="/my_news.php">News</a>
+      <a class="button" href="/members.php">Members</a>
+      <a class="button" href="/account_settings.php">Account-Settings</a>
+
+      <!-- TODO: logout does not work -->
+      <div class="w3-right">
+        <form style="display: inline">
+          <input type="hidden" name="action" value="logout">
+          <button class="button" style="border-color: mediumvioletred; color: mediumvioletred">Logout</button>
+        </form>
+        <a class="button" style="border-color: #8bc34a; color: #8bc34a" href="/project.php"> Project-Info </a>
+      </div>
+    </nav>
     <?php
   }
 }

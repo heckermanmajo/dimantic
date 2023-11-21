@@ -10,6 +10,7 @@ try {
   $app->init_database();
 
   HtmlUtils::head();
+  HtmlUtils::main_header();
   ?>
   <br>
   <a class="button w3-margin w3-padding" href="/index.php"> ZURÜCK </a>

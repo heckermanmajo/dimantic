@@ -238,13 +238,26 @@ class Dialogue extends DataClass {
     return Dialogue::get_array(
       $app->get_database(),
       "SELECT * FROM Dialogue WHERE id IN 
-        (SELECT dialogue_id FROM DialogueMembership 
-            WHERE account_id = :account_id AND DialogueMembership.state = :membership_state)
-        AND Dialogue.state = :dialogue_state",
+            (SELECT dialogue_id FROM DialogueMembership 
+              WHERE 
+                  account_id = :account_id 
+              )
+              AND 
+              (
+                SELECT COUNT(*) FROM DialogueMembership as d2
+                    WHERE 
+                        (
+                            d2.state = :membership_state_pending
+                            OR
+                            d2.state = :membership_state_declined
+                        ) 
+              ) = 0
+        AND Dialogue.state = :dialogue_state_pending",
       [
         "account_id" => $app->get_currently_logged_in_account()->id,
-        "membership_state" => DialogueMembership::STATE_ACTIVE,
-        "dialogue_state" => Dialogue::STATE_NOT_YET_STARTED
+        "dialogue_state_pending" => Dialogue::STATE_NOT_YET_STARTED,
+        "membership_state_pending" => DialogueMembership::STATE_PENDING,
+        "membership_state_declined" => DialogueMembership::STATE_DECLINED,
       ]
     );
   }
@@ -289,12 +302,51 @@ class Dialogue extends DataClass {
   static function get_dialogues_i_am_invited_to(int $offset, int $limit, App $app): array {
     return Dialogue::get_array(
       $app->get_database(),
-      "SELECT * FROM Dialogue WHERE id IN 
-        (SELECT dialogue_id FROM DialogueMembership WHERE account_id = :account_id AND state = :state)",
+      "
+        SELECT * FROM Dialogue 
+          WHERE id IN 
+            /* I am pending member of this dialogue. */
+            (
+                SELECT dialogue_id FROM DialogueMembership 
+                  WHERE account_id= :account_id 
+                    AND state = :state
+            )
+            AND
+              /* Dialogue is not dead. */
+              dead = 0
+            ",
       [
         "account_id" => $app->get_currently_logged_in_account()->id,
         "state" => DialogueMembership::STATE_PENDING
       ]
+    );
+  }
+
+  static function get_dialogues_not_ready_to_start(int $offset, int $limit, App $app): array {
+    # missing members
+    return Dialogue::get_array(
+        $app->get_database(),
+        "
+            SELECT * FROM Dialogue WHERE 
+                /* I am pending OR active member of this dialogue. */
+                (
+                    SELECT dialogue_id FROM DialogueMembership 
+                      WHERE account_id= :account_id 
+                        AND state = :state_pending
+                      OR state = :state_active
+                )
+                    AND 
+                /* Some member is pending. */                       
+                (   
+                    SELECT COUNT(*) FROM DialogueMembership 
+                      WHERE 
+                        DialogueMembership.dialogue_id = Dialogue.id 
+                        AND state = :state_pending) != 0",
+        [
+          "account_id" => $app->get_currently_logged_in_account()->id,
+          "state_pending" => DialogueMembership::STATE_PENDING,
+          "state_active" => DialogueMembership::STATE_ACTIVE
+        ]
     );
   }
 

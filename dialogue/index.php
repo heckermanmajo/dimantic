@@ -124,39 +124,9 @@ try {
 
   <?php
   if ($app->somebody_logged_in()) {
-    # main content ... -> my active dialoges
-    ?>
-    <nav class="w3-margin">
-      <a class="button" href="/home.php">Home</a>
-      <a class="button" href="/my_news.php">News</a>
-      <a class="button" href="/members.php">Members</a>
-      <a class="button" href="/account_settings.php">Account-Settings</a>
-
-      <!-- TODO: logout does not work -->
-      <div class="w3-right">
-        <a class="delete-button" href="/index.php?tab=logout">Logout</a>
-        <a class="button" style="border-color: #8bc34a; color: #8bc34a" href="/project.php"> Project-Info </a>
-      </div>
-    </nav>
-    <?php
-
-    match ($_GET["tab"] ?? "") {
-      "settings" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/settings.php")(
-        app: $app
-      ),
-      "members" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/members.php")(
-        app: $app
-      ),
-      "my_news" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/my_news.php")(
-        app: $app
-      ),
-      "concepts" => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/concepts.php")(
-        app: $app
-      ),
-      default => (require $_SERVER["DOCUMENT_ROOT"] . "/pages/index/home.php")(
-        app: $app
-      )
-    }; # end match
+    ob_get_clean();
+    header("Location: /home.php");
+    exit;
   }
   else {
     ?>

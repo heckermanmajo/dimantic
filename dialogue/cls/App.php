@@ -44,6 +44,8 @@ function FN_IS_MOBILE(): bool {
  *
  */
 function FN_IS_DEBUG(): bool {
+  # todo: remove the line below after debugging is done
+  return true; # for debuggng
   # cli mode is always debug mode
   if (FN_IS_CLI()) {
     return true;
@@ -394,7 +396,7 @@ class App {
       echo $t->getTraceAsString();
       echo "</pre>";
     }
-    echo "<hr><pre style='background-color: #3a3a3a'  class='w3-card w3-margin w3-padding'>";
+    echo "<hr><pre style='background-color: #3a3a3a; font-size: 85%'  class='w3-card w3-margin w3-padding'>";
     foreach (static::$logs as $log) {
       # todo:  echo "\033[0;31m"; in cli mode
       if (str_contains($log, "ERROR")) {

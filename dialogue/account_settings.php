@@ -44,6 +44,7 @@ try {
   }
 
   HtmlUtils::head();
+  HtmlUtils::main_header();
 
   ?>
   <button

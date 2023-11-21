@@ -44,6 +44,7 @@ try {
   }
 
   HtmlUtils::head();
+  HtmlUtils::main_header();
 
   $all_members = Account::get_all_accounts(0, 50, $app);
   foreach ($all_members as $member) {
