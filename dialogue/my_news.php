@@ -14,7 +14,6 @@ try {
 
   App::init_context(basename_file: basename(path:__FILE__));
   $app = App::get();
-  $app->init_database();
   [$log, $warn, $err, $todo]
     = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 

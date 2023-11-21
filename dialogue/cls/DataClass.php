@@ -69,7 +69,7 @@ abstract class DataClass implements JsonSerializable {
    */
   static function create_table(PDO $pdo): void {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
-    $log("Create Table: " . static::class);
+    #$log("Create Table: " . static::class);
     #var_dump($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
     $is_mysql = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === "mysql";
     $is_sqlite3 = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === "sqlite";
@@ -129,7 +129,7 @@ abstract class DataClass implements JsonSerializable {
           throw $e;
         }
         else {
-          $log("Field in $table_name already exists - ignore alter table", $statement);
+          #$log("Field in $table_name already exists - ignore alter table", $statement);
         }
       }
     }

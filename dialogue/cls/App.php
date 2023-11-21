@@ -212,6 +212,9 @@ class App {
       $log("read session from parameter", $session);
       $this->session = &$session;
     }
+
+    # todo: make this configurable -> not in debug mode
+    $this->init_database();
   }
 
   function set_session_field(string $name, mixed $value): void {
@@ -264,6 +267,12 @@ class App {
   function login(Account $account): void {
     # todo: error when somebody is already logged in (somebody else)
     $this->session["account"] = $account;
+  }
+
+  function logout(): void {
+    unset($this->session["account"]);
+    // destroy the session
+    session_destroy();
   }
 
   /**

@@ -80,7 +80,7 @@ class HtmlUtils {
 
       <!-- TODO: logout does not work -->
       <div class="w3-right">
-        <form style="display: inline">
+        <form style="display: inline" method="post">
           <input type="hidden" name="action" value="logout">
           <button class="button" style="border-color: mediumvioletred; color: mediumvioletred">Logout</button>
         </form>

@@ -7,7 +7,6 @@ include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 try {
   App::init_context(basename(__FILE__));
   $app = App::get();
-  $app->init_database();
 
   HtmlUtils::head();
   HtmlUtils::main_header();

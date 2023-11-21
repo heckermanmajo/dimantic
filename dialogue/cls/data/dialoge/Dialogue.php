@@ -515,5 +515,4 @@ class Dialogue extends DataClass {
     return null;
   }
 
-  #function get_dialoge_card() { }
 }
