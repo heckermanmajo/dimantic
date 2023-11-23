@@ -8,6 +8,7 @@ use cls\data\account\NewsEntry;
 use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMembership;
 use cls\data\dialoge\DialogueMessage;
+use cls\data\dialoge\DialogueMessageComment;
 use PDO;
 use ReflectionException;
 
@@ -34,6 +35,12 @@ function FN_IS_MOBILE(): bool {
   return false;
 }
 
+const DEVELOPERS_HOME_PATHS = [
+  "/home/majo/",
+  # ...
+  # add your home path here ...
+];
+
 /**
  * Debug mode allows to see error messages and also
  * get the application logs.
@@ -50,13 +57,23 @@ function FN_IS_DEBUG(): bool {
   if (FN_IS_CLI()) {
     return true;
   }
+
   $root_path = $_SERVER["DOCUMENT_ROOT"];
-  $developers = [
-    "/home/majo/",
-    # ...
-    # add your home path here ...
-  ];
-  foreach ($developers as $developer) {
+  foreach (DEVELOPERS_HOME_PATHS as $developer) {
+    if (str_contains(haystack: $root_path, needle: $developer)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * This function  returns true, if this is run on localhost.
+ * @return bool
+ */
+function FN_IS_LOCAL_HOST(): bool {
+  $root_path = $_SERVER["DOCUMENT_ROOT"];
+  foreach (DEVELOPERS_HOME_PATHS as $developer) {
     if (str_contains(haystack: $root_path, needle: $developer)) {
       return true;
     }
@@ -308,6 +325,7 @@ class App {
     Dialogue::create_table($db);
     DialogueMembership::create_table($db);
     DialogueMessage::create_table($db);
+    DialogueMessageComment::create_table($db);
     NewsEntry::create_table($db);
     # add new tables (Dataclasses) here ...
     # ...

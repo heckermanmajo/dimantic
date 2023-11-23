@@ -147,10 +147,10 @@ class Account extends DataClass {
   }
 
   /** @return string The HTML for the profile image based on the email address (Gravatar) */
-  function get_gravtar_profile_image(): string {
+  function get_gravtar_profile_image(int $size = 40): string {
     return static::get_gravatar(
       email: $this->email,
-      size: 80,
+      size: $size,
       default: 'wavatar',
       img: true,
       attributes: [

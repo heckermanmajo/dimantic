@@ -207,6 +207,10 @@ class Dialogue extends DataClass {
 
   function has_not_yet_started(): bool { }
 
+  function current_user_is_member(App $app): bool {
+    return $this->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id) != null;
+  }
+
 ###########################################################################
 #                                                                         #
 #  Model-Queries                                                          #
@@ -514,5 +518,7 @@ class Dialogue extends DataClass {
   static function check_value(string $field_name, mixed $value, App $app): string|null {
     return null;
   }
+
+
 
 }

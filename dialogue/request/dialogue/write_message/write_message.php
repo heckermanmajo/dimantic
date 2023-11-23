@@ -28,6 +28,12 @@ function write_message(
 
   # todo: check to not insert the same message as before
 
+  // check that same message was not sent before
+  $last_message = $dialogue->get_last_message($app);
+  if ($last_message->content == $content) {
+    return new RequestError("Same message was sent before", RequestError::USER_INPUT_ERROR);
+  }
+
   $message = new DialogueMessage();
   $message->account_id = $app->get_currently_logged_in_account()->id;
   $message->dialogue_id = (int)$dialogue_id;

@@ -45,6 +45,7 @@ try {
   $invite_error = null;
 
 
+  include $_SERVER["DOCUMENT_ROOT"] . "/handler.php";
 
   $dialogue = Dialogue::get_by_id($app->get_database(), (int)$_GET["id"]);
 

@@ -137,6 +137,21 @@ switch ($_POST["action"] ?? "") {
     }
     break;
 
+  case "create_comment_from_selection":
+    $result = (require(
+      $_SERVER["DOCUMENT_ROOT"] .
+      "/request/dialogue/create_comment_from_selection/create_comment_from_selection.php"
+    ))(
+      $app, $_POST
+    );
+    if ($result instanceof RequestError) {
+      $create_comment_from_selection_error = $result;
+    }
+    else {
+      # pass since all user dependent data is used beneath
+    }
+    break;
+
 
   default:
     if (isset($_POST["action"])) {
