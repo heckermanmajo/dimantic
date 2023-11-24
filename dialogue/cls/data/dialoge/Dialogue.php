@@ -211,6 +211,22 @@ class Dialogue extends DataClass {
     return $this->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id) != null;
   }
 
+  /**
+   * @param App $app
+   * @return array<DialogueRule>
+   */
+  function get_rules_of_dialogue(App $app): array {
+    $rules = DialogueRule::get_array(
+      pdo: $app->get_database(),
+      sql: "SELECT * FROM `DialogueRule` WHERE `dialogue_id` = ?",
+      params: [$this->id]
+    );
+    foreach ($rules as $count => $rule) {
+      $rule->__rule_order = $count;
+    }
+    return $rules;
+  }
+
 ###########################################################################
 #                                                                         #
 #  Model-Queries                                                          #
