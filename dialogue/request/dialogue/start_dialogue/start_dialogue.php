@@ -24,6 +24,14 @@ function start_dialoge(
     );
   }
 
+  if(!$app->somebody_logged_in()){
+    return new RequestError(
+      dev_message: "You are not logged in.",
+      code: RequestError::RULE_ERROR,
+    );
+  }
+
+
   $dialogue = Dialogue::get_by_id(
     $app->get_database(),
     (int) $_POST["dialogue_id"]

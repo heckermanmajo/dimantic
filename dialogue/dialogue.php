@@ -45,7 +45,7 @@ try {
   $invite_error = null;
 
 
-  include $_SERVER["DOCUMENT_ROOT"] . "/handler.php";
+  $app->handle_action_requests();
 
   $dialogue = Dialogue::get_by_id($app->get_database(), (int)$_GET["id"]);
 
@@ -153,17 +153,56 @@ try {
       elseif ($dialogue->state == Dialogue::STATE_OPEN) {
         echo $dialogue->get_overview_card($app);
         $messages = DialogueMessage::get_all_messages_of_dialogue($app, $dialogue->id);
+        $my_membership = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
         ?>
         <div>
+          <button onclick="FN_TOGGLE('my_notes')">Show/hide My Notes </button>
+          <div id="my_notes">
+            <form method="post" class="w3-card-4 w3-margin">
+              <input type="hidden" value="update_private_notes" name="action">
+              <input type="hidden" value="<?= $dialogue->id ?>" name="dialogue_id">
+              <textarea
+                placeholder="PRIVATE NOTES"
+                name="notes_field"
+                onfocusout="this.form.submit()"
+              ><?=$my_membership->notes_field?></textarea>
+              <button type="submit"> Save </button>
+            </form>
+          </div>
+          <p>Your Notes</p>
           <?php if ($dialogue->next_turn_is_my_turn($app)): ?>
-            <?= ($create_message_error ?? null)?->get_error_card() ?>
+            <?= $app->executed_action == "write_message"?: $app->action_error?->get_error_card()?>
+
             <p>It is your turn to write a message.</p>
             <form method="post" class="w3-margin w3-padding w3-card-4">
               <input type="hidden" name="action" value="write_message">
               <input type="hidden" name="dialogue_id" value="<?= $dialogue->id ?>">
               <label>
-                <textarea name="content" rows="6" cols="50"></textarea>
+                <textarea id="text_content" name="content" rows="6" cols="50"></textarea>
               </label>
+              <div>
+                <button type="button" onclick="FN_TOGGLE('emoji_picker')" class="button">EMOJI</button>
+              </div>
+              <div id="emoji_picker" style="display: none">
+                <?php
+                $emojis = \cls\HtmlUtils::get_emojis();
+                foreach ($emojis as $emoji) {
+                  ?>
+                  <button type="button"
+                          style="cursor: pointer; border-style: none; margin: 0; padding: 0"
+                          onclick="
+                    document.getElementById('text_content').value += '<?=$emoji?>';"
+                    oncontextmenu="navigator.clipboard.writeText('<?=$emoji?>'); return false;"
+                  ><?= $emoji ?></button>
+                  <?php
+                }
+                #🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🥸 🤩 🥳
+                #😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😮‍💨 😤 😠 😡 🤬 🤯 😳 🥵 🥶 😱 😨 😰 😥 😓 🫣 🤗 🫡 🤔 🫢
+                #🤭 🤫 🤥 😶 😶‍🌫️ 😐 😑 😬 🫨 🫠 🙄 😯 😦 😧 😮 😲 🥱 😴 🤤 😪 😵 😵‍💫 🫥 🤐 🥴 🤢 🤮 🤧 😷 🤒 🤕 🤑 🤠
+                #😈 👿 👹 👺 🤡 💩 👻 💀 ☠️ 👽 👾 🤖 🎃 😺 😸 😹 😻 😼 😽 🙀 😿 😾
+
+                ?>
+              </div>
               <button class="button">SEND</button>
             </form>
           <?php else: ?>

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\dialoge\Dialogue;
-use cls\data\dialoge\DialogueRule;
 use cls\Protocol;
 use cls\RequestError;
 
@@ -14,10 +13,10 @@ if (count(debug_backtrace()) == 0) {
 }
 
 
-function delete_rule(
+function update_private_rules(
   App   $app,
   array $post_data,
-): null|RequestError {
+): \cls\data\dialoge\DialogueMembership|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   try {
 
@@ -28,15 +27,6 @@ function delete_rule(
       );
     }
 
-    if (!isset($post_data["dialogue_rule_id"])) {
-      return new RequestError(
-        dev_message: "\$post_data[\"dialogue_rule_id\"] not set",
-        code: RequestError::BAD_REQUEST,
-      );
-    }
-
-    $dialogue_rule_id = (int)$post_data["dialogue_rule_id"];
-
     if (!isset($post_data["dialogue_id"])) {
       return new RequestError(
         dev_message: "\$post_data[\"dialogue_id\"] not set",
@@ -46,28 +36,34 @@ function delete_rule(
 
     $dialogue_id = (int)$post_data["dialogue_id"];
 
-    $dialogue = Dialogue::get_by_id($app->get_database(), $dialogue_id);
-
-    // check that user is author of rule
-    if ($dialogue->author_id != $app->get_currently_logged_in_account()->id) {
+    if (!isset($post_data["notes_field"])) {
       return new RequestError(
-        dev_message: "You are not the author of this rule.",
-        code: RequestError::RULE_ERROR,
-      );
-    }
-
-    $rule = DialogueRule::get_by_id($app->get_database(), $dialogue_rule_id);
-
-    if ($rule == null) {
-      return new RequestError(
-        dev_message: "Rule with id $dialogue_rule_id not found.",
+        dev_message: "\$post_data[\"notes_field\"] not set",
         code: RequestError::BAD_REQUEST,
       );
     }
 
-    $rule->delete($app->get_database());
+    $dialogue = Dialogue::get_by_id($app->get_database(), $dialogue_id);
+    if(!$dialogue->current_user_is_member($app)){
+      return new RequestError(
+        dev_message: "You are not a member of this dialogue.",
+        code: RequestError::RULE_ERROR,
+      );
+    }
 
-    return null;
+    $my_membership = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
+    if ($my_membership == null) {
+      # todo_: extra-bad error  -> why is this happening?
+      return new RequestError(
+        dev_message: "You are not a member of this dialogue.",
+        code: RequestError::RULE_ERROR,
+      );
+    }
+
+    $my_membership->notes_field = $post_data["notes_field"];
+    $my_membership->save($app->get_database());
+
+    return $my_membership;
   }
   catch (Throwable $e) {
     return new RequestError(
@@ -79,6 +75,6 @@ function delete_rule(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: delete_rule(...),
+  function: update_private_rules(...),
   app: App::get(),
 );

@@ -25,7 +25,7 @@ class DialogueMessageComment extends DataClass {
     ?>
     <div class="w3-card" style="font-size: 90%">
       <span style="margin-left: 2%"> >>"<b><?=$this->selection?></b>"</span>
-      <pre style="padding-left: 5px; margin: 0"><?=$author->get_gravtar_profile_image(20)?><?=$author->name?>: <i><?=$this->comment_text?></i></pre>
+      <div style="padding-left: 5px; margin: 0"><?=$author->get_gravtar_profile_image(20)?><?=$author->name?>: <?=$app->markdown_to_html($this->comment_text)?></div>
     </div>
     <?php
     return ob_get_clean();

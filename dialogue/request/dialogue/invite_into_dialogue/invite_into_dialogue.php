@@ -22,6 +22,13 @@ function invite_into_dialoge(
 ): DialogueMembership|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
+  if(!$app->somebody_logged_in()){
+    return new RequestError(
+      dev_message: "You are not logged in.",
+      code: RequestError::RULE_ERROR,
+    );
+  }
+
   if (!isset($post_data["dialogue_id"])) {
     return new RequestError(
       dev_message: "\$post_data[\"dialogue_id\"] not set",

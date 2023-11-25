@@ -28,6 +28,11 @@ class DialogueMembership extends DataClass {
   var string $state = '';
   var string $type = '';
   var string $create_date = '';
+  /**
+   * @var string All members of a dialogue have a notes field
+   * where they can takle private notes ...
+   */
+  var string $notes_field = '';
 
   #################################
   ###### Joined Values      #######

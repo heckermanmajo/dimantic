@@ -20,6 +20,14 @@ function write_message(
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   # todo: check input and rights ...
 
+  if(!$app->somebody_logged_in()){
+    return new RequestError(
+      dev_message: "You are not logged in.",
+      code: RequestError::RULE_ERROR,
+    );
+  }
+
+
   $dialogue_id = $post_data["dialogue_id"] ?? throw new Exception("dialogue_id");
   $content = $post_data["content"] ?? throw new Exception("content");
 
@@ -30,7 +38,7 @@ function write_message(
 
   // check that same message was not sent before
   $last_message = $dialogue->get_last_message($app);
-  if ($last_message->content == $content) {
+  if ($last_message && $last_message->content == $content) {
     return new RequestError("Same message was sent before", RequestError::USER_INPUT_ERROR);
   }
 

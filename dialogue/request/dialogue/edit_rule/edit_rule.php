@@ -15,12 +15,19 @@ if (count(debug_backtrace()) == 0) {
 }
 
 
-function delete_rule(
+function edit_rule(
   App   $app,
   array $post_data,
 ): DialogueRule|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   try {
+
+    if(!$app->somebody_logged_in()){
+      return new RequestError(
+        dev_message: "You are not logged in.",
+        code: RequestError::RULE_ERROR,
+      );
+    }
 
     if (!isset($post_data["dialogue_rule_id"])) {
       return new RequestError(
@@ -51,20 +58,19 @@ function delete_rule(
 
     $rule_text = (string)$post_data["rule_text"];
 
-    // check that user is author of rule
-    if ($dialogue->author_id != $app->get_currently_logged_in_account()->id) {
-      return new RequestError(
-        dev_message: "You are not the author of this rule.",
-        code: RequestError::RULE_ERROR,
-      );
-    }
-
     $rule = DialogueRule::get_by_id($app->get_database(), $dialogue_rule_id);
 
     if ($rule == null) {
       return new RequestError(
         dev_message: "Rule with id $dialogue_rule_id not found.",
         code: RequestError::BAD_REQUEST,
+      );
+    }
+
+    if($rule->account_id != $app->get_currently_logged_in_account()->id) {
+      return new RequestError(
+        dev_message: "You are not the author of this rule.",
+        code: RequestError::RULE_ERROR,
       );
     }
 
@@ -95,6 +101,6 @@ function delete_rule(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: delete_rule(...),
+  function: edit_rule(...),
   app: App::get(),
 );

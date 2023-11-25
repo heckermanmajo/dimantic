@@ -16,7 +16,7 @@ try {
   [$log, $warn, $err, $todo]
     = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
-  include $_SERVER["DOCUMENT_ROOT"] . "/handler.php";
+  $app->handle_action_requests();
 
   HtmlUtils::head();
 
@@ -48,7 +48,7 @@ try {
           method="post">
           <input type="hidden" name="action" value="login">
           <h4>Login</h4>
-          <?= ($login_error ?? null)?->get_error_card() ?>
+          <?= ($app->executed_action == "login") ?: $app->action_error?->get_error_card() ?>
           <label>
             <span><small>Username/Email</small></span>
             <br>
@@ -64,7 +64,7 @@ try {
 
         <form class="w3-margin w3-padding w3-card-4" method="post">
           <h4>Register</h4>
-          <?= ($register_error ?? null)?->get_error_card() ?>
+          <?= ($app->executed_action == "register") ?: $app->action_error?->get_error_card() ?>
           <input type="hidden" name="action" value="register">
           <label>
             <span><small>Username</small></span>

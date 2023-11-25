@@ -16,7 +16,16 @@ function logout(
   App   $app,
   array $post_data,
 ): null|RequestError {
+
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+
+  if(!$app->somebody_logged_in()){
+    return new RequestError(
+      dev_message: "You are not logged in.",
+      code: RequestError::RULE_ERROR,
+    );
+  }
+
   $app->logout();
   return null;
 }

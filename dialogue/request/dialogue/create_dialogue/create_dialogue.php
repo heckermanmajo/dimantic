@@ -26,6 +26,13 @@ function create_dialogue(
   #  );
   #}
 
+  if(!$app->somebody_logged_in()){
+    return new RequestError(
+      dev_message: "You are not logged in.",
+      code: RequestError::RULE_ERROR,
+    );
+  }
+
   // create new dialogue
   $dialogue = new Dialogue();
   $dialogue->content = "";

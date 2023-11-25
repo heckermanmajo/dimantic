@@ -183,6 +183,17 @@ class App {
    */
   private array $session = [];
 
+  /**
+   * @var string|null The action that was executed.
+   * @see App::handle_action_requests
+   */
+  public ?string $executed_action = null;
+  /**
+   * @var RequestError|null The error that occurred during the action.
+   * @see App::handle_action_requests
+   */
+  public ?RequestError $action_error = null;
+
   static function get_logs(): array {
     return static::$logs;
   }
@@ -444,6 +455,135 @@ class App {
     echo "</pre>";
     ?>
     <?php
+  }
+
+
+  function handle_action_requests(): void {
+
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+
+    if(!isset($_POST["action"])){
+      $log("no action to execute");
+      return;
+    }
+
+    $all_requests = $_SERVER["DOCUMENT_ROOT"] . "/request/*/*/*.php";
+    $all_requests = glob(pattern: $all_requests);
+    $requests_mapped_on_name = [];
+    foreach ($all_requests as $request) {
+      $name = explode(separator: "/", string: $request);
+      // request name is same name as file name
+      $name = explode(separator: ".", string: $name[count($name) - 1]);
+      $name = $name[0];
+      $requests_mapped_on_name[$name] = $request;
+    }
+
+    foreach ($requests_mapped_on_name as $request_name => $request_file_path) {
+      $log("checking action: $request_name");
+      if ($_POST["action"] === $request_name) {
+        $log("<span style='color: purple'>IMPORTANT: executing action: $request_name</span>");
+        $this->executed_action = $request_name;
+        $request_function = require($requests_mapped_on_name[$request_name]);
+        $result = $request_function($this, $_POST);
+        if ($result instanceof RequestError) {
+          $this->action_error = $result;
+          $warn("action error: " . $result->dev_message);
+        }
+        else {
+          $log("<span style='color:green'>action success</span>");
+          $this->action_error = null;
+        }
+      }
+    }
+
+    if (isset($_POST["action"]) && $this->executed_action === null) {
+      $warn("unknown action: " . $_POST["action"]);
+    }
+
+    if ($this->executed_action === "login" || $this->executed_action === "register") {
+      if ($this->action_error === null) {
+        ob_get_clean();
+        header("Location: /index.php");
+        exit;
+      }
+    }
+  }
+
+  function markdown_to_html(string $markdown): string {
+
+    $markdown = htmlspecialchars($markdown);
+
+    // Convert italic and bold text
+    $markdown = preg_replace("/\*\*(.+)\*\*/", '<b>$1</b>', $markdown);
+    $markdown = preg_replace("/\*(.+)\*/", '<i>$1</i>', $markdown);
+
+    // same for _ and __
+    $markdown = preg_replace("/__(.+)__/", '<b>$1</b>', $markdown);
+    $markdown = preg_replace("/_(.+)_/", '<i>$1</i>', $markdown);
+
+    // Convert headings
+    $markdown = preg_replace("/^# (.+)$/m", '<h1>$1</h1>', $markdown);
+    $markdown = preg_replace("/^## (.+)$/m", '<h2>$1</h2>', $markdown);
+    $markdown = preg_replace("/^### (.+)$/m", '<h3>$1</h3>', $markdown);
+
+    // Convert quotes
+    //$markdown = preg_replace("/>(.+)/m", '<blockquote>$1</blockquote>', $markdown);
+
+    // Convert links
+    $markdown = preg_replace_callback("/\[([^\]]+)\]\((https:\/\/[^\)]+)\)/", function ($matches) {
+      $url = htmlspecialchars($matches[2]);
+      $text = htmlspecialchars($matches[1]);
+      return '<a href="' . $url . '" target="_blank" rel="noopener noreferrer">' . $text . '</a>';
+    }, $markdown);
+
+    // Convert images
+    $markdown = preg_replace_callback("/!\[([^\]]+)\]\((https:\/\/[^\)]+)\)/", function ($matches) {
+      $alt = htmlspecialchars($matches[1]);
+      $src = htmlspecialchars($matches[2]);
+      return '<img alt="' . $alt . '" src="' . $src . '">';
+    }, $markdown);
+
+    // change quotes
+    $correct_quotes = "";
+    foreach (explode("\n", $markdown) as $line) {
+      if (str_starts_with(haystack: trim($line), needle: "&gt;")) {
+        $correct_quotes .= "<p class='quote'>" . $line . "</p>\n";
+      }
+      else {
+        $correct_quotes .= $line . "\n";
+      }
+    }
+    $markdown = $correct_quotes;
+
+
+    // replace newlines with <br>
+    $markdown = preg_replace("/\n/", "<br>", $markdown);
+
+
+    $correct_quotes = "";
+    foreach (explode("<br>", $markdown) as $line) {
+      if (
+        str_ends_with(haystack: trim($line), needle: "</h1>")
+        || str_ends_with(haystack: trim($line), needle: "</h2>")
+        || str_ends_with(haystack: trim($line), needle: "</h3>")
+        || str_ends_with(haystack: trim($line), needle: "</p>")
+      ) {
+        $correct_quotes .= $line;
+      }
+      else {
+        $correct_quotes .= $line . "<br>";
+      }
+    }
+    $markdown = $correct_quotes;
+
+    // replace umlauts
+    $markdown = str_replace(
+      search: ["ä", "ö", "ü", "Ä", "Ö", "Ü", "ß"],
+      replace: ["&auml;", "&ouml;", "&uuml;", "&Auml;", "&Ouml;", "&Uuml;", "&szlig;"],
+      subject: $markdown
+    );
+
+    return $markdown;
   }
 
 }

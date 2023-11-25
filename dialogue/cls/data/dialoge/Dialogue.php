@@ -195,7 +195,7 @@ class Dialogue extends DataClass {
 
   function is_closed(): bool { }
 
-  function get_last_message(App $app): DialogueMessage {
+  function get_last_message(App $app): ?DialogueMessage {
     return DialogueMessage::get_one(
       pdo: $app->get_database(),
       sql: "SELECT * FROM `DialogueMessage` WHERE `dialogue_id` = ? ORDER BY `create_date` DESC LIMIT 1",
@@ -271,6 +271,7 @@ class Dialogue extends DataClass {
                             OR
                             d2.state = :membership_state_declined
                         ) 
+                    AND d2.dialogue_id = Dialogue.id
               ) = 0
         AND Dialogue.state = :dialogue_state_pending",
       [
@@ -507,7 +508,7 @@ class Dialogue extends DataClass {
         <?php if (trim($this->content) == ""): ?>
           <h6>Untitled Dialogue</h6>
         <?php else: ?>
-          <h6s><?= $this->content ?></h6s>
+          <?= $app->markdown_to_html($this->content) ?>
         <?php endif; ?>
         <!--<div>
           <small>created: <?= $this->create_date ?></small>
@@ -519,8 +520,8 @@ class Dialogue extends DataClass {
         && $this->author_id == $app->get_currently_logged_in_account()->id
       ) { ?>
         <form method="post" style="display: inline-block">
-          <?= $activate_error?->get_error_card() ?>
-          <input type="hidden" name="action" value="activate_dialogue">
+          <?= $app->executed_action == "start_dialogue"?: $app->action_error?->get_error_card() ?>
+          <input type="hidden" name="action" value="start_dialogue">
           <input type="hidden" name="dialogue_id" value="<?= $this->id ?>">
           <button class="button">Start Dialogue</button>
         </form>

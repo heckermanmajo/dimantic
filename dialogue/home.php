@@ -21,7 +21,7 @@ try {
     header("Location: /index.php");
   }
 
-  include $_SERVER["DOCUMENT_ROOT"] . "/handler.php";
+  $app->handle_action_requests();
 
   HtmlUtils::head();
   HtmlUtils::main_header();

@@ -100,8 +100,6 @@ class  DialogueMessage extends DataClass {
 
     $mem = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
 
-    $save_instance = $this->get_escaped_copy_instance();
-
     $author = Account::get_by_id($app->get_database(), $this->account_id);
 
     # if i am member and active
@@ -127,9 +125,9 @@ class  DialogueMessage extends DataClass {
         <?= $author->get_gravtar_profile_image(size: 18) ?>
         <small><?= $this->create_date ?></small>
       </div>
-      <pre
+      <div
         onmousemove="FN_HANDLE_UPDATE_TEXT_SELECTION(<?= $this->id ?>)"
-      ><?= $save_instance->content ?></pre>
+      ><?= $app->markdown_to_html(markdown: $this->content) ?></div>
       <!--<pre><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>-->
       <?php
       $all_comments = $this->get_message_comments($app);
