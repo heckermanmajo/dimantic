@@ -68,7 +68,7 @@ abstract class DataClass implements JsonSerializable {
    * @throws Exception
    */
   static function create_table(PDO $pdo): void {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+    # [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     #$log("Create Table: " . static::class);
     #var_dump($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
     $is_mysql = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === "mysql";

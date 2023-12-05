@@ -9,6 +9,8 @@ use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMembership;
 use cls\data\dialoge\DialogueMessage;
 use cls\data\dialoge\DialogueMessageComment;
+use cls\data\dialoge\DialogueRule;
+use cls\data\dialoge\DialogueRuleRating;
 use PDO;
 use ReflectionException;
 
@@ -308,8 +310,9 @@ class App {
    * Currently only sqlite is supported.
    */
   function get_database(): PDO {
-    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+    # extra no log for a simple call of this function, since it is called very often and clutters the logs
     if ($this->db == null) {
+      [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
       $log("connection to sqlite-database at " . $_SERVER["DOCUMENT_ROOT"] . "/../dimantic.sqlite");
       $this->db = new PDO("sqlite:" . $_SERVER["DOCUMENT_ROOT"] . "/../dimantic.sqlite");
       $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -337,7 +340,10 @@ class App {
     DialogueMembership::create_table($db);
     DialogueMessage::create_table($db);
     DialogueMessageComment::create_table($db);
+    DialogueRule::create_table($db);
+    DialogueRuleRating::create_table($db);
     NewsEntry::create_table($db);
+
     # add new tables (Dataclasses) here ...
     # ...
   }
@@ -365,44 +371,38 @@ class App {
     string $file = "",
     int    $line = 0
   ): array {
-    App::$logs[] = "($file:::$line)[$class:$function]";
+    if( $class == "") {
+      $file = basename($file);
+      if($function == ""){
+        App::$logs[] = "&[$file($line)]";
+      }
+      else{
+        App::$logs[] = "&[$file::$function($line)]";
+      }
+    }else{
+      App::$logs[] = "&[$class::$function($line)]";
+    }
+
+    $meta_lambda = function ($class, $function, $mode) {
+      return function (string $message, null|array|string $data = null) use ($class, $function, $mode) {
+        if($mode== "log"){
+          static::$logs[] = "   $message";
+        }else{
+          static::$logs[] = "   ($mode)$message";
+        }
+        if ($data !== null) {
+          if (is_array($data)) {
+            $data = "   " .json_encode($data, JSON_PRETTY_PRINT);
+          }
+          static::$logs[] = $data;
+        }
+      };
+    };
     return [
-      function (string $message, null|array|string $data = null) use ($class, $function) {
-        static::$logs[] = "[$class:$function] $message";
-        if ($data != null) {
-          if (is_array($data)) {
-            $data = json_encode($data, JSON_PRETTY_PRINT);
-          }
-          static::$logs[] = $data;
-        }
-      },
-      function (string $message, null|array|string $data = null) use ($class, $function) {
-        static::$logs[] = "[$class:$function] WARNING $message";
-        if ($data != null) {
-          if (is_array($data)) {
-            $data = json_encode($data, JSON_PRETTY_PRINT);
-          }
-          static::$logs[] = $data;
-        }
-      },
-      function (string $message, null|array|string $data = null) use ($class, $function) {
-        static::$logs[] = "[$class:$function] ERROR $message";
-        if ($data != null) {
-          if (is_array($data)) {
-            $data = json_encode($data, JSON_PRETTY_PRINT);
-          }
-          static::$logs[] = $data;
-        }
-      },
-      function (string $message, null|array|string $data = null) use ($class, $function) {
-        static::$logs[] = "[$class:$function] TODO $message";
-        if ($data != null) {
-          if (is_array($data)) {
-            $data = json_encode($data, JSON_PRETTY_PRINT);
-          }
-          static::$logs[] = $data;
-        }
-      },
+      $meta_lambda($class, $function, "log"),
+      $meta_lambda($class, $function, "warn"),
+      $meta_lambda($class, $function, "err"),
+      $meta_lambda($class, $function, "todo"),
     ];
   }
 
@@ -449,7 +449,16 @@ class App {
       else {
         echo "<span style='color: rgb(222,222,222)'>";
       }
-      echo "$log\n";
+      if(str_starts_with($log, "&[")){
+        echo "<small><b>";
+        echo $log;
+        echo "</b></small>";
+        echo "<br>";
+      }
+      else{
+        echo $log;
+        echo "<br>";
+      }
       echo "</span>";
     }
     echo "</pre>";
@@ -458,11 +467,20 @@ class App {
   }
 
 
+  /**
+   * This function is called at the top of most page-files.
+   * It handles all post-requests.
+   *
+   * Reads all request files from the request folder maps
+   * them on name and executes the request if the name matches.
+   *
+   * @return void
+   */
   function handle_action_requests(): void {
 
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
-    if(!isset($_POST["action"])){
+    if (!isset($_POST["action"])) {
       $log("no action to execute");
       return;
     }
@@ -500,6 +518,7 @@ class App {
       $warn("unknown action: " . $_POST["action"]);
     }
 
+    # Special treatment for login and register -> redirect to home
     if ($this->executed_action === "login" || $this->executed_action === "register") {
       if ($this->action_error === null) {
         ob_get_clean();
@@ -507,83 +526,20 @@ class App {
         exit;
       }
     }
+
+    # special treatment for logout -> redirect to index
+    if ($this->executed_action == "logout"){
+      ob_get_clean();
+      header("Location: /index.php");
+      exit;
+    }
+
   }
 
   function markdown_to_html(string $markdown): string {
-
-    $markdown = htmlspecialchars($markdown);
-
-    // Convert italic and bold text
-    $markdown = preg_replace("/\*\*(.+)\*\*/", '<b>$1</b>', $markdown);
-    $markdown = preg_replace("/\*(.+)\*/", '<i>$1</i>', $markdown);
-
-    // same for _ and __
-    $markdown = preg_replace("/__(.+)__/", '<b>$1</b>', $markdown);
-    $markdown = preg_replace("/_(.+)_/", '<i>$1</i>', $markdown);
-
-    // Convert headings
-    $markdown = preg_replace("/^# (.+)$/m", '<h1>$1</h1>', $markdown);
-    $markdown = preg_replace("/^## (.+)$/m", '<h2>$1</h2>', $markdown);
-    $markdown = preg_replace("/^### (.+)$/m", '<h3>$1</h3>', $markdown);
-
-    // Convert quotes
-    //$markdown = preg_replace("/>(.+)/m", '<blockquote>$1</blockquote>', $markdown);
-
-    // Convert links
-    $markdown = preg_replace_callback("/\[([^\]]+)\]\((https:\/\/[^\)]+)\)/", function ($matches) {
-      $url = htmlspecialchars($matches[2]);
-      $text = htmlspecialchars($matches[1]);
-      return '<a href="' . $url . '" target="_blank" rel="noopener noreferrer">' . $text . '</a>';
-    }, $markdown);
-
-    // Convert images
-    $markdown = preg_replace_callback("/!\[([^\]]+)\]\((https:\/\/[^\)]+)\)/", function ($matches) {
-      $alt = htmlspecialchars($matches[1]);
-      $src = htmlspecialchars($matches[2]);
-      return '<img alt="' . $alt . '" src="' . $src . '">';
-    }, $markdown);
-
-    // change quotes
-    $correct_quotes = "";
-    foreach (explode("\n", $markdown) as $line) {
-      if (str_starts_with(haystack: trim($line), needle: "&gt;")) {
-        $correct_quotes .= "<p class='quote'>" . $line . "</p>\n";
-      }
-      else {
-        $correct_quotes .= $line . "\n";
-      }
-    }
-    $markdown = $correct_quotes;
-
-
-    // replace newlines with <br>
-    $markdown = preg_replace("/\n/", "<br>", $markdown);
-
-
-    $correct_quotes = "";
-    foreach (explode("<br>", $markdown) as $line) {
-      if (
-        str_ends_with(haystack: trim($line), needle: "</h1>")
-        || str_ends_with(haystack: trim($line), needle: "</h2>")
-        || str_ends_with(haystack: trim($line), needle: "</h3>")
-        || str_ends_with(haystack: trim($line), needle: "</p>")
-      ) {
-        $correct_quotes .= $line;
-      }
-      else {
-        $correct_quotes .= $line . "<br>";
-      }
-    }
-    $markdown = $correct_quotes;
-
-    // replace umlauts
-    $markdown = str_replace(
-      search: ["ä", "ö", "ü", "Ä", "Ö", "Ü", "ß"],
-      replace: ["&auml;", "&ouml;", "&uuml;", "&Auml;", "&Ouml;", "&Uuml;", "&szlig;"],
-      subject: $markdown
-    );
-
-    return $markdown;
+    $parsedown = new \cls\lib\Parsedown();
+    $parsedown->setSafeMode(true);
+    return $parsedown->text($markdown);
   }
 
 }

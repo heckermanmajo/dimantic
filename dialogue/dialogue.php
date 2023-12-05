@@ -58,7 +58,8 @@ try {
   <?php
   if ($dialogue->author_id == $app->get_currently_logged_in_account()->id && $dialogue->state == Dialogue::STATE_NOT_YET_STARTED) {
     ?>
-    <a class="button w3-margin w3-padding" href="/dialogue.php?id=<?= $dialogue->id ?>&tab=edit_dialoge"> Edit Dialogue </a>
+    <a class="button w3-margin w3-padding" href="/dialogue.php?id=<?= $dialogue->id ?>&tab=edit_dialoge"> Edit
+      Dialogue </a>
     <?php
   }
   ?>
@@ -112,7 +113,7 @@ try {
       ?>
       <div class="info-card">
 
-        <p> <img src="/res/info.png" width="60"> <b>Edit Dialogue</b> </p>
+        <p><img src="/res/info.png" width="60"> <b>Edit Dialogue</b></p>
         <ul>
           <li>What topic dou you want to talk about?</li>
           <li>What is the broad goal?</li>
@@ -131,7 +132,8 @@ try {
         <input type="number" name="message_cooldown_in_hours" value="<?= $dialogue->message_cooldown_in_hours ?>">
       </label>-->
         <label>
-          <textarea rows="10" cols="80" name="content" placeholder="Describe Dialogue"><?= $dialogue->content ?></textarea>
+          <textarea rows="10" style="width: 100%" name="content"
+                    placeholder="Describe Dialogue"><?= $dialogue->content ?></textarea>
         </label>
         <br><br>
         <button class="button">Edit Dialogue</button>
@@ -156,65 +158,220 @@ try {
         $my_membership = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
         ?>
         <div>
-          <button onclick="FN_TOGGLE('my_notes')">Show/hide My Notes </button>
-          <div id="my_notes">
-            <form method="post" class="w3-card-4 w3-margin">
-              <input type="hidden" value="update_private_notes" name="action">
-              <input type="hidden" value="<?= $dialogue->id ?>" name="dialogue_id">
-              <textarea
-                placeholder="PRIVATE NOTES"
-                name="notes_field"
-                onfocusout="this.form.submit()"
-              ><?=$my_membership->notes_field?></textarea>
-              <button type="submit"> Save </button>
-            </form>
-          </div>
-          <p>Your Notes</p>
-          <?php if ($dialogue->next_turn_is_my_turn($app)): ?>
-            <?= $app->executed_action == "write_message"?: $app->action_error?->get_error_card()?>
 
-            <p>It is your turn to write a message.</p>
-            <form method="post" class="w3-margin w3-padding w3-card-4">
-              <input type="hidden" name="action" value="write_message">
-              <input type="hidden" name="dialogue_id" value="<?= $dialogue->id ?>">
-              <label>
-                <textarea id="text_content" name="content" rows="6" cols="50"></textarea>
-              </label>
-              <div>
-                <button type="button" onclick="FN_TOGGLE('emoji_picker')" class="button">EMOJI</button>
-              </div>
-              <div id="emoji_picker" style="display: none">
-                <?php
-                $emojis = \cls\HtmlUtils::get_emojis();
-                foreach ($emojis as $emoji) {
-                  ?>
-                  <button type="button"
-                          style="cursor: pointer; border-style: none; margin: 0; padding: 0"
-                          onclick="
-                    document.getElementById('text_content').value += '<?=$emoji?>';"
-                    oncontextmenu="navigator.clipboard.writeText('<?=$emoji?>'); return false;"
-                  ><?= $emoji ?></button>
+        <!--<button class="w3-margin" onclick="FN_TOGGLE('my_notes')">Show/hide My Notes</button>-->
+
+        <div>
+
+          <div class="w3-row">
+            <div class="w3-half">
+
+              <div class="w3-card-4 w3-margin">
+                <h4 class="menu-header-color" style="cursor: pointer">
+                  <span onclick="FN_TOGGLE('my_notes')">My Notes</span>
+                  <span onclick="FN_TOGGLE('my_notes_info_box')" style="font-style: normal;"> ℹ️ </span>
+                </h4>
+
+                <div id="my_notes_info_box" class="info-card" style="display: none">
+                  <h4> Infos about my notes ... </h4>
+                </div>
+
+                <div id="my_notes">
                   <?php
-                }
-                #🙂 🙃 😉 😌 😍 🥰 😘 😗 😙 😚 😋 😛 😝 😜 🤪 🤨 🧐 🤓 😎 🥸 🤩 🥳
-                #😏 😒 😞 😔 😟 😕 🙁 ☹️ 😣 😖 😫 😩 🥺 😢 😭 😮‍💨 😤 😠 😡 🤬 🤯 😳 🥵 🥶 😱 😨 😰 😥 😓 🫣 🤗 🫡 🤔 🫢
-                #🤭 🤫 🤥 😶 😶‍🌫️ 😐 😑 😬 🫨 🫠 🙄 😯 😦 😧 😮 😲 🥱 😴 🤤 😪 😵 😵‍💫 🫥 🤐 🥴 🤢 🤮 🤧 😷 🤒 🤕 🤑 🤠
-                #😈 👿 👹 👺 🤡 💩 👻 💀 ☠️ 👽 👾 🤖 🎃 😺 😸 😹 😻 😼 😽 🙀 😿 😾
-
-                ?>
+                  echo \cls\HtmlUtils::get_markdown_editor_field_for_ajax(
+                    field_name: "notes_field",
+                    ajax_end_point_path_from_root: "/request/dialogue/update_private_notes/update_private_notes.php",
+                    init_text: $my_membership->notes_field,
+                    extra_json_fields: [
+                      "dialogue_id" => $dialogue->id,
+                    ]
+                  );
+                  ?>
+                </div>
+                <script>
+                  // todo: problem: if the easy mde editor is hidden from the start
+                  // todo: it does not load the content
+                  // todo: only if the user clicks into the editor the content is loaded
+                  $(document).ready(function () {
+                    $("#my_notes").hide();
+                  });
+                </script>
               </div>
-              <button class="button">SEND</button>
-            </form>
-          <?php else: ?>
-            <div class="w3-card w3-margin w3-padding">
-              <p>It is not your turn to write a message.</p>
-              <p>You will get a news entry when your partner has answered.</p>
             </div>
-          <?php endif; ?>
+
+            <div class="w3-half">
+              <div id="create_rule" class="w3-card-4 w3-margin">
+
+                <h4 class="menu-header-color" style="cursor: pointer">
+                  <span onclick="FN_TOGGLE('create_rule_draft')">Create Rule</span>
+                  <span onclick="FN_TOGGLE('create_rule_draft_info_box')" style="font-style: normal;"> ℹ️ </span>
+                </h4>
+
+                <div id="create_rule_draft_info_box" class="info-card" style="display: none">
+                  <h4> How to create Rules ... </h4>
+                </div>
+
+                <div id="create_rule_draft">
+                  <?= \cls\HtmlUtils::get_markdown_editor_field_for_ajax(
+                    field_name: "rule_draft_content",
+                    ajax_end_point_path_from_root: "/request/dialogue/update_rule_draft/update_rule_draft.php",
+                    init_text: $my_membership->rule_draft,
+                    extra_json_fields: [
+                      "dialogue_id" => $dialogue->id,
+                    ]
+                  ); ?>
+
+                  <?= ($app->executed_action == "create_rule") ? $app->action_error?->get_error_card() : "" ?>
+                  <form method="post">
+                    <input type="hidden" name="action" value="create_rule">
+                    <input type="hidden" name="dialogue_id" value="<?= $dialogue->id ?>">
+                    <button class="button">Create Rule</button>
+                  </form>
+
+                </div>
+                <?php if (!($app->executed_action == "create_rule" && $app->action_error !== null)): ?>
+                  <script>
+                    // todo: problem: if the easy mde editor is hidden from the start
+                    // todo: it does not load the content
+                    // todo: only if the user clicks into the editor the content is loaded
+                    $(document).ready(function () {
+                      $("#create_rule_draft").hide();
+                    });
+                  </script>
+                <?php endif; ?>
+
+              </div> <!-- create_rule -->
+            </div>
+
+          </div>
+
+          <div class="w3-card-4 w3-margin">
+            <h4 class="menu-header-color" style="cursor: pointer">
+              <span onclick="FN_TOGGLE('rules_list')">Rules</span>
+              <span onclick="FN_TOGGLE('rules_list_info_box')" style="font-style: normal;"> ℹ️ </span>
+            </h4>
+
+            <?php
+
+            if (
+              $app->executed_action == "decline_rule"
+              || $app->executed_action == "accept_rule"
+            ) {
+              if ($app->action_error !== null) {
+                echo $app->action_error->get_error_card();
+              }
+            }
+
+            ?>
+
+            <div
+              id="rules_list_info_box"
+              class="info-card"
+              style="display: none">
+              <h4> Rules ... </h4>
+            </div>
+
+            <div
+              id="rules_list"
+              <?php if ($app->executed_action != "edit_rule") echo 'style="display: none"' ?>
+            >
+              <?php
+              $rules = $dialogue->get_rules_of_dialogue($app);
+              foreach ($rules as $rule) {
+                echo $rule->get_display_card($app);
+              }
+              ?>
+            </div>
+
+          </div>
+
+
+          <div class="w3-margin w3-padding w3-card-4">
+            <input type="hidden" name="action" value="write_message">
+            <input type="hidden" name="dialogue_id" value="<?= $dialogue->id ?>">
+            <label>
+
+              <span onclick="FN_TOGGLE('write_message_info')" style="font-style: normal; cursor: pointer">
+                Draft the next message
+                ℹ️ </span>
+              <div id="write_message_info" class="info-card" style="display: none">
+                <h4> How to write a message how stuff works ... </h4>
+              </div>
+              <?php echo \cls\HtmlUtils::get_markdown_editor_field_for_ajax(
+                field_name: "next_message_draft_content",
+                ajax_end_point_path_from_root: "/request/dialogue/update_message_draft/update_message_draft.php",
+                init_text: $my_membership->next_message_draft,
+                extra_json_fields: [
+                  "dialogue_id" => $dialogue->id,
+                ]
+              );
+              ?>
+            </label>
+            <br><br>
+            <!-- todo: new request: send message, only display button if it is my turn -->
+            <!-- otherwise display as draft -->
+
+            <?= ($app->executed_action == "publish_message_from_draft") ? $app->action_error?->get_error_card() : "" ?>
+
+            <?php if ($dialogue->next_turn_is_my_turn($app)): ?>
+
+              <p class="w3-margin"><b>It is your turn to submit a message.</b></p>
+              <span>Publish <b style="color: dodgerblue">§ <?= count($messages) + 1 ?></b> from <b>draft</b></span>
+
+              <form method="post">
+                <input type="hidden" name="action" value="publish_message_from_draft">
+                <input type="hidden" name="dialogue_id" value="<?= $dialogue->id ?>">
+                <button
+                  class="button"
+                  onclick="
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if(confirm('Publish your current draft? NO edit afterwards!')){
+                      this.form.submit();
+                    }
+                  "> Publish your Message
+                </button>
+              </form>
+
+            <?php else: ?>
+
+              <div class="w3-card w3-margin w3-padding">
+
+                <h6>
+                  It is not your turn to write a message.
+                  <span onclick="FN_TOGGLE('dialogue_writing_order_info')" style="cursor: pointer"> ℹ️ </span>
+                </h6>
+                <p>You will get a news entry when your partner has answered.</p>
+                <div id="dialogue_writing_order_info" style="display: none" class="info-card">
+                  <h4> How does the writing order work? </h4>
+                  <p>
+                    The writing order is determined by the number of messages you have written.
+                    The person with the least messages written is the next one to write a message.
+                  </p>
+                  <p>
+                    If you have written the same number of messages as your partner, the person who has written the last
+                    message is the next one to write a message.
+                  </p>
+                  <p>
+                    If you have written the same number of messages as your partner and the last message was written by
+                    you, then your partner is the next one to write a message.
+                  </p>
+                </div>
+              </div>
+
+
+            <?php endif; ?>
+          </div>
+
+          <hr>
+
           <!-- <h2>WRITE MESSAGES!!!</h2>-->
           <?php
-          foreach ($messages as $message) {
-            echo $message->get_view_card($app);
+
+          $all_messages_num = count($messages);
+          foreach ($messages as $number => $message) {
+            $message_number = $all_messages_num - $number;
+            echo $message->get_view_card($app, $message_number);
           }
           ?>
 

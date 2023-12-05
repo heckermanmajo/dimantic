@@ -9,6 +9,7 @@ use cls\DataClass;
 use cls\RequestError;
 use PDO;
 
+
 class DialogueMembership extends DataClass {
   const STATE_PENDING = 'pending';
   const STATE_ACTIVE = 'active';
@@ -28,11 +29,26 @@ class DialogueMembership extends DataClass {
   var string $state = '';
   var string $type = '';
   var string $create_date = '';
+
   /**
    * @var string All members of a dialogue have a notes field
    * where they can takle private notes ...
    */
   var string $notes_field = '';
+
+  /**
+   * @var string This is the draft of the next message
+   * that will be sent to the dialogue, if the user
+   * publishes it AND the time util publish is reached.
+   */
+  var string $next_message_draft = '';
+
+  /**
+   * @var string This is the draft-text of a rule
+   * authored by the member of this entry - not published
+   * yet.
+   */
+  var string $rule_draft = '';
 
   #################################
   ###### Joined Values      #######

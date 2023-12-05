@@ -6,6 +6,8 @@ namespace cls\data\dialoge;
 use cls\App;
 use cls\data\account\Account;
 use cls\DataClass;
+use cls\HtmlUtils;
+use cls\lib\Parsedown;
 use cls\RequestError;
 
 class  DialogueMessage extends DataClass {
@@ -84,7 +86,8 @@ class  DialogueMessage extends DataClass {
   #                                                                         #
   ###########################################################################
 
-  function get_view_card(App $app): string {
+  function get_view_card(App $app, int $message_number = 0): string {
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     /**
      * This field is possibly set in the handler.php
      * It is the return value of the create_comment_from_selection.php
@@ -106,55 +109,55 @@ class  DialogueMessage extends DataClass {
     # i want my messages on the left whatever
     if ($mem && $mem->state == DialogueMembership::STATE_ACTIVE) {
       if ($this->account_id == $app->get_currently_logged_in_account()->id) {
-        $style = "margin-right: 20% !important;";
+        $style = "margin-right: 20% !important;border-color: lightblue;border-width: 2px;";
       }
       else {
-        $style = "margin-left: 20% !important; border-color: #69ff7a";
+        $style = "margin-left: 20% !important; border-color: green;border-width: 2px;";
       }
     }
     else if ($dialogue->author_id == $this->account_id) {
       # if I am not member, i wants the authors messages on the left
-      $style = "margin-right: 20% !important;";
+      $style = "margin-right: 20% !important;border-color: lightblue;border-width: 2px;";
     }
     else {
-      $style = "margin-left: 20% !important; border-color: #69ff7a";
+      $style = "margin-left: 20% !important; border-color: green; border-width: 2px;";
     }
     ?>
     <div class="w3-card-4 w3-margin w3-padding" style="<?= $style ?>">
       <div>
-        <?= $author->get_gravtar_profile_image(size: 18) ?>
-        <small><?= $this->create_date ?></small>
+
+        <b style="font-size: 20px; color: dodgerblue;">
+          § <?=$message_number?>
+        </b>
+        &nbsp;&nbsp;&nbsp;
+        <div class="w3-right">
+          <small style="color: #818181"><?= $this->create_date ?></small>
+          <?= $author->get_gravtar_profile_image(size: 30) ?>
+        </div>
+
       </div>
       <div
         onmousemove="FN_HANDLE_UPDATE_TEXT_SELECTION(<?= $this->id ?>)"
-      ><?= $app->markdown_to_html(markdown: $this->content) ?></div>
+      ><?php
+        $parsedown = new Parsedown();
+        $parsedown->setSafeMode(true);
+        $text = $parsedown->parse($this->content);
+        echo $text;
+         ?></div>
       <!--<pre><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>-->
       <?php
       $all_comments = $this->get_message_comments($app);
       if (count($all_comments) != 0):
         ?>
-        <button
+        <!-- <button
           class="button"
           onclick="FN_TOGGLE('comments_of_message_<?= $this->id ?>')"
         >
           Show Comments (<?= count($all_comments) ?>)
-        </button>
+        </button>-->
       <?php
       endif;
-      ?>
-      <div
-        id="comments_of_message_<?= $this->id ?>" style="display: none">
-        <?php
 
-        foreach ($all_comments as $comment) {
-          echo $comment->get_display_card($app);
-        }
-        ?>
-      </div>
-    </div>
-
-    <!-- The Form for creating a comment from a text selection -->
-    <?php
     if (isset($create_comment_from_selection_error) and $_POST["dialogue_message_id"] == $this->id){
       $selection = $_POST["selection"];
       $comment_text = $_POST["comment_text"];
@@ -166,6 +169,8 @@ class  DialogueMessage extends DataClass {
       $style = "display:none;";
     }
     ?>
+      <?= ($app->executed_action == "create_comment_from_selection"
+        && $_POST["dialogue_message_id"] == $this->id) ? $app->action_error?->get_error_card(): ""; ?>
     <div
       class="w3-card-4 w3-margin w3-padding"
       id="create_comment_from_selection_<?= $this->id ?>"
@@ -185,10 +190,23 @@ class  DialogueMessage extends DataClass {
           id="create_comment_from_selection_<?= $this->id ?>_hidden_input"
           name="selection"
           value="<?=$selection?>">
-        <textarea
+        <?php
+        # todo: make comments editable until i have written my message ...
+        echo \cls\HtmlUtils::get_markdown_editor_field_for_ajax(
+          field_name: "comment_text",
+          ajax_end_point_path_from_root: "",
+          init_text: "",
+          extra_json_fields: [
+            "dialogue_id" => $dialogue->id,
+          ]
+        );
+
+        ?>
+        <!--<textarea
           name="comment_text"
+          id="create_comment_from_selection_<?= $this->id ?>_textarea"
           style="width: 100%"
-          id="create_comment_from_selection_<?= $this->id ?>_textarea"><?=$comment_text?></textarea>
+          id="create_comment_from_selection_<?= $this->id ?>_textarea"><?=$comment_text?></textarea>-->
         <br>
         <button class="button">Create Comment</button>
       </form>
@@ -200,6 +218,18 @@ class  DialogueMessage extends DataClass {
         X CLOSE FORM
       </button>
     </div>
+      <div
+        id="comments_of_message_<?= $this->id ?>"> <!-- style="display: none">-->
+        <?php
+
+        foreach ($all_comments as $num => $comment) {
+          echo $comment->get_display_card($app, $message_number, $num);
+        }
+        ?>
+      </div>
+    </div>
+
+    <!-- The Form for creating a comment from a text selection -->
     <?php
     return ob_get_clean();
   }

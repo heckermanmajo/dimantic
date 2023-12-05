@@ -17,7 +17,8 @@ class Protocol {
         # todo add logs on debug mode
         echo json_encode([
           "status" => "ok",
-          "data" => $result
+          "data" => $result,
+          "logs" => FN_IS_DEBUG() ? App::get_logs() : [],
         ]);
       }
       exit();

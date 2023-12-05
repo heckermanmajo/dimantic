@@ -39,6 +39,7 @@ try {
           <div class="w3-center">
             <img src="/res/dasein.png" width="300px">
           </div>
+
         </div>
       </div>
       <div class="w3-rest">

@@ -29,15 +29,6 @@ function create_rule(
       );
     }
 
-    if (!isset($post_data["dialogue_rule_id"])) {
-      return new RequestError(
-        dev_message: "\$post_data[\"dialogue_rule_id\"] not set",
-        code: RequestError::BAD_REQUEST,
-      );
-    }
-
-    $dialogue_rule_id = (int)$post_data["dialogue_rule_id"];
-
     if (!isset($post_data["dialogue_id"])) {
       return new RequestError(
         dev_message: "\$post_data[\"dialogue_id\"] not set",
@@ -57,14 +48,32 @@ function create_rule(
       );
     }
 
-    $rule_text = (string)$post_data["rule_text"];
-
-    // check that user is author of rule
-    if ($dialogue->author_id != $app->get_currently_logged_in_account()->id) {
+    $my_membership = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
+    if (!$my_membership) {
       return new RequestError(
-        dev_message: "You are not the author of this rule.",
+        dev_message: "You are not a member of this dialogue.",
         code: RequestError::RULE_ERROR,
       );
+    }
+
+    $rule_text = $my_membership->rule_draft;
+
+    // check if emty
+    if (strlen($rule_text) == 0) {
+      return new RequestError(
+        dev_message: "Rule text is empty.",
+        code: RequestError::RULE_ERROR,
+      );
+    }
+    // dont inster the same rule twice
+    $last_rule = $dialogue->get_rules_of_dialogue($app);
+    foreach ($last_rule as $rule) {
+      if ($rule->rule_text == $rule_text) {
+        return new RequestError(
+          dev_message: "Same rule was sent before",
+          code: RequestError::RULE_ERROR,
+        );
+      }
     }
 
     $rule = new DialogueRule();
@@ -85,8 +94,11 @@ function create_rule(
       $rating->save($app->get_database());
     }
 
-
     // todo: create news
+
+    // make the draft field empty
+    $my_membership->rule_draft = "";
+    $my_membership->save($app->get_database());
 
     return $rule;
   }

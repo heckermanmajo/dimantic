@@ -80,10 +80,13 @@ function edit_rule(
 
     // reset all ratings -> set them to pending
 
+    /**
+     * @var DialogueRuleRating $rating
+     */
     foreach ($rule->get_current_ratings($app) as $rating) {
       // todo: create new if from active to pending
       // todo; also news if the state changes from declined to pending
-      $rating->state = DialogueRuleRating::RATING_PENDING;
+      $rating->rating = DialogueRuleRating::RATING_PENDING;
       $rating->save($app->get_database());
     }
 
