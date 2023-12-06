@@ -283,6 +283,11 @@ try {
               ?>
             </div>
 
+            <!---
+              TODO: Display the rules that are accepted not in the display none part but
+              TODO: always for everybody to see.
+            -->
+
           </div>
 
 

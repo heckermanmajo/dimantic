@@ -179,6 +179,7 @@ class App {
    * If null, then the connection is not yet established.
    */
   var ?PDO $db = null;
+
   /**
    * We don't change the session, except through the
    * App functions.
@@ -190,16 +191,27 @@ class App {
    * @see App::handle_action_requests
    */
   public ?string $executed_action = null;
+
   /**
    * @var RequestError|null The error that occurred during the action.
    * @see App::handle_action_requests
    */
   public ?RequestError $action_error = null;
 
+  /**
+   * Returns all the logs.
+   * @return array<string> all the logs
+   */
   static function get_logs(): array {
     return static::$logs;
   }
 
+  /**
+   * Returns an instance of the App class.
+   * - implements the singleton pattern -> only one instance
+   *
+   * @return App the instance of the App class
+   */
   static function get(): App {
     if (self::$instance == null) {
       self::$instance = new App();
@@ -213,6 +225,11 @@ class App {
    */
   static function get_test_instance(): App { }
 
+  /**
+   * This function is used when a script is run in cli mode.
+   * This makes sense for tests and also for cli-run-analysis.
+   * @return void
+   */
   static function init_cli_test_context(): void { }
 
   /**
@@ -247,12 +264,30 @@ class App {
     $this->init_database();
   }
 
+  /**
+   * This function is used to set a field in the session.
+   *
+   * !!NO setting of the session variable directly.
+   *
+   * @param string $name the name of the field
+   * @param mixed $value the value of the field
+   *
+   * @return void
+   */
   function set_session_field(string $name, mixed $value): void {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $log("set_session_field", [$name, $value]);
     $this->session[$name] = $value;
   }
 
+  /**
+   * This function is used to get a field from the session.
+   * If the field is not set, then the default value is returned.
+   *
+   * @param string $name
+   * @param mixed|null $default
+   * @return mixed
+   */
   function get_session_field(string $name, mixed $default = null): mixed {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $log("get_session_field", [$name, $this->session[$name] ?? $default]);
@@ -299,6 +334,11 @@ class App {
     $this->session["account"] = $account;
   }
 
+  /**
+   * Handles all the logout logic.
+   *
+   * @return void
+   */
   function logout(): void {
     unset($this->session["account"]);
     // destroy the session
@@ -536,7 +576,22 @@ class App {
 
   }
 
+  /**
+   * Converts markdown to html.
+   * Don't use the parse-down library directly, so we
+   * can add more functionality later, like removing unwanted tags, etc.
+   *
+   * - currently just uses the parsedown library in safe mode.
+   *
+   * @param string $markdown an input string in markdown format
+   * @return string the html representation of the markdown
+   *
+   * @see \cls\lib\Parsedown
+   */
   function markdown_to_html(string $markdown): string {
+    # todo: we dont want to allow underlined text in markdown
+    #       since we need the underlining for hinting meta data
+    #       for the text of the message, like comments, likes, etc.
     $parsedown = new \cls\lib\Parsedown();
     $parsedown->setSafeMode(true);
     return $parsedown->text($markdown);

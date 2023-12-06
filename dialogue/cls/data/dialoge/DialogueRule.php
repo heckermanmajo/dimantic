@@ -16,6 +16,18 @@ class DialogueRule extends DataClass {
   var int $account_id = 0;
   var int $created_at = 0;
 
+  /**
+   * The difference between rules and summaries
+   * is, that a summary just summarizes some important
+   * points of the dialogue until now.
+   *
+   * They are located between the messages. But they
+   * can also be accessed at the top, beneath the rules.
+   *
+   * @var int
+   */
+  var int $is_summary = 0;
+
   var int $__rule_order = 0;
 
   function __construct(array $data_from_db = []) {

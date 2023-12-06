@@ -79,6 +79,10 @@ class HtmlUtils {
     <?php
   }
 
+  /**
+   * The main header of the website - used on all main sides.
+   * @return void
+   */
   static function main_header() {
     ?>
     <nav class="w3-margin">
@@ -87,7 +91,6 @@ class HtmlUtils {
       <a class="button" href="/members.php">Members</a>
       <a class="button" href="/account_settings.php">Account-Settings</a>
 
-      <!-- TODO: logout does not work -->
       <div class="w3-right">
         <form style="display: inline" method="post">
           <input type="hidden" name="action" value="logout">
@@ -99,6 +102,10 @@ class HtmlUtils {
     <?php
   }
 
+  /**
+   * @return string[] all important emojis as array
+   * @see get_markdown_editor_field_for_ajax()
+   */
   static function get_important_emojis(): array {
     return [
       "😀", "😂", "🤣", "🥲", "😇", "🙂", "🥰", "😘", "🤪", "🤨", "🧐", "🤓", "🤠", "👿", "🤡", "💩",
@@ -107,91 +114,83 @@ class HtmlUtils {
     ];
   }
 
-  static function get_emojis() {
-    return [
-      "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "🥲", "🥹", "☺️", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗",
-      "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🥸", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁",
-      "☹️", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😮‍💨", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥",
-      "😓", "🫣", "🤗", "🫡", "🤔", "🫢", "🤭", "🤫", "🤥", "😶", "😶‍🌫️", "😐", "😑", "😬", "🫨", "🫠", "🙄", "😯", "😦", "😧", "😮",
-      "😲", "🥱", "😴", "🤤", "😪", "😵", "😵‍💫", "🫥", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹",
-      "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾", "👋", "🤚",
-      "🖐", "✋", "🖖", "👌", "🤌", "🤏", "✌️", "🤞", "🫰", "🤟", "🤘", "🤙", "🫵", "🫱", "🫲", "🫸", "🫷", "🫳", "🫴", "👈", "👉",
-      "👆", "🖕", "👇", "☝️", "👍", "👎", "✊", "👊", "🤛", "🤜", "👏", "🫶", "🙌", "👐", "🤲", "🤝", "🙏", "✍️", "💅", "🤳", "💪",
-      "🦾", "🦵", "🦿", "🦶", "👣", "👂", "🦻", "👃", "🫀", "🫁", "🧠", "🦷", "🦴", "👀", "👁", "👅", "👄", "🫦", "💋", "🩸🗣",
-      "👤", "👥", "🫂", "⌚️", "📱", "📲", "💻", "⌨️", "🖥", "🖨", "🖱", "🖲", "🕹", "🗜", "💽", "💾", "💿", "📀", "📼", "📷", "📸",
-      "📹", "🎥", "📽", "🎞", "📞", "☎️", "📟", "📠", "📺", "📻", "🎙", "🎚", "🎛", "🧭", "⏱", "⏲", "⏰", "🕰", "⌛️", "⏳", "📡",
-      "🔋", "🪫", "🔌", "💡", "🔦", "🕯", "🪔", "🧯", "🛢", "🛍️", "💸", "💵", "💴", "💶", "💷", "🪙", "💰", "💳", "💎", "⚖️", "🪮",
-      "🪜", "🧰", "🪛", "🔧", "🔨", "⚒", "🛠", "⛏", "🪚", "🔩", "⚙️", "🪤", "🧱", "⛓", "🧲", "🔫", "💣", "🧨", "🪓", "🔪", "🗡",
-      "⚔️", "🛡", "🚬", "⚰️", "🪦", "⚱️", "🏺", "🔮", "📿", "🧿", "🪬", "💈", "⚗️", "🔭", "🔬", "🕳", "🩹", "🩺", "🩻", "🩼", "💊",
-      "💉", "🩸", "🧬", "🦠", "🧫", "🧪", "🌡", "🧹", "🪠", "🧺", "🧻", "🚽", "🚰", "🚿", "🛁", "🛀", "🧼", "🪥", "🪒", "🧽", "🪣",
-      "🧴", "🛎", "🔑", "🗝", "🚪", "🪑", "🛋", "🛏", "🛌", "🧸", "🪆", "🖼", "🪞", "🪟", "🛍", "🛒", "🎁", "🎈", "🎏", "🎀", "🪄",
-      "🪅", "🎊", "🎉", "🪩", "🎎", "🏮", "🎐", "🧧", "✉️", "📩", "📨", "📧", "💌", "📥", "📤", "📦", "🏷", "🪧", "📪", "📫", "📬",
-      "📭", "📮", "📯", "📜", "📃", "📄", "📑", "🧾", "📊", "📈", "📉", "🗒", "🗓", "📆", "📅", "🗑", "🪪", "📇", "🗃", "🗳", "🗄",
-      "📋", "📁", "📂", "🗂", "🗞", "📰", "📓", "📔", "📒", "📕", "📗", "📘", "📙", "📚", "📖", "🔖", "🧷", "🔗", "📎", "🖇", "📐",
-      "📏", "🧮", "📌", "📍", "✂️", "🖊", "🖋", "✒️", "🖌", "🖍", "📝", "✏️", "🔍", "🔎", "🔏", "🔐", "🔒", "🔓", "❤️", "🩷", "🧡",
-      "💛", "💚", "💙", "🩵", "💜", "🖤", "🩶", "🤍", "🤎", "❤️‍🔥", "❤️‍🩹", "💔", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟",
-      "☮️", "✝️", "☪️", "🪯", "🕉", "☸️", "✡️", "🔯", "🕎", "☯️", "☦️", "🛐", "⛎", "♈️", "♉️", "♊️", "♋️", "♌️", "♍️", "♎️", "♏️",
-      "♐️", "♑️", "♒️", "♓️", "🆔", "⚛️", "🉑", "☢️", "☣️", "📴", "📳", "🈶", "🈚️", "🈸", "🈺", "🈷️", "✴️", "🆚", "💮", "🉐", "㊙️", "㊗️",
-      "🈴", "🈵", "🈹", "🈲", "🅰️", "🅱️", "🆎", "🆑", "🅾️", "🆘", "❌", "⭕️", "🛑", "⛔️", "📛", "🚫", "💯", "💢", "♨️", "🚷", "🚯", "🚳",
-      "🚱", "🔞", "📵", "🚭", "❗️", "❕", "❓", "❔", "‼️", "⁉️", "🔅", "🔆", "〽️", "⚠️", "🚸", "🔱", "⚜️", "🔰", "♻️", "✅", "🈯️", "💹",
-      "❇️", "✳️", "❎", "🌐", "💠", "Ⓜ️", "🌀", "💤", "🏧", "🚾", "♿️", "🅿️", "🛗", "🈳", "🈂️", "🛂", "🛃", "🛄", "🛅", "🚹", "🚺", "🚼",
-      "⚧", "🚻", "🚮", "🎦", "🛜", "📶", "🈁", "🔣", "ℹ️", "🔤", "🔡", "🔠", "🆖", "🆗", "🆙", "🆒", "🆕", "🆓", "0️⃣", "1️⃣", "2️⃣", "3️⃣",
-      "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "🔢", "#️⃣", "*️⃣", "⏏️", "▶️", "⏸", "⏯", "⏹", "⏺", "⏭", "⏮", "⏩", "⏪", "⏫",
-      "⏬", "◀️", "🔼", "🔽", "➡️", "⬅️", "⬆️", "⬇️", "↗️", "↘️", "↙️", "↖️", "↕️", "↔️", "↪️", "↩️", "⤴️", "⤵️", "🔀", "🔁", "🔂",
-      "🔄", "🔃", "🎵", "🎶", "➕", "➖", "➗", "✖️", "🟰", "♾", "💲", "💱", "™️", "©️", "®️", "〰️", "➰", "➿", "🔚", "🔙", "🔛", "🔝",
-      "🔜", "✔️", "☑️", "🔘", "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "⚫️", "⚪️", "🟤", "🔺", "🔻", "🔸", "🔹", "🔶", "🔷", "🔳", "🔲", "▪️"
-      , "▫️", "◾️", "◽️", "◼️", "◻️", "🟥", "🟧", "🟨", "🟩", "🟦", "🟪", "⬛️", "⬜️", "🟫", "🔈", "🔇", "🔉", "🔊", "🔔", "🔕", "📣",
-      "📢", "👁‍🗨", "💬", "💭", "🗯", "♠️", "♣️", "♥️", "♦️", "🃏", "🎴🚗", "🚕", "🚙", "🚌", "🚎", "🏎", "🚓", "🚑", "🚒", "🚐", "🛻",
-      "🚚", "🚛", "🚜", "🦯", "🦽", "🦼", "🛴", "🚲", "🛵", "🏍", "🛺", "🚨", "🚔", "🚍", "🚘", "🚖", "🛞", "🚡", "🚠", "🚟", "🚃",
-      "🚋", "🚞", "🚝", "🚄", "🚅", "🚈", "🚂", "🚆", "🚇", "🚊", "🚉", "✈️", "🛫", "🛬", "🛩", "💺", "🛰", "🚀", "🛸", "🚁", "🛶",
-      "⛵️", "🚤", "🛥", "🛳", "⛴", "🚢", "⚓️", "🛟", "🪝", "⛽️", "🚧", "🚦", "🚥", "🚏", "🗺", "🗿", "🗽", "🗼", "🏰", "🏯", "🏟",
-      "🎡", "🎢", "🛝", "🎠", "⛲️", "⛱", "🏖", "🏝", "🏜", "🌋", "⛰", "🏔", "🗻", "🏕", "⛺️", "🛖", "🏠", "🏡", "🏘", "🏚", "🏗",
-      "🏭", "🏢", "🏬", "🏣", "🏤", "🏥", "🏦", "🏨", "🏪", "🏫", "🏩", "💒", "🏛", "⛪️", "🕌", "🕍", "🛕", "🕋", "⛩", "🛤", "🛣",
-      "🗾", "🎑", "🏞", "🌅", "🌄", "🌠", "🎇", "🎆", "🌇", "🌆", "🏙", "🌃", "🌌", "🌉", "🌁",
-      "(ノಠ益ಠ)ノ彡┻━┻"
-    ];
-  }
-
+  /**
+   * This function returns a markdown editor field that sends ajax requests to the given endpoint
+   * when the content of the editor changes.
+   *
+   * However, the ajax request can be disabled by setting the $ajax_end_point_path_from_root to an empty string.
+   *
+   * The input is not sent immediately, but only after the user stops typing for a few hundered miliseconds.
+   * @param string $field_name the name of the fieldm this is important if the editor is
+   *        inside a conventional post form
+   * @param string $ajax_end_point_path_from_root the path to the endpoint that should
+   *        be called when the content of the editor changes - can be empty string;
+   *        relative path from root of the website
+   * @param string $init_text the initial text of the editor, should be set to the
+   *        current value of the field
+   * @param array $extra_json_fields extra fields that should be sent with the ajax
+   *        request, should be empty if $ajax_end_point_path_from_root is empty
+   *
+   * @return string the html of the editor
+   *
+   * @throws \Exception
+   * @todo: this function is not finished yet
+   *
+   * It can also be used as a part of a conventional post form.
+   *
+   * EasyMDE is used as the markdown editor.
+   * @see get_important_emojis()
+   * @see https://github.com/Ionaru/easy-markdown-editor
+   *
+   */
   static function get_markdown_editor_field_for_ajax(
     string $field_name,
     string $ajax_end_point_path_from_root,
     string $init_text,
     array  $extra_json_fields
-  ) {
+  ): false|string {
 
     ob_start();
 
     $debug_feedback_space_css_id = "debug_feedback_space_" . rand(0, 1000000);
     $random_css_id = "id_" . rand(0, 1000000);
     $editor_name = "editor_" . rand(0, 1000000);
+
     ?>
+    <!-- This textarea is hidden and used as base for the markdown editor -->
     <textarea
       name="<?= $field_name ?>"
       id="<?= $random_css_id ?>"
       onchange="console.log(this.value)"
     ><?= $init_text ?></textarea>
+
     <script>
+
       let <?=$editor_name?> = null;
+
+      // todo: this is the only jquery code so far
+      // todo: maybe we can remove jquery and use vanilla js instead
       $(document).ready(function () {
         <?=$editor_name?> = new EasyMDE({
           element: document.getElementById('<?=$random_css_id?>'),
-          // german spellchecker
           spellChecker: false,
           // log the content of the textarea to the console when changed
+          <?php if (FN_IS_LOCAL_HOST()): ?>
           onchange: function () {
             console.log(<?=$editor_name?>.value());
             alert("lol")
           },
+          <?php endif; ?>
         });
 
 
         <?=$editor_name?>.codemirror.on("change", () => {
           // todo: make it, so that the textarea sends ajax request for update and waits for response
-          // if a new input since then wait til response is back and update again.
-          // also wait a few hundered miliseconds until  the next Response.
+          // todo: if a new input since then wait til response is back and update again.
+          // todo: also wait a few hundred miliseconds until  the next Response.
           console.log(<?=$editor_name?>.value());
 
-          if("<?=$ajax_end_point_path_from_root?>" == ""){
+          if ("<?=$ajax_end_point_path_from_root?>" == "") {
             return;
           }
 
@@ -199,11 +198,15 @@ class HtmlUtils {
 
           let form_data = new FormData();
           let data = {
-            "<?= $field_name ?>": <?=$editor_name?>.value(),
-            <?php foreach ($extra_json_fields as $key => $value) { ?>
-            "<?= $key ?>": "<?= $value ?>",
-            <?php } ?>
+            <?php
+            #note: making this with the template engine looks like a mess
+            echo "\"$field_name\": $editor_name.value(),";
+            foreach ($extra_json_fields as $key => $value) {
+              echo "\"$key\": \"$value\",";
+            }
+            ?>
           };
+
           for (let key in data) {
             form_data.append(key, data[key]);
           }
@@ -215,7 +218,6 @@ class HtmlUtils {
               mode: 'no-cors',
               headers: {
                 'Content-Type': 'application/json',
-
               },
               body: form_data,
             })
@@ -225,11 +227,9 @@ class HtmlUtils {
                 console.log("successfull call to " + "<?=$ajax_end_point_path_from_root?>");
                 console.log(data);
               } else {
-                //alert("error");
-                document.getElementById("<?=$debug_feedback_space_css_id?>").innerHTML = FN_RETURN_ERROR_CARD(data)
-                // document.getElementById("<?=$debug_feedback_space_css_id?>").innerHTML = data.logs;
+                document.getElementById("<?=$debug_feedback_space_css_id?>")
+                  .innerHTML = FN_RETURN_ERROR_CARD(data);
                 console.log(data);
-                //alert(data.error_message);
               }
 
             })
@@ -244,43 +244,44 @@ class HtmlUtils {
     </script>
     <div id="<?= $debug_feedback_space_css_id ?>">
     </div>
-    <!--<button
-      onclick="
-        const text = easymde.value();
-        alert(text);
-        e.preventDefault();
-        return false;
-      "
-    >
-      alert content
-    </button>-->
-
-    <!--
-      button that adds a smiley to the textarea
-      TODO: add all emojis to this button -> with a nice emoji selection of 20 best onces
-     -->
     <?php
+    # The emoji buttons beneath the editor
     foreach (HtmlUtils::get_important_emojis() as $emoji) {
       ?>
       <button
-        style="background-color: inherit; border: solid black 1px; margin: 3px; padding-left: 5px;padding-right: 5px; cursor: pointer; font-size: 130%"
+        style="
+          background-color: inherit;
+          border: solid black 1px;
+          margin: 3px;
+          padding-left: 5px;
+          padding-right: 5px;
+          cursor: pointer;
+          font-size: 130%
+        "
         onclick="
           const text = <?= $editor_name ?>.value();
           let cursorPosition = <?= $editor_name ?>.codemirror.getCursor();
+          // todo: error: is the emoji is inserted a lot of times, it jumps spaces
+          //        and the cursor is not at the right position
         <?= $editor_name ?>.codemirror.replaceRange('<?= $emoji ?>', cursorPosition);
           // set cursor one character after the pasted emoji
         <?= $editor_name ?>.codemirror.setCursor(cursorPosition.line, cursorPosition.ch + <?= strlen($emoji) + 1 ?>);
+          // important so we don't send a potential form, in which this editor is embedded
           event.preventDefault();
           event.stopPropagation();
           return false;
-          "
+        "
       >
         <?= $emoji ?>
       </button>
       <?php
     }
 
-    return ob_get_clean();
+    $ret = ob_get_clean();
+    if ($ret === false) {
+      throw new \Exception("ob_get_clean() failed");
+    }
+    return $ret;
 
   }
 

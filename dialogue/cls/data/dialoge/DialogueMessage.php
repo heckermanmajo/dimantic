@@ -105,6 +105,8 @@ class  DialogueMessage extends DataClass {
 
     $author = Account::get_by_id($app->get_database(), $this->account_id);
 
+    $unique_css_prefix = hash("sha256", (string)$this->id);
+
     # if i am member and active
     # i want my messages on the left whatever
     if ($mem && $mem->state == DialogueMembership::STATE_ACTIVE) {
@@ -127,7 +129,7 @@ class  DialogueMessage extends DataClass {
       <div>
 
         <b style="font-size: 20px; color: dodgerblue;">
-          § <?=$message_number?>
+          § <?= $message_number ?>
         </b>
         &nbsp;&nbsp;&nbsp;
         <div class="w3-right">
@@ -143,7 +145,7 @@ class  DialogueMessage extends DataClass {
         $parsedown->setSafeMode(true);
         $text = $parsedown->parse($this->content);
         echo $text;
-         ?></div>
+        ?></div>
       <!--<pre><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>-->
       <?php
       $all_comments = $this->get_message_comments($app);
@@ -158,66 +160,91 @@ class  DialogueMessage extends DataClass {
       <?php
       endif;
 
-    if (isset($create_comment_from_selection_error) and $_POST["dialogue_message_id"] == $this->id){
-      $selection = $_POST["selection"];
-      $comment_text = $_POST["comment_text"];
-      $style = "display:block;";
-    }
-    else{
-      $selection = "";
-      $comment_text = "";
-      $style = "display:none;";
-    }
-    ?>
+      if (isset($create_comment_from_selection_error) and $_POST["dialogue_message_id"] == $this->id) {
+        $selection = $_POST["selection"];
+        $comment_text = $_POST["comment_text"];
+        $style = "display:block;";
+      }
+      else {
+        $selection = "";
+        $comment_text = "";
+        $style = "display:none;";
+      }
+      ?>
       <?= ($app->executed_action == "create_comment_from_selection"
-        && $_POST["dialogue_message_id"] == $this->id) ? $app->action_error?->get_error_card(): ""; ?>
-    <div
-      class="w3-card-4 w3-margin w3-padding"
-      id="create_comment_from_selection_<?= $this->id ?>"
-      style="<?= $style ?>"
-    >
-      <p>Write comment for following text-selection: </p>
-      <pre id="create_comment_from_selection_<?= $this->id ?>_span"><?=$selection?></pre>
-      <form method="post">
-        <?= ($create_comment_from_selection_error ?? null)?->get_error_card() ?>
-        <input name="dialogue_message_id" type="hidden" value="<?= $this->id ?>">
-        <input
-          type="hidden"
-          name="action"
-          value="create_comment_from_selection">
-        <input
-          type="hidden"
-          id="create_comment_from_selection_<?= $this->id ?>_hidden_input"
-          name="selection"
-          value="<?=$selection?>">
-        <?php
-        # todo: make comments editable until i have written my message ...
-        echo \cls\HtmlUtils::get_markdown_editor_field_for_ajax(
-          field_name: "comment_text",
-          ajax_end_point_path_from_root: "",
-          init_text: "",
-          extra_json_fields: [
-            "dialogue_id" => $dialogue->id,
-          ]
-        );
+        && $_POST["dialogue_message_id"] == $this->id) ? $app->action_error?->get_error_card() : ""; ?>
+      <div
+        class="w3-card-4 w3-margin w3-padding"
+        id="create_comment_from_selection_<?= $this->id ?>"
+        style="<?= $style ?>"
+      >
+        <div class="w3-right">
+          <button
+            class="delete-button"
+            onclick="FN_TOGGLE('create_comment_from_selection_<?= $this->id ?>')"
+          >
+            X CLOSE FORM
+          </button>
+        </div>
+        <p>
+          <b>Write comment below </b>
+          <span style="cursor: pointer" onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_comments')">ℹ️</span>
+          for following text-selection
+          <b>OR</b>
+          <button class="button" style="color: forestgreen; border-color: #4CAF50"> Like the passage ❤️‍🔥</button>
+          <span style="cursor: pointer"  onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_likes')">ℹ️</span>
+          <br>
+          (this like would cost XXX of your XXX like points)
+          <span style="cursor: pointer"  onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_likes')">ℹ️</span>
+        </p>
+        <div
+          onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_comments')"
+          id="<?=$unique_css_prefix?>_info_about_comments" style="display:none" class="info-card"> Information about comments </div>
+        <div
+          onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_likes')"
+          id="<?=$unique_css_prefix?>_info_about_likes" style="display:none" class="info-card"> Information about likes </div>
+        <pre>
+        This like costs XXX of your XXX like points.
+        -> if it costs to much like points, you can not like it.
+        -> This needs to be handled by an JS-Call.
+        -> Help button to explain the like points.
+        -> Hide the like button, once there is content in the comment-textarea field.
+      </pre>
+        <pre id="create_comment_from_selection_<?= $this->id ?>_span"><?= $selection ?></pre>
+        <form method="post">
+          <?= ($create_comment_from_selection_error ?? null)?->get_error_card() ?>
+          <input name="dialogue_message_id" type="hidden" value="<?= $this->id ?>">
+          <input
+            type="hidden"
+            name="action"
+            value="create_comment_from_selection">
+          <input
+            type="hidden"
+            id="create_comment_from_selection_<?= $this->id ?>_hidden_input"
+            name="selection"
+            value="<?= $selection ?>">
+          <?php
+          # todo: make comments editable until i have written my message ...
+          echo \cls\HtmlUtils::get_markdown_editor_field_for_ajax(
+            field_name: "comment_text",
+            ajax_end_point_path_from_root: "",
+            init_text: "",
+            extra_json_fields: [
+              "dialogue_id" => $dialogue->id,
+            ]
+          );
 
-        ?>
-        <!--<textarea
+          ?>
+          <!--<textarea
           name="comment_text"
           id="create_comment_from_selection_<?= $this->id ?>_textarea"
           style="width: 100%"
-          id="create_comment_from_selection_<?= $this->id ?>_textarea"><?=$comment_text?></textarea>-->
-        <br>
-        <button class="button">Create Comment</button>
-      </form>
-      <br><br>
-      <button
-        class="delete-button"
-        onclick="FN_TOGGLE('create_comment_from_selection_<?= $this->id ?>')"
-      >
-        X CLOSE FORM
-      </button>
-    </div>
+          id="create_comment_from_selection_<?= $this->id ?>_textarea"><?= $comment_text ?></textarea>-->
+          <br>
+          <button class="button">Create Comment</button>
+        </form>
+        <br><br>
+      </div>
       <div
         id="comments_of_message_<?= $this->id ?>"> <!-- style="display: none">-->
         <?php

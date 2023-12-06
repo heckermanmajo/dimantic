@@ -1,3 +1,13 @@
+-> Likes anhand der menge an zeichen in einem dialog
+   - der menge von likes die man schon als like markiert hat
+-> Summary, wie die regeln machen
+-> Dauer die man hat bie man die nächst antwort senden kann.
+-> Beschreibungen für die einzelnen Features
+-> Mehrere Leute im Dialog
+
+----
+
+
 Until MVP
 
 
