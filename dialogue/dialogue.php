@@ -156,6 +156,27 @@ try {
         echo $dialogue->get_overview_card($app);
         $messages = DialogueMessage::get_all_messages_of_dialogue($app, $dialogue->id);
         $my_membership = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
+
+
+        $log("Like Percentage: " . $my_membership->like_percentage);
+        $log("Number of all chars in messages text: " . $dialogue->get_number_of_all_chars_in_messages_text($app));
+        $log("Absolute amount of all like credits: " . $my_membership->get_absolute_amount_of_all_possible_like_credits($app));
+        $log("Used like credits of this account: " . \cls\data\dialoge\DialogueMessageSelectionLike::get_all_used_like_credits_per_person_per_dialogue(
+            $app,
+            $dialogue->id,
+            $app->get_currently_logged_in_account()->id
+          )
+        );
+        $log("Free like credits of this account: " . $my_membership->get_absolute_amount_of_FREE_like_credits($app));
+        #echo "<hr>";
+        #echo $my_membership->like_percentage;
+        #echo "<hr>";
+        #echo $dialogue->get_number_of_all_chars_in_messages_text($app);
+        #echo "<hr>";
+        #echo $my_membership->get_absolute_amount_of_all_like_credits($app);
+        #echo "<hr>";
+
+
         ?>
         <div>
 
@@ -376,7 +397,11 @@ try {
           $all_messages_num = count($messages);
           foreach ($messages as $number => $message) {
             $message_number = $all_messages_num - $number;
-            echo $message->get_view_card($app, $message_number);
+            echo $message->get_view_card(
+              $app,
+              $message_number,
+              number_of_free_like_credits: $my_membership->get_absolute_amount_of_FREE_like_credits($app)
+            );
           }
           ?>
 

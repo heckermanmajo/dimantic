@@ -9,6 +9,7 @@ use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMembership;
 use cls\data\dialoge\DialogueMessage;
 use cls\data\dialoge\DialogueMessageComment;
+use cls\data\dialoge\DialogueMessageSelectionLike;
 use cls\data\dialoge\DialogueRule;
 use cls\data\dialoge\DialogueRuleRating;
 use PDO;
@@ -383,6 +384,7 @@ class App {
     DialogueRule::create_table($db);
     DialogueRuleRating::create_table($db);
     NewsEntry::create_table($db);
+    DialogueMessageSelectionLike::create_table($db);
 
     # add new tables (Dataclasses) here ...
     # ...
@@ -480,7 +482,7 @@ class App {
       if (str_contains($log, "ERROR")) {
         echo "<span style='color: red'>";
       }
-      elseif (str_contains($log, "WARNING")) {
+      elseif (str_contains($log, "(warn)")) {
         echo "<span style='color: orange'>";
       }
       elseif (str_contains($log, "TODO")) {

@@ -113,7 +113,9 @@ class Dialogue extends DataClass {
    * @param App $app
    * @return array<DialogueMessage>
    */
-  function get_all_messages(App $app): array {
+  function get_all_messages(App $app, bool $cache = false): array {
+    # static $cache = [];
+    # todo: cache the result -> with optional param to not cache
     return DialogueMessage::get_array(
       pdo: $app->get_database(),
       sql: "SELECT * FROM `DialogueMessage` WHERE `dialogue_id` = ? ORDER BY id DESC",
@@ -191,6 +193,30 @@ class Dialogue extends DataClass {
         "dialogue_id" => $this->id
       ]
     );
+  }
+
+  /**
+   * This function returns the number of all characters in the dialogue,
+   * that are not html tags (after markdown has been parsed).
+   *
+   * This is used to calculate the number of used and to be used like credits.
+   *
+   * @param App $app
+   * @return int
+   *
+   * @see DialogueMembership::$like_percentage
+   * @see DialogueMessage::get_view_card()
+   *
+   */
+  function get_number_of_all_chars_in_messages_text(App $app): int {
+    $all_messages = $this->get_all_messages($app);
+    $sum = 0;
+    foreach ($all_messages as $message) {
+      $html_content = $app->markdown_to_html($message->content);
+      $pure_text = strip_tags($html_content);
+      $sum += strlen($pure_text);
+    }
+    return $sum;
   }
 
   function is_closed(): bool { }

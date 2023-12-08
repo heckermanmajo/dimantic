@@ -50,6 +50,12 @@ class DialogueMembership extends DataClass {
    */
   var string $rule_draft = '';
 
+  /**
+   * Percentage of chars that can be maximally liked
+   * by users.
+   */
+  var float $like_percentage = 0.1;
+
   #################################
   ###### Joined Values      #######
   #################################
@@ -120,7 +126,24 @@ class DialogueMembership extends DataClass {
   #                                                                         #
   ###########################################################################
 
+  function get_absolute_amount_of_all_possible_like_credits(App $app): int {
+    $dialogue = $this->get_associated_dialoge($app->get_database());
+    $all_text_chars_in_dialogue = $dialogue->get_number_of_all_chars_in_messages_text($app);
+    return (int)(((float)$all_text_chars_in_dialogue) * $this->like_percentage);
+  }
 
+  /**
+   * @throws \Exception
+   */
+  function get_absolute_amount_of_FREE_like_credits(App $app): int {
+    $all_possible_like_credits = $this->get_absolute_amount_of_all_possible_like_credits($app);
+    $all_used_like_credits = DialogueMessageSelectionLike::get_all_used_like_credits_per_person_per_dialogue(
+      $app,
+      $this->dialogue_id,
+      $this->account_id
+    );
+    return $all_possible_like_credits - $all_used_like_credits;
+  }
 
   ###########################################################################
   #                                                                         #

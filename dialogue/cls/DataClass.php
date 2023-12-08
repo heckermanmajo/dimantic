@@ -341,14 +341,31 @@ abstract class DataClass implements JsonSerializable {
    */
   static function get_count(PDO $pdo, string $sql, array $params = []): int {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
-    if (!str_starts_with($sql, "SELECT COUNT(*)")) {
+    if (
+      !str_starts_with($sql, "SELECT COUNT(*)")
+    ) {
       $err("get_count called with sql that does not start with SELECT COUNT(*)");
       $err("sql: $sql");
       throw new Exception("get_count called with sql that does not start with SELECT COUNT(*)");
     }
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-    return (int)$stmt->fetchColumn();  // COUNT(*) returns an integer
+    return (int)$stmt->fetchColumn();  // COUNT(*) returns an integer,
+  }
+
+
+  static function get_sum(PDO $pdo, string $sql, array $params = []): int|float {
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+    if (
+      !str_starts_with(trim($sql), "SELECT SUM")
+    ) {
+      $err("get_sum called with sql that does not start with SELECT SUM");
+      $err("sql: $sql");
+      throw new Exception("get_sum called with sql that does not start with SELECT SUM");
+    }
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return (int)$stmt->fetchColumn();  //
   }
 
   /**

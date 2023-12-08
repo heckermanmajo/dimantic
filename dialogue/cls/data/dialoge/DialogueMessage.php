@@ -86,7 +86,11 @@ class  DialogueMessage extends DataClass {
   #                                                                         #
   ###########################################################################
 
-  function get_view_card(App $app, int $message_number = 0): string {
+  function get_view_card(
+    App $app,
+                         int $message_number = 0,
+    int $number_of_free_like_credits = 0,
+  ): string {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     /**
      * This field is possibly set in the handler.php
@@ -138,8 +142,9 @@ class  DialogueMessage extends DataClass {
         </div>
 
       </div>
+      <!--  TODO: insert here the real number of chars to like -->
       <div
-        onmousemove="FN_HANDLE_UPDATE_TEXT_SELECTION(<?= $this->id ?>)"
+        onmousemove="FN_HANDLE_UPDATE_TEXT_SELECTION(<?= $this->id ?>, <?=$number_of_free_like_credits?>)"
       ><?php
         $parsedown = new Parsedown();
         $parsedown->setSafeMode(true);
@@ -186,31 +191,62 @@ class  DialogueMessage extends DataClass {
             X CLOSE FORM
           </button>
         </div>
-        <p>
+        <br>
+        <hr>
+
+        <pre id="create_comment_from_selection_<?= $this->id ?>_span"><?= $selection ?></pre>
+        <b><span id="len_of_selected_text_in_like_form_<?= $this->id ?>"></span></b>
+        Chars Selected
+        <hr>
+        <div>
           <b>Write comment below </b>
-          <span style="cursor: pointer" onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_comments')">ℹ️</span>
+          <span style="cursor: pointer" onclick="FN_TOGGLE('<?= $unique_css_prefix ?>_info_about_comments')">ℹ️</span>
           for following text-selection
-          <b>OR</b>
-          <button class="button" style="color: forestgreen; border-color: #4CAF50"> Like the passage ❤️‍🔥</button>
-          <span style="cursor: pointer"  onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_likes')">ℹ️</span>
+
+          <!--
+          Create Like selection form.
+          -->
+          <form method="post" style="display: inline-block"
+                id="like_form_message_<?= $this->id ?>"
+          >
+            <b>OR</b>
+            <input type="hidden" name="action" value="create_selection_like">
+            <input type="hidden" name="dialogue_message_id" value="<?= $this->id ?>">
+            <input type="hidden" id="like_selection_<?= $this->id ?>_hidden_input" name="liked_selection">
+
+            <button class="button" style="color: forestgreen; border-color: #4CAF50"> Like the passage ❤️‍🔥</button>
+          </form>
+
+          <div
+            id="like_error_div_<?=$this->id?>"
+            style="display: none" class="info-card">
+            <p>Selected Text is to long, cant like it</p>
+            <p>Todo: info and numbers</p>
+          </div>
+
+          <span style="cursor: pointer" onclick="FN_TOGGLE('<?= $unique_css_prefix ?>_info_about_likes')">ℹ️</span>
           <br>
           (this like would cost XXX of your XXX like points)
-          <span style="cursor: pointer"  onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_likes')">ℹ️</span>
-        </p>
+          <span style="cursor: pointer" onclick="FN_TOGGLE('<?= $unique_css_prefix ?>_info_about_likes')">ℹ️</span>
+        </div>
         <div
-          onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_comments')"
-          id="<?=$unique_css_prefix?>_info_about_comments" style="display:none" class="info-card"> Information about comments </div>
+          onclick="FN_TOGGLE('<?= $unique_css_prefix ?>_info_about_comments')"
+          id="<?= $unique_css_prefix ?>_info_about_comments" style="display:none" class="info-card"> Information about
+          comments
+        </div>
         <div
-          onclick="FN_TOGGLE('<?=$unique_css_prefix?>_info_about_likes')"
-          id="<?=$unique_css_prefix?>_info_about_likes" style="display:none" class="info-card"> Information about likes </div>
-        <pre>
+          onclick="FN_TOGGLE('<?= $unique_css_prefix ?>_info_about_likes')"
+          id="<?= $unique_css_prefix ?>_info_about_likes" style="display:none" class="info-card"> Information about
+          likes
+        </div>
+        <pre style="display: none">
         This like costs XXX of your XXX like points.
         -> if it costs to much like points, you can not like it.
         -> This needs to be handled by an JS-Call.
         -> Help button to explain the like points.
         -> Hide the like button, once there is content in the comment-textarea field.
       </pre>
-        <pre id="create_comment_from_selection_<?= $this->id ?>_span"><?= $selection ?></pre>
+
         <form method="post">
           <?= ($create_comment_from_selection_error ?? null)?->get_error_card() ?>
           <input name="dialogue_message_id" type="hidden" value="<?= $this->id ?>">
