@@ -11,12 +11,19 @@ use PDO;
 
 
 class DialogueMembership extends DataClass {
+  
+  /** @deprecated We move all the management away from the dialogue into the inducement */
   const STATE_PENDING = 'pending';
+  /** @deprecated We move all the management away from the dialogue into the inducement */
   const STATE_ACTIVE = 'active';
+  /** @deprecated We move all the management away from the dialogue into the inducement */
   const STATE_DECLINED = 'declined';
-
+  
+  /** @deprecated We move all the management away from the dialogue into the inducement */
   const TYPE_INVITATION = 'invitation';
+  /** @deprecated We move all the management away from the dialogue into the inducement */
   const TYPE_JOIN_REQUEST = 'join_request';
+  /** @deprecated We move all the management away from the dialogue into the inducement */
   const TYPE_CREATOR = 'creator';
   ###########################################################################
   #                                                                         #
@@ -26,7 +33,12 @@ class DialogueMembership extends DataClass {
   var int $last_message_seen_id = 0;
   var int $dialogue_id = 0;
   var int $account_id = 0;
+  /**
+   * todo: state needs to become "left" or "active"
+   * @var string
+   */
   var string $state = '';
+  /** @deprecated We move all the management away from the dialogue into the inducement */
   var string $type = '';
   var string $create_date = '';
 

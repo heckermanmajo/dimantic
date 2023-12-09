@@ -5,6 +5,7 @@ namespace cls\data\dialoge;
 
 use cls\App;
 use cls\data\account\Account;
+use cls\data\inducement\Inducement;
 use cls\DataClass;
 use cls\RequestError;
 
@@ -560,6 +561,40 @@ class Dialogue extends DataClass {
 
   static function check_value(string $field_name, mixed $value, App $app): string|null {
     return null;
+  }
+  
+  /**
+   * Creates an conversation between the given accounts.
+   *
+   * We ditch the invite stuff, so you can just create dialoge with one function and
+   * we then add all the invite, accept stuff later, as pat of inducements.
+   *
+   * @return int|RequestError The id of the created dialogue.
+   */
+  static function createNewConversation(
+    array $account_ids,
+    int|null $possible_moderator_id,
+    Inducement $inducement,
+    App $app
+  ): int|RequestError {
+    
+    $accounts = [];
+    foreach ($account_ids as $account_id) {
+      $account = Account::get_by_id(
+        pdo: $app->get_database(),
+        id: $account_id
+      );
+      if ($account == null) {
+        return new RequestError("Account with id $account_id does not exist.", RequestError::NOT_FOUND);
+      }
+      $accounts[] = $account;
+    }
+    
+    $dialogue = new Dialogue();
+    
+    
+    #foreach ()
+    
   }
 
 
