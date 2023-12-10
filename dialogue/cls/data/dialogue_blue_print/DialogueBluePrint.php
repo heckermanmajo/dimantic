@@ -1,11 +1,15 @@
 <?php
 
-namespace cls\data\inducement;
+namespace cls\data\dialogue_blue_print;
+
+use cls\DataClass;
 
 /**
  * Initiation of a conversation.
  */
-class Inducement {
+class DialogueBluePrint extends DataClass {
+
+  public int $author = 0;
 
   /**
    * The id of the inducement, this one is the counteroffer to.

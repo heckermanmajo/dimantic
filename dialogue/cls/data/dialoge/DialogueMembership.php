@@ -15,8 +15,6 @@ class DialogueMembership extends DataClass {
   /** @deprecated We move all the management away from the dialogue into the inducement */
   const STATE_PENDING = 'pending';
   /** @deprecated We move all the management away from the dialogue into the inducement */
-  const STATE_ACTIVE = 'active';
-  /** @deprecated We move all the management away from the dialogue into the inducement */
   const STATE_DECLINED = 'declined';
   
   /** @deprecated We move all the management away from the dialogue into the inducement */
@@ -25,6 +23,11 @@ class DialogueMembership extends DataClass {
   const TYPE_JOIN_REQUEST = 'join_request';
   /** @deprecated We move all the management away from the dialogue into the inducement */
   const TYPE_CREATOR = 'creator';
+
+  const STATE_LEFT = 'left';
+  const STATE_ACTIVE = 'active';
+  const STATE_MODERATOR = 'moderator';
+
   ###########################################################################
   #                                                                         #
   #  Properties & Property-functions                                        #
@@ -37,7 +40,7 @@ class DialogueMembership extends DataClass {
    * todo: state needs to become "left" or "active"
    * @var string
    */
-  var string $state = '';
+  var string $state = 'active';
   /** @deprecated We move all the management away from the dialogue into the inducement */
   var string $type = '';
   var string $create_date = '';

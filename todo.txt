@@ -1,140 +1,19 @@
--> Likes anhand der menge an zeichen in einem dialog
+BIS ENDE DES JAHRES
+
+TODO 1: Create Test case for creating dialogue by blueprint
+TODO 2: Remove all other accept/reject logic
+
+
+
+-> Dafür brauche ich einen Plan.
+-> Likes anhand der Menge an zeichen in einem dialog
    - der menge von likes die man schon als like markiert hat
--> Summary, wie die regeln machen
+-> Summary, wie die regeln machen -> es sind regeln nur mit extra daten
 -> Dauer die man hat bie man die nächst antwort senden kann.
 -> Beschreibungen für die einzelnen Features
--> Mehrere Leute im Dialog
-
-----
-
-
-Until MVP
-
-
-
-
-Die eigene Historie erforschen?
--> wie kann man das machen? gehört das überhaupt auf diese seite?
-
--> matches & Rating
-
-Das macht es einfacher missverständnisse zu vermeiden
-Neutrale Konzepte einbauen.
-Zum verweisen drauf, was man meint:
--> Wortdefinitionen
--> Kontextdefinitionen
-
-
--> Add rating dimensions to league in admin edit
--> also add the infos about the dimension to the league description for info
-
--> make rating within the idea space possible
--> create some kind of qualifying view per idea space
-
--> if your post has lost a qualifier
--> down re-compete the same post
--> only display league winner posts in the feed and global search
-
-/**
- * An attention lense is a number of commands
- * to filter data - a very complicated, assembled search-command.
- * - Can be shared between members
- * - usage earns the creator geistmark
- */
-
-
-AttentionLeague PLea
-The best people create plea why a certain post should
- * win in an attention league.
-
-Porblem:
--> Wie prevented man bad actors davor die idea-spaces zu
-   unter-wanderen und MURKS im man der unterwanderten community
-   up-zu voten.
--> TRUST-value
--> Kompetenz-wert
--> rating History: die community kann eine "überprüfung" beantragen
-
--> Community Notes an Posts anfügen
-===> Recherche
--> Value of Notes rating based on trust
-
--> community based trust score
-
-
-- Wer ist wann qualifiziert für die Leagues?
-- random leute zur verständlichkeitsbeurteilung berufen wie schöffen
-
-- Content teilnhame ist content only.
-- betwerten dürfen nur die mit hohem trust und hoher kompetenz
-und diejenigen die schon kontent in die liga gebracht haben.
-- kompetenz liga abhängig machen
-- mindest posts für seasons, min time
-
--> posts comitted in eine liga zähl nicht mehr in die 100% der posts in einem
-  idea space von denen dann 10% ausgewählt werden
-
-- Plebs-Feedback
-- plabs diskussion
-
-- den INterpreter für allen content nutzen
-- dann unterschiedliche mods für
-- posts, idea spaces, etc.
-
-- hinzufügen zu welchem idea space posts gehören
-- man muss dem idea space beitreten
-- nur die besten 20 % der Posts im Idea space können an den Leagues teil nehmen
-
-- create league & idea space: Admin
-- add memberships to idea space
-- closed idea spaces, mit bewerbung
-
-- Council: Wie setzt sie sich zusammen
-- create and list endorsements
-- endorsement category
-- create endorsemenrt category
-
-- TODO: IGNORE Dimensions with less than 5 ratings
-
-- create util function for the tests
-- dataset with posts that are not just our posts ...
-- pagination
-- why can i not add stuff to the root node in a tree??
-
-- todo: apply bigger change if the distance between rated posts is bigger
-
-
-
-- Account system sollte eingermaßen stehen (password reset,email verification, etc.)
-- Überall alles escapen (html,js)
-- allen input überprüfen
-- rating
-- feed
-- geistmark
-- actions
-- add associations(other posts) to a post
-- application for attention-dimensions
-- post filter by attention dimension
-- pagination -> 6 posts per page
-
-Codebase:
-- extract all the html from the model-classes
-extract sql from the controller an dview
-- add language to posts
-- remove last_api_call_logs
-- Add the algo-placeholders
-- comment all dataclasses
-- add the project guidelines to the readme
-
-Concept:
-- Datastructures for the graph
-- Plugins?? -> js only, command-language, etc.
-
-Project:
-- invite russ & robin to discord
-- setup the discord with some content
-- Setup a Tasklist
-- Setup code & project-introduction videos
-
-Question:
-When and how API?, App, etc. ...
+-> Mehrere Leute im Dialog -> unendlich viele
+-> DIALOG von einem inducement erstellen (no ui)
+-> Testcases für die einzelnen features, dialog sachen
+-> unit test zum ausführen
+-> von außen jemanden dazu schalten können
+-> Vn chat-GPT die Dialog-message überprüfen lassen, bevor man sie abschickt

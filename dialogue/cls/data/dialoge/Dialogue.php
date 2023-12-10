@@ -5,9 +5,11 @@ namespace cls\data\dialoge;
 
 use cls\App;
 use cls\data\account\Account;
-use cls\data\inducement\Inducement;
+use cls\data\account\NewsEntry;
+use cls\data\dialogue_blue_print\DialogueBluePrint;
 use cls\DataClass;
 use cls\RequestError;
+use Exception;
 
 /**
  * This class represents one dialogue between multiple
@@ -19,6 +21,7 @@ class Dialogue extends DataClass {
   /**
    * If a dialogue has not yet started, members can join and its content
    * can be changed.
+   * @deprecated
    */
   const STATE_NOT_YET_STARTED = 'not_yet_started';
   /**
@@ -37,11 +40,18 @@ class Dialogue extends DataClass {
   ###########################################################################
 
   /**
+   * @var int The id of the inducement, this dialogue is created from.
+   */
+  var int $inducement_id = 0;
+
+  /**
    * The content of the dialogue.
    * This can be used to describe the topic of the dialogue.
    * Also: add rules or other information.
    *
    * It is parsed by the interpreter.
+   *
+   * @deprecated -> is set in the inducement
    */
   var string $content = '';
 
@@ -55,20 +65,24 @@ class Dialogue extends DataClass {
    * The number of days you have to answer to a message.
    * -> If the member fails to answer, we offer the other member
    * to end the dialogue.
+   * @deprecated -> is set in the inducement
    */
   var int $number_of_days_to_reply = 0;
 
   /**
+   * @deprecated -> is set in the inducement
    * The number of hours you have to wait until you can send a new message.
    */
   var int $message_cooldown_in_hours = 0;
 
   /**
+   * @deprecated -> is set in the inducement
    * The number of words you can write per message.
    */
   var int $max_words_per_message = 0;
 
   /**
+   * @deprecated With the inducement system, all members are added at the beginning.
    * The number of members that are needed to start the dialogue.
    */
   var int $number_of_needed_members = 1;
@@ -77,24 +91,20 @@ class Dialogue extends DataClass {
    * The id of the account that has created the dialogue.
    */
   # todo: set to to 0
-  var int $author_id = 3;
+  var int $author_id = 0;
 
   /**
    * The date the dialogue has been created.
    * Format: YYYY-MM-DD HH:MM:SS
+   * @deprecated -> remove this in favor of created_at
    */
   var string $create_date = '';
 
   /**
    * If the invited member declines the invitation, the dialogue is dead.
+   * @deprecated -> new use of state variable makes this obsolete
    */
   var int $dead = 0;
-
-  /**
-   * If the dialogue is a vault-dialogue, this is the id of the vault.
-   * If 0 -> not a vault dialogue.
-   */
-  var int $vault_id = 0;
 
   #################################
   ###### Joined Values      #######
@@ -409,7 +419,7 @@ class Dialogue extends DataClass {
    *
    * @param App $app
    * @return bool
-   * @throws \Exception
+   * @throws Exception
    */
   function next_turn_is_my_turn(App $app): bool {
     $messages = $this->get_all_messages($app);
@@ -562,20 +572,31 @@ class Dialogue extends DataClass {
   static function check_value(string $field_name, mixed $value, App $app): string|null {
     return null;
   }
-  
+
   /**
-   * Creates an conversation between the given accounts.
+   * Creates a conversation between the given accounts.
+   *
+   * All checks if the dialoge SHOULD be created need to be done before.
    *
    * We ditch the invite stuff, so you can just create dialoge with one function and
    * we then add all the invite, accept stuff later, as pat of inducements.
    *
+   * @param array<int> $account_ids
+   * @param int|null $possible_moderator_id
+   * @param DialogueBluePrint $blue_print
+   * @param App $app
+   * @param bool $create_news_entries
+   *
    * @return int|RequestError The id of the created dialogue.
+   *
+   * @throws Exception
    */
   static function createNewConversation(
-    array $account_ids,
-    int|null $possible_moderator_id,
-    Inducement $inducement,
-    App $app
+    array             $account_ids,
+    int|null          $possible_moderator_id,
+    DialogueBluePrint $blue_print,
+    App               $app,
+    bool              $create_news_entries = true
   ): int|RequestError {
     
     $accounts = [];
@@ -589,12 +610,69 @@ class Dialogue extends DataClass {
       }
       $accounts[] = $account;
     }
+
+    $moderator_account = null;
+    if($possible_moderator_id !== null){
+
+      $moderator_account = Account::get_by_id(
+        pdo: $app->get_database(),
+        id: $possible_moderator_id
+      );
+
+      if ($moderator_account == null) {
+        return new RequestError("Account with id $possible_moderator_id does not exist.", RequestError::NOT_FOUND);
+      }
+
+    }
     
     $dialogue = new Dialogue();
-    
-    
-    #foreach ()
-    
+    $dialogue->author_id = $blue_print->author;
+    $dialogue->inducement_id = $blue_print->id;
+    $dialogue->created_at = time();
+    $dialogue->state = Dialogue::STATE_OPEN;
+
+    $dialogue->save($app->get_database());
+
+    foreach ($accounts as $account) {
+      $membership = new DialogueMembership();
+      $membership->account_id = $account->id;
+      $membership->dialogue_id = $dialogue->id;
+      $membership->state = DialogueMembership::STATE_ACTIVE;
+
+      $membership->save($app->get_database());
+    }
+
+    # Create the moderator membership
+    if(isset($moderator_account) && $moderator_account != null ){
+      $membership = new DialogueMembership();
+      $membership->account_id = $moderator_account->id;
+      $membership->dialogue_id = $dialogue->id;
+      $membership->state = DialogueMembership::STATE_MODERATOR;
+
+      $membership->save($app->get_database());
+    }
+
+    if ($create_news_entries){
+      foreach ($accounts as $account){
+        $news_entry = new NewsEntry();
+        $news_entry->account_id = $account->id;
+        $news_entry->type = NewsEntry::TYPE_DIALOGUE_HAS_STARTED;
+        $news_entry->dialogue_id = $dialogue->id;
+        $news_entry->save($app->get_database());
+      }
+
+      if (isset($moderator_account) && $moderator_account != null){
+        $news_entry = new NewsEntry();
+        $news_entry->account_id = $moderator_account->id;
+        # todo: add more specific type -> I am moderator ...
+        $news_entry->type = NewsEntry::TYPE_DIALOGUE_HAS_STARTED;
+        $news_entry->dialogue_id = $dialogue->id;
+        $news_entry->save($app->get_database());
+      }
+    }
+
+    return $dialogue->id;
+
   }
 
 
