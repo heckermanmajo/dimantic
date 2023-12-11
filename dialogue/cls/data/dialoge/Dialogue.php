@@ -45,47 +45,10 @@ class Dialogue extends DataClass {
   var int $inducement_id = 0;
 
   /**
-   * The content of the dialogue.
-   * This can be used to describe the topic of the dialogue.
-   * Also: add rules or other information.
-   *
-   * It is parsed by the interpreter.
-   *
-   * @deprecated -> is set in the inducement
-   */
-  var string $content = '';
-
-  /**
    * The state of the dialogue.
    * @see Dialogue::STATE_* constants
    */
   var string $state = '';
-
-  /**
-   * The number of days you have to answer to a message.
-   * -> If the member fails to answer, we offer the other member
-   * to end the dialogue.
-   * @deprecated -> is set in the inducement
-   */
-  var int $number_of_days_to_reply = 0;
-
-  /**
-   * @deprecated -> is set in the inducement
-   * The number of hours you have to wait until you can send a new message.
-   */
-  var int $message_cooldown_in_hours = 0;
-
-  /**
-   * @deprecated -> is set in the inducement
-   * The number of words you can write per message.
-   */
-  var int $max_words_per_message = 0;
-
-  /**
-   * @deprecated With the inducement system, all members are added at the beginning.
-   * The number of members that are needed to start the dialogue.
-   */
-  var int $number_of_needed_members = 1;
 
   /**
    * The id of the account that has created the dialogue.
@@ -93,18 +56,7 @@ class Dialogue extends DataClass {
   # todo: set to to 0
   var int $author_id = 0;
 
-  /**
-   * The date the dialogue has been created.
-   * Format: YYYY-MM-DD HH:MM:SS
-   * @deprecated -> remove this in favor of created_at
-   */
-  var string $create_date = '';
-
-  /**
-   * If the invited member declines the invitation, the dialogue is dead.
-   * @deprecated -> new use of state variable makes this obsolete
-   */
-  var int $dead = 0;
+  var int $created_at = 0;
 
   #################################
   ###### Joined Values      #######
@@ -113,11 +65,6 @@ class Dialogue extends DataClass {
   #################################
   ###### Property-functions #######
   #################################
-
-  function get_title(App $app): string {
-    # todo: add later the correct title via interpreter
-    return $this->content;
-  }
 
   /**
    * Return the messages in descending id order.
@@ -155,54 +102,12 @@ class Dialogue extends DataClass {
   }
 
   function get_number_of_memberships(
-    App  $app,
-    bool $ignore_pending = false,
-    bool $ignore_declined = true,
+    App $app
   ): int {
-    if ($ignore_pending && $ignore_declined) {
-      return DialogueMembership::get_count(
-        pdo: $app->get_database(),
-        sql: "SELECT COUNT(*) FROM `DialogueMembership` WHERE `dialogue_id` = ? AND `state` = ?",
-        params: [$this->id, DialogueMembership::STATE_ACTIVE]
-      );
-    }
-    if ($ignore_pending) {
-      return DialogueMembership::get_count(
-        pdo: $app->get_database(),
-        sql: "SELECT COUNT(*) FROM `DialogueMembership` WHERE `dialogue_id` = ? AND (`state` = ? OR `state` = ?)",
-        params: [$this->id, DialogueMembership::STATE_ACTIVE, DialogueMembership::STATE_DECLINED]
-      );
-    }
-    if ($ignore_declined) {
-      return DialogueMembership::get_count(
-        pdo: $app->get_database(),
-        sql: "SELECT COUNT(*) FROM `DialogueMembership` WHERE `dialogue_id` = ? AND (`state` = ? OR `state` = ?)",
-        params: [$this->id, DialogueMembership::STATE_ACTIVE, DialogueMembership::STATE_PENDING]
-      );
-    }
     return DialogueMembership::get_count(
       pdo: $app->get_database(),
       sql: "SELECT COUNT(*) FROM `DialogueMembership` WHERE `dialogue_id` = ?",
       params: [$this->id]
-    );
-  }
-
-  function get_only_active_memberships(App $app): array {
-    return DialogueMembership::get_array(
-      pdo: $app->get_database(),
-      sql: "SELECT * FROM `DialogueMembership` WHERE `dialogue_id` = ? AND `state` = ?",
-      params: [$this->id, DialogueMembership::STATE_ACTIVE]
-    );
-  }
-
-  function get_member_accounts_(App $app): array {
-    return Account::get_array(
-      $app->get_database(),
-      "SELECT * FROM Account WHERE id IN 
-        (SELECT account_id FROM DialogueMembership WHERE dialogue_id = :dialogue_id)",
-      [
-        "dialogue_id" => $this->id
-      ]
     );
   }
 
@@ -230,7 +135,22 @@ class Dialogue extends DataClass {
     return $sum;
   }
 
-  function is_closed(): bool { }
+  /**
+   * Returns all members that have left the dialogue.
+   * -> If all but one have left, the dialogue is closed.
+   * @param App $app
+   * @return int
+   */
+  function get_number_of_members_left(App $app): int {
+    $all_memberships = $this->get_memberships($app);
+    $members_that_have_left = 0;
+    foreach ($all_memberships as $membership) {
+      if ($membership->state == DialogueMembership::STATE_LEFT) {
+        $members_that_have_left++;
+      }
+    }
+    return $members_that_have_left;
+  }
 
   function get_last_message(App $app): ?DialogueMessage {
     return DialogueMessage::get_one(
@@ -239,10 +159,6 @@ class Dialogue extends DataClass {
       params: [$this->id]
     );
   }
-
-  function get_last_message_date(): string { }
-
-  function has_not_yet_started(): bool { }
 
   function current_user_is_member(App $app): bool {
     return $this->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id) != null;
@@ -269,56 +185,6 @@ class Dialogue extends DataClass {
 #  Model-Queries                                                          #
 #                                                                         #
 ###########################################################################
-  static function find_dialoges_by_search_string(
-    string $search_string,
-    int    $offset,
-    int    $limit
-  ): array {
-  }
-
-  static function get_my_ongoing_dialogues(int $offset, int $limit, App $app): array {
-    return Dialogue::get_array(
-      $app->get_database(),
-      "SELECT * FROM Dialogue WHERE id IN 
-        (SELECT dialogue_id FROM DialogueMembership 
-            WHERE account_id = :account_id AND DialogueMembership.state = :membership_state)
-        AND Dialogue.state = :dialogue_state",
-      [
-        "account_id" => $app->get_currently_logged_in_account()->id,
-        "membership_state" => DialogueMembership::STATE_ACTIVE,
-        "dialogue_state" => Dialogue::STATE_OPEN
-      ]
-    );
-  }
-
-  static function my_dialogues_ready_to_start(int $offset, int $limit, App $app): array {
-    return Dialogue::get_array(
-      $app->get_database(),
-      "SELECT * FROM Dialogue WHERE id IN 
-            (SELECT dialogue_id FROM DialogueMembership 
-              WHERE 
-                  account_id = :account_id 
-              )
-              AND 
-              (
-                SELECT COUNT(*) FROM DialogueMembership as d2
-                    WHERE 
-                        (
-                            d2.state = :membership_state_pending
-                            OR
-                            d2.state = :membership_state_declined
-                        ) 
-                    AND d2.dialogue_id = Dialogue.id
-              ) = 0
-        AND Dialogue.state = :dialogue_state_pending",
-      [
-        "account_id" => $app->get_currently_logged_in_account()->id,
-        "dialogue_state_pending" => Dialogue::STATE_NOT_YET_STARTED,
-        "membership_state_pending" => DialogueMembership::STATE_PENDING,
-        "membership_state_declined" => DialogueMembership::STATE_DECLINED,
-      ]
-    );
-  }
 
   /**
    * @param int $offset
@@ -332,79 +198,6 @@ class Dialogue extends DataClass {
       sql: "SELECT * FROM `Dialogue` WHERE `id` 
                IN (SELECT `dialogue_id` FROM `DialogueMembership` WHERE `account_id` = ?)",
       params: [$app->get_currently_logged_in_account()->id]
-    );
-  }
-
-  static function get_dialoges_i_have_unseen_messages_in(int $offset, int $limit): array {
-
-  }
-
-  static function get_count_of_dialoges_i_have_unseen_messages_in(): int {
-
-  }
-
-  static function get_dialogues_by_state(int $offset, int $limit, string $state, App $app): array {
-    return static::get_array(
-      pdo: $app->get_database(),
-      sql: "SELECT * FROM `Dialogue` WHERE `state` = ?",
-      params: [$state]
-    );
-  }
-
-  /**
-   * Returns the dialogues i am invited to, but have not yet joined.
-   * @param int $offset
-   * @param int $limit
-   * @return array<Dialogue>
-   */
-  static function get_dialogues_i_am_invited_to(int $offset, int $limit, App $app): array {
-    return Dialogue::get_array(
-      $app->get_database(),
-      "
-        SELECT * FROM Dialogue 
-          WHERE id IN 
-            /* I am pending member of this dialogue. */
-            (
-                SELECT dialogue_id FROM DialogueMembership 
-                  WHERE account_id= :account_id 
-                    AND state = :state
-            )
-            AND
-              /* Dialogue is not dead. */
-              dead = 0
-            ",
-      [
-        "account_id" => $app->get_currently_logged_in_account()->id,
-        "state" => DialogueMembership::STATE_PENDING
-      ]
-    );
-  }
-
-  static function get_dialogues_not_ready_to_start(int $offset, int $limit, App $app): array {
-    # missing members
-    return Dialogue::get_array(
-        $app->get_database(),
-        "
-            SELECT * FROM Dialogue WHERE 
-                /* I am pending OR active member of this dialogue. */
-                (
-                    SELECT dialogue_id FROM DialogueMembership 
-                      WHERE account_id= :account_id 
-                        AND state = :state_pending
-                      OR state = :state_active
-                )
-                    AND 
-                /* Some member is pending. */                       
-                (   
-                    SELECT COUNT(*) FROM DialogueMembership 
-                      WHERE 
-                        DialogueMembership.dialogue_id = Dialogue.id 
-                        AND state = :state_pending) != 0",
-        [
-          "account_id" => $app->get_currently_logged_in_account()->id,
-          "state_pending" => DialogueMembership::STATE_PENDING,
-          "state_active" => DialogueMembership::STATE_ACTIVE
-        ]
     );
   }
 
@@ -455,115 +248,53 @@ class Dialogue extends DataClass {
       id: $this->author_id
     );
 
-    $accept_invitation_button = false;
-    $i_am_part_of_dialogue = false;
-    if ($my_membership == null) {
-      $my_membership_hint = "<small>You are not a <b style='color: #ffd205'>member</b> of this dialogue</small>";
-    }
-    else {
-      if ($my_membership->type == DialogueMembership::TYPE_CREATOR) {
-        $my_membership_hint = "<small>You are the <b style='color: #69ff7a'>creator</b> of this dialogue</small>";
-        $i_am_part_of_dialogue = true;
-      }
-      else {
-        if ($my_membership->state == DialogueMembership::STATE_PENDING) {
-          $my_membership_hint = "<small><b style='color: #00bcd4'>You have been requested to join this dialogue</b></small>";
-          $accept_invitation_button = true;
-        }
-        else {
-          if ($my_membership->state == DialogueMembership::STATE_DECLINED) {
-            $my_membership_hint = "<small><b style='color: #e400ff'>You have declined to join this dialogue</b></small>";
-          }
-          else {
-            $my_membership_hint = "<small>You are a <b style='color: yellow'>member</b> of this dialogue</small>";
-            $i_am_part_of_dialogue = true;
-          }
-        }
-      }
+    $i_am_part_of_dialogue = $my_membership != null;
+
+    $my_membership_hint = "";
+    if ($i_am_part_of_dialogue) {
+      $my_membership_hint = "<small style='color: greenyellow'>Member</small>";
     }
 
     $state_hint = match ($this->state) {
-      Dialogue::STATE_NOT_YET_STARTED => "<small style='color: white'>Not yet started</small>",
       Dialogue::STATE_OPEN => "<small style='color: greenyellow'>Open</small>",
       Dialogue::STATE_CLOSED => "<small style='color: #b4aa50'>Closed</small>",
+      default => "DEPRECATED",
     };
 
     $number_of_members = $this->get_number_of_memberships($app);
-
-    $number_of_active_memberships = count($this->get_only_active_memberships($app));
-
     ob_start();
+
     ?>
     <div>
-      <?php if ($this->dead == 1): ?>
-        <b style="color: red">DEAD</b> |
+
+      <?php if ($i_am_part_of_dialogue && $this->next_turn_is_my_turn($app)): ?>
+        <b style="color: #00ff78">MY TURN</b> |
+      <?php else: ?>
+        <b style="color: #797979">THEIR TURN</b> |
       <?php endif; ?>
-      <?php if ($this->state == Dialogue::STATE_OPEN && $i_am_part_of_dialogue && !$this->dead == 1): ?>
-        <?php if ($this->next_turn_is_my_turn($app)): ?>
-          <b style="color: #00ff78">MY TURN</b> |
-        <?php else: ?>
-          <b style="color: #797979">THEIR TURN</b> |
-        <?php endif; ?>
-      <?php endif; ?>
+
       <?= $my_membership_hint ?> | <?= $state_hint ?> | <small>members: <?= $number_of_members ?></small>
-      | <small>active members: <?= $number_of_active_memberships ?></small>
-      | <small>created: <?= $this->create_date ?></small>
+      | <small>created: <?= $this->created_at ?></small>
       | <small>author: <b><?= $author->name ?></b></small>
-      <?php if ($accept_invitation_button): ?>
-        <form method="post" style="display: inline-block">
-          <input type="hidden" name="action" value="accept_dialogue_invitation">
-          <input type="hidden" name="dialogue_id" value="<?= $this->id ?>">
-          <button class="button">Accept Invitation</button>
-        </form>
-        <form method="post" style="display: inline-block">
-          <input type="hidden" name="action" value="decline_invitation">
-          <input type="hidden" name="dialogue_id" value="<?= $this->id ?>">
-          <button class="button">Decline Invitation</button>
-        </form>
-      <?php endif; ?>
     </div>
     <?php
     return ob_get_clean();
   }
 
   function get_overview_card(
-    App           $app,
-    ?RequestError $activate_error = null
+    App $app,
   ): string {
 
-    $can_be_started = count($this->get_only_active_memberships($app))
-      >= $this->number_of_needed_members;
-
-    $is_started = $this->state != Dialogue::STATE_NOT_YET_STARTED;
-
     ob_start();
+
+    $content = "Empty, but load later from blueprint.";
     ?>
 
     <div class="w3-card w3-margin w3-padding">
       <small><?= $this->get_header_bar($app) ?></small>
       <a style="text-decoration: none" href="/dialogue.php?id=<?= $this->id ?>">
-        <?php if (trim($this->content) == ""): ?>
-          <h6>Untitled Dialogue</h6>
-        <?php else: ?>
-          <?= $app->markdown_to_html($this->content) ?>
-        <?php endif; ?>
-        <!--<div>
-          <small>created: <?= $this->create_date ?></small>
-        </div>-->
+        <?= $content ?>
       </a>
-      <?php if (
-        $can_be_started
-        && !$is_started
-        && $this->author_id == $app->get_currently_logged_in_account()->id
-      ) { ?>
-        <form method="post" style="display: inline-block">
-          <?= $app->executed_action == "start_dialogue"?: $app->action_error?->get_error_card() ?>
-          <input type="hidden" name="action" value="start_dialogue">
-          <input type="hidden" name="dialogue_id" value="<?= $this->id ?>">
-          <button class="button">Start Dialogue</button>
-        </form>
-      <?php } ?>
-      <!--<pre><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>-->
     </div>
     <?php
     return ob_get_clean();
@@ -572,109 +303,5 @@ class Dialogue extends DataClass {
   static function check_value(string $field_name, mixed $value, App $app): string|null {
     return null;
   }
-
-  /**
-   * Creates a conversation between the given accounts.
-   *
-   * All checks if the dialoge SHOULD be created need to be done before.
-   *
-   * We ditch the invite stuff, so you can just create dialoge with one function and
-   * we then add all the invite, accept stuff later, as pat of inducements.
-   *
-   * @param array<int> $account_ids
-   * @param int|null $possible_moderator_id
-   * @param DialogueBluePrint $blue_print
-   * @param App $app
-   * @param bool $create_news_entries
-   *
-   * @return int|RequestError The id of the created dialogue.
-   *
-   * @throws Exception
-   */
-  static function createNewConversation(
-    array             $account_ids,
-    int|null          $possible_moderator_id,
-    DialogueBluePrint $blue_print,
-    App               $app,
-    bool              $create_news_entries = true
-  ): int|RequestError {
-    
-    $accounts = [];
-    foreach ($account_ids as $account_id) {
-      $account = Account::get_by_id(
-        pdo: $app->get_database(),
-        id: $account_id
-      );
-      if ($account == null) {
-        return new RequestError("Account with id $account_id does not exist.", RequestError::NOT_FOUND);
-      }
-      $accounts[] = $account;
-    }
-
-    $moderator_account = null;
-    if($possible_moderator_id !== null){
-
-      $moderator_account = Account::get_by_id(
-        pdo: $app->get_database(),
-        id: $possible_moderator_id
-      );
-
-      if ($moderator_account == null) {
-        return new RequestError("Account with id $possible_moderator_id does not exist.", RequestError::NOT_FOUND);
-      }
-
-    }
-    
-    $dialogue = new Dialogue();
-    $dialogue->author_id = $blue_print->author;
-    $dialogue->inducement_id = $blue_print->id;
-    $dialogue->created_at = time();
-    $dialogue->state = Dialogue::STATE_OPEN;
-
-    $dialogue->save($app->get_database());
-
-    foreach ($accounts as $account) {
-      $membership = new DialogueMembership();
-      $membership->account_id = $account->id;
-      $membership->dialogue_id = $dialogue->id;
-      $membership->state = DialogueMembership::STATE_ACTIVE;
-
-      $membership->save($app->get_database());
-    }
-
-    # Create the moderator membership
-    if(isset($moderator_account) && $moderator_account != null ){
-      $membership = new DialogueMembership();
-      $membership->account_id = $moderator_account->id;
-      $membership->dialogue_id = $dialogue->id;
-      $membership->state = DialogueMembership::STATE_MODERATOR;
-
-      $membership->save($app->get_database());
-    }
-
-    if ($create_news_entries){
-      foreach ($accounts as $account){
-        $news_entry = new NewsEntry();
-        $news_entry->account_id = $account->id;
-        $news_entry->type = NewsEntry::TYPE_DIALOGUE_HAS_STARTED;
-        $news_entry->dialogue_id = $dialogue->id;
-        $news_entry->save($app->get_database());
-      }
-
-      if (isset($moderator_account) && $moderator_account != null){
-        $news_entry = new NewsEntry();
-        $news_entry->account_id = $moderator_account->id;
-        # todo: add more specific type -> I am moderator ...
-        $news_entry->type = NewsEntry::TYPE_DIALOGUE_HAS_STARTED;
-        $news_entry->dialogue_id = $dialogue->id;
-        $news_entry->save($app->get_database());
-      }
-    }
-
-    return $dialogue->id;
-
-  }
-
-
 
 }

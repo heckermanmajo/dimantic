@@ -98,66 +98,8 @@ class NewsEntry extends DataClass {
     ob_start();
     ?>
     <div class="w3-card w3-margin w3-padding">
-      <?php switch ($this->type):
-
-        case static::TYPE_INVITED_TO_NEW_DIALOGUE:
-          $new_dialogue = Dialogue::get_by_id(
-            pdo: $app->get_database(),
-            id: $this->dialogue_id
-          );
-          ?>
-          <h4>You have been invited to a new dialogue!</h4>
-          <p><?= $new_dialogue->get_title($app) ?></p>
-          <a class="button" href="/dialogue.php?id=<?= $new_dialogue->id ?>">Go to dialogue </a>
-          <?php
-          break;
-
-        case static::TYPE_NEW_MESSAGE_IN_DIALOGUE:
-          $dialogue = Dialogue::get_by_id(
-            pdo: $app->get_database(),
-            id: $this->dialogue_id
-          );
-          ?>
-          <h4>New message in dialogue!</h4>
-          <p><?= $dialogue->get_title($app) ?></p>
-          <pre><?= $dialogue->get_last_message($app)->get_preview_of_content() ?></pre>
-          <?php
-          break;
-
-        case static::TYPE_OTHER_PERSON_HAS_ACCEPTED_INVITATION:
-          $dialogue = Dialogue::get_by_id(
-            pdo: $app->get_database(),
-            id: $this->dialogue_id
-          );
-          # todo: later more than two people can be members, fix this
-          $memberships = $dialogue->get_memberships($app);
-          $other_person = null;
-          foreach ($memberships as $m){
-            if($m->type == DialogueMembership::TYPE_CREATOR){
-              continue;
-            }
-            $other_person = $m->get_associated_account($app->get_database());
-          }
-          ?>
-          <h4><b><?=$other_person->name?></b> has joined dialogue!</h4>
-          <p><?= $dialogue->get_title($app) ?></p>
-          <p></p>
-          <?php
-          break;
-
-        case static::TYPE_DIALOGUE_HAS_STARTED:
-          $dialogue = Dialogue::get_by_id(
-            pdo: $app->get_database(),
-            id: $this->dialogue_id
-          );
-          ?>
-          <h4>Dialogue has started!</h4>
-          <p><?= $dialogue->get_title($app) ?></p>
-          <?php
-          break;
-
-      endswitch;
-      ?>
+      <h6>NewsEntry</h6>
+      <pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>
     </div>
     <?php
     return ob_get_clean();

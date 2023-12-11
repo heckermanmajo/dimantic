@@ -11,18 +11,6 @@ use PDO;
 
 
 class DialogueMembership extends DataClass {
-  
-  /** @deprecated We move all the management away from the dialogue into the inducement */
-  const STATE_PENDING = 'pending';
-  /** @deprecated We move all the management away from the dialogue into the inducement */
-  const STATE_DECLINED = 'declined';
-  
-  /** @deprecated We move all the management away from the dialogue into the inducement */
-  const TYPE_INVITATION = 'invitation';
-  /** @deprecated We move all the management away from the dialogue into the inducement */
-  const TYPE_JOIN_REQUEST = 'join_request';
-  /** @deprecated We move all the management away from the dialogue into the inducement */
-  const TYPE_CREATOR = 'creator';
 
   const STATE_LEFT = 'left';
   const STATE_ACTIVE = 'active';
@@ -41,8 +29,7 @@ class DialogueMembership extends DataClass {
    * @var string
    */
   var string $state = 'active';
-  /** @deprecated We move all the management away from the dialogue into the inducement */
-  var string $type = '';
+
   var string $create_date = '';
 
   /**
@@ -86,20 +73,6 @@ class DialogueMembership extends DataClass {
     return Account::get_by_id(pdo: $connection, id: $this->account_id);
   }
 
-  static function value_is_correct_type(string $type): bool {
-    return in_array(
-      needle: $type,
-      haystack: [self::TYPE_INVITATION, self::TYPE_JOIN_REQUEST]
-    );
-  }
-
-  static function value_is_correct_state(string $state): bool {
-    return in_array(
-      needle: $state,
-      haystack: [self::STATE_ACTIVE, self::STATE_DECLINED, self::STATE_PENDING]
-    );
-  }
-
   ###########################################################################
   #                                                                         #
   #  Model-Queries                                                          #
@@ -115,24 +88,6 @@ class DialogueMembership extends DataClass {
       "SELECT * FROM `DialogueMembership` WHERE `dialogue_id` = ? AND `account_id` = ?",
       [$dialogue_id, $app->get_currently_logged_in_account()->id],
     );
-  }
-
-  /**
-   * @return array<int, static>
-   */
-  static function get_all_memberships_by_user(
-    int $account_id, string $status, string $type, PDO $account
-  ): array {
-
-  }
-
-  /**
-   * @return array<int, static>
-   */
-  static function get_all_memberships_for_dialoge(
-    int $account_id, PDO $account
-  ): array {
-
   }
 
   ###########################################################################
@@ -166,25 +121,4 @@ class DialogueMembership extends DataClass {
   #                                                                         #
   ###########################################################################
 
-  function get_info_bar(App $app) : string {
-    ob_start();
-    ?>
-    <div class="w3-card w3-margin w3-padding">
-      <?php if ($this->state == static::STATE_PENDING): ?>
-        <div class="w3-panel w3-yellow">
-          <p>pending</p>
-        </div>
-      <?php elseif ($this->state == static::STATE_ACTIVE): ?>
-        <div class="w3-panel w3-green">
-          <p>active</p>
-        </div>
-      <?php elseif ($this->state == static::STATE_DECLINED): ?>
-        <div class="w3-panel w3-red">
-          <p>declined</p>
-        </div>
-      <?php endif; ?>
-    </div>
-    <?php
-    return ob_get_clean();
-  }
 }

@@ -208,12 +208,20 @@ class App {
   }
 
   /**
+   * The path to the database file used in clientmode only
+   * (f.e. for tests).
+   * @var string
+   */
+  static string $cli_db_path = "";
+
+  /**
    * Returns an instance of the App class.
    * - implements the singleton pattern -> only one instance
    *
    * @return App the instance of the App class
    */
   static function get(): App {
+
     if (self::$instance == null) {
       self::$instance = new App();
     }
@@ -248,7 +256,6 @@ class App {
   }
 
   private function __construct(
-    string $db_type = "sqlite",
     ?array $session = null
   ) {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
@@ -354,10 +361,23 @@ class App {
     # extra no log for a simple call of this function, since it is called very often and clutters the logs
     if ($this->db == null) {
       [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
-      $log("connection to sqlite-database at " . $_SERVER["DOCUMENT_ROOT"] . "/../dimantic.sqlite");
-      $this->db = new PDO("sqlite:" . $_SERVER["DOCUMENT_ROOT"] . "/../dimantic.sqlite");
-      $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      if (FN_IS_CLI()) {
+        if(static::$cli_db_path == ""){
+          throw new \Exception("static::\$cli_db_path is not set.");
+        }
+        $log("COMMAND_LINE_INTERFACE_DETECTED_CONNECTION");
+        $log("connection to sqlite-database at " . static::$cli_db_path);
+        $this->db = new PDO("sqlite:" . static::$cli_db_path);
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      }
+      else {
+        $log("connection to sqlite-database at " . $_SERVER["DOCUMENT_ROOT"] . "/../dimantic.sqlite");
+        $this->db = new PDO("sqlite:" . $_SERVER["DOCUMENT_ROOT"] . "/../dimantic.sqlite");
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      }
+
     }
+
     return $this->db;
   }
 
@@ -413,28 +433,30 @@ class App {
     string $file = "",
     int    $line = 0
   ): array {
-    if( $class == "") {
+    if ($class == "") {
       $file = basename($file);
-      if($function == ""){
+      if ($function == "") {
         App::$logs[] = "&[$file($line)]";
       }
-      else{
+      else {
         App::$logs[] = "&[$file::$function($line)]";
       }
-    }else{
+    }
+    else {
       App::$logs[] = "&[$class::$function($line)]";
     }
 
     $meta_lambda = function ($class, $function, $mode) {
       return function (string $message, null|array|string $data = null) use ($class, $function, $mode) {
-        if($mode== "log"){
+        if ($mode == "log") {
           static::$logs[] = "   $message";
-        }else{
+        }
+        else {
           static::$logs[] = "   ($mode)$message";
         }
         if ($data !== null) {
           if (is_array($data)) {
-            $data = "   " .json_encode($data, JSON_PRETTY_PRINT);
+            $data = "   " . json_encode($data, JSON_PRETTY_PRINT);
           }
           static::$logs[] = $data;
         }
@@ -491,13 +513,13 @@ class App {
       else {
         echo "<span style='color: rgb(222,222,222)'>";
       }
-      if(str_starts_with($log, "&[")){
+      if (str_starts_with($log, "&[")) {
         echo "<small><b>";
         echo $log;
         echo "</b></small>";
         echo "<br>";
       }
-      else{
+      else {
         echo $log;
         echo "<br>";
       }
@@ -570,7 +592,7 @@ class App {
     }
 
     # special treatment for logout -> redirect to index
-    if ($this->executed_action == "logout"){
+    if ($this->executed_action == "logout") {
       ob_get_clean();
       header("Location: /index.php");
       exit;

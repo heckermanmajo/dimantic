@@ -139,8 +139,6 @@ class Account extends DataClass {
       </h3>
       <pre><?= $this->content ?></pre>
       <br>
-      <a class="button" href="/dialogue.php?partner_id=<?= $this->id ?>"> Start dialogue with this person </a>
-
     </div>
     <?php
     return ob_get_clean();
