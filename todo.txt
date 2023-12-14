@@ -5,6 +5,8 @@ TODO 2: Remove all other accept/reject logic
 
 
 
+
+
 -> Dafür brauche ich einen Plan.
 -> Likes anhand der Menge an zeichen in einem dialog
    - der menge von likes die man schon als like markiert hat

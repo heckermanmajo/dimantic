@@ -1,0 +1,9 @@
+
+
+- GROUP-WIKI-TOOL
+    - insert documetns, embeddings -> search them and link them (or link parts)
+    - use a blue ocean droplet to make pdfs and other docuimetns to markdown
+
+- Group based
+
+- todo: search script
