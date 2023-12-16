@@ -12,6 +12,7 @@ use cls\data\dialoge\DialogueMessageComment;
 use cls\data\dialoge\DialogueMessageSelectionLike;
 use cls\data\dialoge\DialogueRule;
 use cls\data\dialoge\DialogueRuleRating;
+use cls\data\space\Space;
 use PDO;
 use ReflectionException;
 
@@ -405,6 +406,7 @@ class App {
     DialogueRuleRating::create_table($db);
     NewsEntry::create_table($db);
     DialogueMessageSelectionLike::create_table($db);
+    Space::create_table($db);
 
     # add new tables (Dataclasses) here ...
     # ...

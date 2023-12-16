@@ -49,7 +49,6 @@ class HtmlUtils {
 
           <?php include($_SERVER["DOCUMENT_ROOT"] . "/res/main.css.php");?>
 
-
           <?=$style?>
       </style>
 
@@ -86,17 +85,21 @@ class HtmlUtils {
   static function main_header() {
     ?>
     <nav class="w3-margin">
-      <a class="button" href="/home.php">Home</a>
-      <a class="button" href="/my_news.php">News</a>
-      <a class="button" href="/members.php">Members</a>
-      <a class="button" href="/account_settings.php">Account-Settings</a>
+      <a class="button" href="/home.php">Focus</a>
+      <a class="button" href="/search.php">Search</a>
+      <!--<a class="button" href="/my_news.php">News</a>-->
+      <!--<a class="button" href="/members.php">Members</a>-->
 
       <div class="w3-right">
+        <a class="button" href="/create_space.php"> ➕ Create Space </a>
+        &nbsp;
+        <a class="button" style="border-color: #8bc34a; color: #8bc34a" href="/project.php">ℹ️</a>
+        <a class="button" href="/account_settings.php">⚙️</a>
         <form style="display: inline" method="post">
           <input type="hidden" name="action" value="logout">
-          <button class="button" style="border-color: mediumvioletred; color: mediumvioletred">Logout</button>
+          <button class="button" style="border-color: mediumvioletred; color: mediumvioletred">🔚</button>
         </form>
-        <a class="button" style="border-color: #8bc34a; color: #8bc34a" href="/project.php"> Project-Info </a>
+
       </div>
     </nav>
     <?php

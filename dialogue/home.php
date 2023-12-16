@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\dialoge\Dialogue;
+use cls\data\space\Space;
 use cls\HtmlUtils;
 
 include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
@@ -25,19 +26,59 @@ try {
 
   ?>
   <div>
+
+      <?php
+      $all_my_dialogues = Dialogue::get_my_dialoges(
+        0, 20, $app
+      );
+      $counter = 0;
+      $mappedOn3 = [];
+      foreach ($all_my_dialogues as $dialoge) {
+        if(!isset($mappedOn3[(int)($counter / 3) ])){
+          $mappedOn3[(int)($counter / 3) ] = [];
+        }
+        $mappedOn3[(int)($counter / 3) ][] = $dialoge->get_overview_card(
+          $app
+        );
+        $counter++;
+        if ($counter >= 9) {
+          break;
+        }
+      }
+
+      foreach ($mappedOn3 as $row) {
+        ?>
+        <div class="w3-row">
+          <?php
+          foreach ($row as $card) {
+            ?>
+            <div class="w3-third">
+              <?= $card ?>
+            </div>
+            <?php
+          }
+          ?>
+        </div>
+        <?php
+
+      }
+
+      ?>
+      <a href="/search.php?myConversations" style="font-size: 80%"> All my conversations</a>
+
+
+    <?php
+    $all_spaces = Space::getAllSpaces($app);
+    foreach ($all_spaces as $space) {
+      echo $space->getDisplayCard($app);
+    }
+    ?>
+
+
     <div onclick="FN_TOGGLE('home_info')" class="info-card" id="home_info" style="display:none">
       <p>Home info .... </p>
     </div>
-    <?php
-    $all_my_dialogues = Dialogue::get_my_dialoges(
-      0, 20, $app
-    );
-    foreach ($all_my_dialogues as $dialoge) {
-      echo $dialoge->get_overview_card(
-        $app
-      );
-    }
-    ?>
+
   </div>
   <?php
 

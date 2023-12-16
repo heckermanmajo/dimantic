@@ -1,4 +1,20 @@
 Spaces
+
+- Kernfrage was bracht die Community?
+
+- Focus of Attention
+-> Hat eine Community nicht auch goals?
+-> Anführer müssen Goals setzen können
+-> Und es müssen community goals entstehen
+   Indem den anführern das wichtigste angezeigt wird.
+
+
+Man unterstützt sachen mit seinem "Gewicht"
+Das eigene Gewicht fließt aus der eigenen Dauer
+in der community, dem rang, dem trust,
+und der Qualität der beiträge.
+
+
 -> Alles sind Spaces,
 -> Es gibt kein "globales" toplevel
 -> Spaces definieren sich über ihren inhalt
