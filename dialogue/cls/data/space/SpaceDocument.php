@@ -2,6 +2,8 @@
 
 namespace cls\data\space;
 
-class SpaceDocument {
+use cls\DataClass;
+
+class SpaceDocument extends DataClass {
 
 }

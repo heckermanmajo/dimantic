@@ -13,6 +13,8 @@ use cls\data\dialoge\DialogueMessageSelectionLike;
 use cls\data\dialoge\DialogueRule;
 use cls\data\dialoge\DialogueRuleRating;
 use cls\data\space\Space;
+use cls\data\space\SpaceDocument;
+use cls\data\space\SpaceMembership;
 use PDO;
 use ReflectionException;
 
@@ -407,6 +409,8 @@ class App {
     NewsEntry::create_table($db);
     DialogueMessageSelectionLike::create_table($db);
     Space::create_table($db);
+    SpaceMembership::create_table($db);
+    SpaceDocument::create_table($db);
 
     # add new tables (Dataclasses) here ...
     # ...

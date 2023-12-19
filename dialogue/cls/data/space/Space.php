@@ -41,6 +41,12 @@ class Space extends DataClass {
 
   function getDisplayCard(App $app): string {
     ob_start();
+    
+    $memberships = SpaceMembership::get_all_memberships_of_space(
+      $app,
+      $this->id,
+    );
+    
     ?>
     <div class="w3-card w3-margin w3-padding">
 
@@ -108,6 +114,14 @@ class Space extends DataClass {
           </div>
         </div>
       </div>
+      
+      <?php
+      
+      foreach ($memberships as $membership) {
+        echo $membership->get_card();
+      }
+      
+      ?>
     </div>
     <?php
     return ob_get_clean();
