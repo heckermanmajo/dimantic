@@ -2,7 +2,10 @@
 
 namespace cls\data\space;
 
-class SpaceMembership {
+use cls\App;
+use cls\DataClass;
+
+class SpaceMembership extends DataClass {
   /**
    * Consul are the owner of the space.
    * The can do everything and remove and create other roles.
@@ -30,4 +33,30 @@ class SpaceMembership {
    * increase the rank if they contribute to the space.
    */
   const ROLE_GUEST = 5;
+  
+  var int $member_id = 0;
+  var int $space_id = 0;
+  var int $role = 0;
+  var int $created_at = 0;
+  
+  static function get_all_memberships_of_space(
+    App $app,
+    int $space_id
+  ): array {
+    return static::get_array(
+      pdo: $app->get_database(),
+      sql: "SELECT * FROM SpaceMembership WHERE space_id = ?",
+      params: [$space_id],
+    );
+  }
+  
+  function get_card(): string {
+    ob_start();
+    ?>
+    <div class="w3-card w3-margin w3-padding">
+      <pre><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>
+    </div>
+    <?php
+    return ob_get_clean();
+  }
 }

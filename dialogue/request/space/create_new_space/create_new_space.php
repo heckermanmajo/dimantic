@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\space\Space;
+use cls\data\space\SpaceMembership;
 use cls\Protocol;
 use cls\RequestError;
 
@@ -69,6 +70,14 @@ function create_new_space(
     $space->author_id = $app->get_currently_logged_in_account()->id;
     $space->created_at = time();
     $space->save($app->get_database());
+    
+    # Create a membership for the author
+    $membership = new SpaceMembership();
+    $membership->member_id = $app->get_currently_logged_in_account()->id;
+    $membership->space_id = $space->id;
+    $membership->role = SpaceMembership::ROLE_CONSUL;
+    $membership->created_at = time();
+    $membership->save($app->get_database());
 
     return $space;
 
