@@ -6,6 +6,20 @@ use cls\App;
 use cls\DataClass;
 use cls\StringUtils;
 
+/**
+ * A Space is a communication-context.
+ *
+ * It can have
+ * - members
+ * - conversations
+ * - documents
+ *
+ * They can be referenced like this:
+ * - www.dimantic.com?space=1&conversation=1
+ * - www.dimantic.com?space=1&member=1
+ * - www.dimantic.com?space=1&document=2
+ *
+ */
 class Space extends DataClass {
   /**
    * @var string Description of the space in markdown.
@@ -21,22 +35,23 @@ class Space extends DataClass {
    * @throws \Exception
    */
   static function getAllSpaces(App $app): array {
-    $spaces = static::get_array(
+    return static::get_array(
       $app->get_database(),
       "SELECT * FROM space",
       [],
       Space::class
     );
-    return $spaces;
   }
 
+  /**
+   * @throws \Exception
+   */
   static function getByContent(App $app, string $content): array {
-    $spaces = static::get_array(
+    return static::get_array(
       pdo: $app->get_database(),
       sql: "SELECT * FROM space WHERE content = :content",
       params: ["content" => $content]
     );
-    return $spaces;
   }
 
   function getDisplayCard(App $app): string {
@@ -49,8 +64,8 @@ class Space extends DataClass {
           <?= StringUtils::get_title_from_md_content($this->content) ?>
         </a>
         <div class="w3-right">
-          <button> Wiki</button>
-          <button> Marketplace</button>
+          <button> Wiki </button>
+          <button> Agora </button>
           <button> Members</button>
         </div>
       </h3>
@@ -58,17 +73,17 @@ class Space extends DataClass {
       <div class="w3-row">
         <div class="w3-third">
           <div class="w3-card w3-margin">
-            <p>Most important</p>
+            <p>Most important by authority</p>
           </div>
         </div>
         <div class="w3-third">
           <div class="w3-card w3-margin">
-            <p>Most important</p>
+            <p>Most important by authority</p>
           </div>
         </div>
         <div class="w3-third">
           <div class="w3-card w3-margin">
-            <p>Most important</p>
+            <p>Most important by authority</p>
           </div>
         </div>
       </div>
@@ -108,6 +123,7 @@ class Space extends DataClass {
           </div>
         </div>
       </div>
+
     </div>
     <?php
     return ob_get_clean();

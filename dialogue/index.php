@@ -34,7 +34,8 @@ try {
     <div class="w3-row">
       <div class="w3-col m9 s9 l9">
         <div class="w3-card-4 w3-margin w3-padding">
-          <h3>Dialoge</h3>
+
+          <h3>Menschenwürde auf den Prozess bringen</h3>
 
           <div class="w3-center">
             <img src="/res/dasein.png" width="300px">

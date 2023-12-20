@@ -2,8 +2,16 @@
 declare(strict_types=1);
 
 use cls\App;
+use cls\data\space\pageviews\SpacePageAgora;
+use cls\data\space\pageviews\SpacePageEdit;
+use cls\data\space\pageviews\SpacePageFilter;
+use cls\data\space\pageviews\SpacePageInfo;
+use cls\data\space\pageviews\SpacePageMembers;
+use cls\data\space\pageviews\SpacePageMyMembershipSettings;
+use cls\data\space\pageviews\SpacePageWiki;
 use cls\data\space\Space;
 use cls\HtmlUtils;
+use cls\StringUtils;
 
 
 include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
@@ -22,30 +30,75 @@ try {
 
   $app->handle_action_requests();
 
-  HtmlUtils::head();
+  HtmlUtils::head(
+    style:"
+      .tab-button{
+        text-decoration: none;
+        color: black;
+        padding: 10px;
+        border: 1px solid black;
+      }
+      
+      .tab-button:hover{
+        background-color: #ddd;
+      }
+    "
+  );
 
   $space = Space::get_by_id(pdo: $app->get_database(), id: (int)$_GET["id"]);
 
   ?>
 
-  <h2>One Space</h2>
+  <h2><?= StringUtils::get_title_from_md_content($space->content)?></h2>
+  <div style="display:inline-block">
+
+    <a class="tab-button" href="/space.php?p=wiki&id=<?=$_GET["id"]?>"> Wiki📚 </a> <!--(documents & closed Conversations) -->
+    <a class="tab-button" href="/space.php?p=agora&id=<?=$_GET["id"]?>"> Agora💬 </a>
+
+    <a class="tab-button" href="/space.php?p=filter&id=<?=$_GET["id"]?>"> by 👑 </a> <!--by Authority -->
+    <a class="tab-button" href="/space.php?p=filter&id=<?=$_GET["id"]?>"> by 🧠 </a> <!--by Most Matching -->
+    <a class="tab-button" href="/space.php?p=filter&id=<?=$_GET["id"]?>"> by ⏱️ </a> <!-- by Recency-->
+
+  </div>
+
+  <div class="w3-right"  style="display:inline-block">
+    <a class="tab-button" href="/space.php?p=info&id=<?=$_GET["id"]?>"> ℹ️ </a>
+    <a class="tab-button" href="/space.php?p=members&id=<?=$_GET["id"]?>"> 👥 </a>
+    <a class="tab-button" href="/space.php?p=my_membership_settings&id=<?=$_GET["id"]?>"> ⚙️👤 </a> <!-- My settings -->
+    <a class="tab-button" href="/space.php?p=edit&id=<?=$_GET["id"]?>"> Edit Space🛠️ </a>
+  </div>
 
   <?php
+  switch($_GET["p"] ?? "default"){
+    case "agora":
+      echo SpacePageAgora::display($space,$app);
+      break;
+    case "wiki":
+      echo SpacePageWiki::display($space,$app);
+      break;
+    case "filter":
+      echo SpacePageFilter::display($space,$app);
+      break;
+    case "edit":
+      echo SpacePageEdit::display($space,$app);
+      break;
+    case "info":
+      echo SpacePageInfo::display($space, $app);
+      break;
+    case "my_membership_settings":
+      echo SpacePageMyMembershipSettings::display($space,$app);
+      break;
+    case "members":
+      echo SpacePageMembers::display($space,$app);
+      break;
+  }
 
-  echo $space->getDisplayCard($app);
 
-  echo HtmlUtils::get_markdown_editor_field_for_ajax(
-    field_name: "content",
-    ajax_end_point_path_from_root: "/request/space/edit_space_content/edit_space_content.php",
-    init_text: $space->content,
-    extra_json_fields: [
-      "id" => $space->id,
-    ]
-  );
+
   ?>
-  <p>
-    <?= $app->markdown_to_html($space->content) ?>
-  </p>
+
+
+
 
   <?php
   HtmlUtils::footer($app);
