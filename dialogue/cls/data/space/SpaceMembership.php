@@ -4,7 +4,11 @@ namespace cls\data\space;
 
 use cls\App;
 use cls\DataClass;
+use Exception;
 
+/**
+ * Membership of a person in a space.
+ */
 class SpaceMembership extends DataClass {
   /**
    * Consul are the owner of the space.
@@ -33,12 +37,18 @@ class SpaceMembership extends DataClass {
    * increase the rank if they contribute to the space.
    */
   const ROLE_GUEST = 5;
-  
+
   var int $member_id = 0;
   var int $space_id = 0;
   var int $role = 0;
   var int $created_at = 0;
-  
+
+  /**
+   * @param App $app
+   * @param int $space_id
+   * @return array<int,SpaceMembership>
+   * @throws Exception
+   */
   static function get_all_memberships_of_space(
     App $app,
     int $space_id
@@ -49,12 +59,35 @@ class SpaceMembership extends DataClass {
       params: [$space_id],
     );
   }
-  
-  function get_card(): string {
+
+  /**
+   * @return string
+   */
+  function get_card(App $app): string {
     ob_start();
     ?>
     <div class="w3-card w3-margin w3-padding">
       <pre><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>
+      <?php
+      if ($this->member_id == $app->get_currently_logged_in_account()->id) {
+        ?>
+        <form class="w3-card w3-margin w3-padding" method="post">
+          <?php
+          if (
+            $app->executed_action == "delete_space_membership"
+            && ($_POST["space_membership_id"] == 0) == $this->id
+          ) {
+            echo $app->action_error?->get_error_card();
+          }
+          ?>
+          <input type="hidden" name="action" value="delete_space_membership">
+          <input type="hidden" name="space_id" value="<?= $this->space_id ?>">
+          <input type="hidden" name="space_membership_id" value="<?= $this->id ?>">
+          <button class="w3-button w3-red">Leave Space</button>
+        </form>
+        <?php
+      }
+      ?>
     </div>
     <?php
     return ob_get_clean();

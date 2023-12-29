@@ -1,15 +1,23 @@
 <?php
 
-namespace cls\data\dialogue_blue_print;
+namespace cls\data\conversation_blue_print;
 
+use cls\App;
 use cls\DataClass;
+use Exception;
 
 /**
  * Initiation of a conversation.
  */
-class DialogueBluePrint extends DataClass {
+class ConversationBluePrint extends DataClass {
 
-  public int $author = 0;
+  public int $author_id = 0;
+
+  public int $space_id = 0;
+
+  public int $published = 0;
+  public int $unpublish_after_number_of_days = 0;
+  public int $unpublish_after_number_of_created_conversations = 0;
 
   /**
    * The id of the inducement, this one is the counteroffer to.
@@ -18,22 +26,12 @@ class DialogueBluePrint extends DataClass {
    * and change some settings, and add a message, after this you can cone mine
    * and add a message, until we can start talking.
    */
-  public int $counteroffer_id_inducement = 0;
+  public int $counteroffer_blueprint_id = 0;
 
   /**
    * The message of the counteroffer.
    */
   public string $counteroffer_message = '';
-
-  /**
-   * @var int Inducement is part of a group.
-   */
-  public int $belongs_to_group = 0;
-
-  /**
-   * @var int Inducement is part of a user.
-   */
-  public int $belongs_to_user = 0;
 
   /**
    * @var int The number of messages that are allowed in a sub-dialogue.
@@ -57,18 +55,12 @@ class DialogueBluePrint extends DataClass {
    * @var int Inducement is active, means it is open.
    */
   public int $active = 0;
-  
-  /**
-   * @var string Array of proto rules as json.
-   * Just a list of strings of markdown.
-   */
-  public string $proto_rules_as_json = '[]';
 
   /**
    * @var string The description of the inducement - not the
    * topic of the dialogue, but text about this blueprint.
    */
-  public string $blueprint_description = '';
+  public string $description = '';
   
   /**
    * @var string The topic of the dialogue that should be started.
@@ -96,8 +88,8 @@ class DialogueBluePrint extends DataClass {
   public int $has_moderator = 0;
 
 
-  public static function getDefaultConfigurationDialogue(): DialogueBluePrint {
-    $bp = new DialogueBluePrint();
+  public static function getDefaultConfigurationDialogue(): ConversationBluePrint {
+    $bp = new ConversationBluePrint();
 
     $bp->min_number_of_users = 2;
     $bp->max_number_of_users = 2;
@@ -121,7 +113,34 @@ class DialogueBluePrint extends DataClass {
 
     $bp->has_moderator = 0;
 
+    $bp->unpublish_after_number_of_created_conversations = 2;
+
+    $bp->unpublish_after_number_of_days = 10;
+
     return $bp;
+  }
+
+  /**
+   * If a blueprint is used to create a conversation, it is in use.
+   * - if a blueprint is in use, it cannot be changed.
+   *
+   * -> so if this function returns true. you need to clone the blueprint in order
+   *    to change it.
+   *
+   * -> only thing you can change is the publication state and the
+   *   number of days it is published and the number of conversations
+   *   after which it is unpublished.
+   *
+   * @param App $app
+   * @return bool
+   * @throws Exception
+   */
+  function is_in_use(App $app): bool {
+    return ConversationBluePrint::get_count(
+      pdo: $app->get_database(),
+      sql: "SELECT COUNT(*) FROM `Dialogue` WHERE `blue_print_id` = ?",
+      params: [$this->id]
+    ) > 0;
   }
   
 }

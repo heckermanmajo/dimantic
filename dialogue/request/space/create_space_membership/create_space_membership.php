@@ -23,10 +23,10 @@ if (count(debug_backtrace()) == 0) {
  * This request creates a new space.
  *
  * @param App $app
- * @param array $post_data
+ * @param array<string,string> $post_data
  * @return Space|RequestError
  */
-function create_new_space(
+function create_space_membership(
   App   $app,
   array $post_data,
 ): Space|RequestError {
@@ -42,43 +42,48 @@ function create_new_space(
       );
     }
 
-    if (!isset($post_data['content'])) {
+    if (!isset($post_data['space_id'])) {
       return new RequestError(
-        dev_message: "\$post_data['content'] not set",
+        dev_message: "\$post_data['space_id'] not set",
         code: RequestError::BAD_REQUEST,
       );
     }
 
-    $content = $post_data['content'];
-
-    # don't insert the same space twice
-    $existing_spaces = Space::getByContent(
-      $app,
-      $content,
+    $space = Space::get_by_id(
+      pdo: $app->get_database(),
+      id: (int) $post_data['space_id'],
     );
 
-    # todo_ possibly check author_id as well
-    if (count($existing_spaces) > 0) {
+    if ($space === null) {
       return new RequestError(
-        dev_message: "This space already exists.",
-        code: RequestError::RULE_ERROR,
+        dev_message: "Space not found.",
+        code: RequestError::NOT_FOUND,
       );
     }
 
-    $space = new Space();
+    $space_memberships = SpaceMembership::get_all_memberships_of_space(
+      app: $app,
+      space_id: $space->id,
+    );
 
-    $space->content = $content;
-    $space->author_id = $app->get_currently_logged_in_account()->id;
-    $space->created_at = time();
-    $space->save($app->get_database());
-    
-    # Create a membership for the author
-    $membership = new SpaceMembership();
-    $membership->member_id = $app->get_currently_logged_in_account()->id;
-    $membership->space_id = $space->id;
-    $membership->role = SpaceMembership::ROLE_CONSUL;
-    $membership->created_at = time();
-    $membership->save($app->get_database());
+    foreach ($space_memberships as $space_membership) {
+      if ($space_membership->member_id == $app->get_currently_logged_in_account()->id) {
+        return new RequestError(
+          dev_message: "You are already a member of this space.",
+          code: RequestError::RULE_ERROR,
+        );
+      }
+    }
+
+    $new_space_membership = new SpaceMembership();
+    $new_space_membership->member_id = $app->get_currently_logged_in_account()->id;
+    $new_space_membership->space_id = $space->id;
+    $new_space_membership->role = SpaceMembership::ROLE_MEMBER;
+    $new_space_membership->created_at = time();
+
+    # todo: add news entries ...
+
+    $new_space_membership->save($app->get_database());
 
     return $space;
 
@@ -96,6 +101,6 @@ function create_new_space(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: create_new_space(...),
+  function: create_space_membership(...),
   app: App::get(),
 );

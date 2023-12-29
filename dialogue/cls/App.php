@@ -5,6 +5,8 @@ namespace cls;
 
 use cls\data\account\Account;
 use cls\data\account\NewsEntry;
+use cls\data\conversation_blue_print\ConversationBluePrint;
+use cls\data\conversation_blue_print\ProtoRule;
 use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMembership;
 use cls\data\dialoge\DialogueMessage;
@@ -15,6 +17,7 @@ use cls\data\dialoge\DialogueRuleRating;
 use cls\data\space\Space;
 use cls\data\space\SpaceDocument;
 use cls\data\space\SpaceMembership;
+use Exception;
 use PDO;
 use ReflectionException;
 
@@ -331,7 +334,7 @@ class App {
   function get_currently_logged_in_account(): Account {
     # todo: assert that somebody is logged in
     if (!$this->somebody_logged_in()) {
-      throw new \Exception("Nobody is logged in.");
+      throw new Exception("Nobody is logged in.");
     }
     return $this->session["account"];
   }
@@ -366,7 +369,7 @@ class App {
       [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
       if (FN_IS_CLI()) {
         if(static::$cli_db_path == ""){
-          throw new \Exception("static::\$cli_db_path is not set.");
+          throw new Exception("static::\$cli_db_path is not set.");
         }
         $log("COMMAND_LINE_INTERFACE_DETECTED_CONNECTION");
         $log("connection to sqlite-database at " . static::$cli_db_path);
@@ -393,6 +396,7 @@ class App {
    * Non needed fields are NOT removed.
    *
    * @throws ReflectionException
+   * @throws Exception
    */
   function init_database(): void {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
@@ -411,6 +415,8 @@ class App {
     Space::create_table($db);
     SpaceMembership::create_table($db);
     SpaceDocument::create_table($db);
+    ConversationBluePrint::create_table($db);
+    ProtoRule::create_table($db);
 
     # add new tables (Dataclasses) here ...
     # ...

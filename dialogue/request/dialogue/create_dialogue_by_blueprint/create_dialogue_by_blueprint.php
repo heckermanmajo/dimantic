@@ -6,7 +6,7 @@ use cls\data\account\Account;
 use cls\data\account\NewsEntry;
 use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMembership;
-use cls\data\dialogue_blue_print\DialogueBluePrint;
+use cls\data\conversation_blue_print\ConversationBluePrint;
 use cls\Protocol;
 use cls\RequestError;
 
@@ -110,7 +110,7 @@ function create_dialogue_by_blueprint(
 
     }
 
-    $blue_print = DialogueBluePrint::get_by_id(
+    $blue_print = ConversationBluePrint::get_by_id(
       pdo: $app->get_database(),
       id: $blue_print_id
     );
@@ -121,7 +121,7 @@ function create_dialogue_by_blueprint(
 
     $dialogue = new Dialogue();
     $dialogue->author_id = $blue_print->author;
-    $dialogue->inducement_id = $blue_print->id;
+    $dialogue->blue_print_id = $blue_print->id;
     $dialogue->created_at = time();
     $dialogue->state = Dialogue::STATE_OPEN;
 

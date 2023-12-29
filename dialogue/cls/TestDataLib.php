@@ -2,7 +2,7 @@
 
 namespace cls;
 
-use cls\data\dialogue_blue_print\DialogueBluePrint;
+use cls\data\conversation_blue_print\ConversationBluePrint;
 
 class TestDataLib {
   /**
@@ -47,10 +47,10 @@ class TestDataLib {
     $data = [];
 
     $blueprints = [];
-    $blueprints[] = DialogueBluePrint::getDefaultConfigurationDialogue();
+    $blueprints[] = ConversationBluePrint::getDefaultConfigurationDialogue();
 
     foreach ($data as $blue_print_data) {
-      $blue_print = new DialogueBluePrint();
+      $blue_print = new ConversationBluePrint();
       foreach ($blue_print_data as $key => $value) {
         $blue_print->$key = $value;
       }

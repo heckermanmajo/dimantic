@@ -10,6 +10,12 @@ class SpacePageAgora {
     ob_start();
     ?>
     <h3> Agora </h3>
+
+
+    <form method="post">
+
+    </form>
+
     <?php
     return ob_get_clean();
   }

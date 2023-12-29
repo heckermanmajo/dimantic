@@ -5,6 +5,7 @@ namespace cls\data\space;
 use cls\App;
 use cls\DataClass;
 use cls\StringUtils;
+use Exception;
 
 /**
  * A Space is a communication-context.
@@ -29,10 +30,28 @@ class Space extends DataClass {
   var int $author_id = 0;
 
   /**
+   * @throws Exception
+   */
+  function current_user_has_access(App $app): bool {
+    # for now: does a membership exists?
+    # todo: not performant
+    $all = SpaceMembership::get_all_memberships_of_space(
+      $app,
+      $this->id,
+    );
+    foreach ($all as $membership) {
+      if ($membership->member_id === $app->get_currently_logged_in_account()->id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    *
    * @param App $app
    * @return array<Space>
-   * @throws \Exception
+   * @throws Exception
    */
   static function getAllSpaces(App $app): array {
     return static::get_array(
@@ -44,7 +63,7 @@ class Space extends DataClass {
   }
 
   /**
-   * @throws \Exception
+   * @throws Exception
    */
   static function getByContent(App $app, string $content): array {
     return static::get_array(
@@ -130,10 +149,12 @@ class Space extends DataClass {
         </div>
       </div>
 
+      <pre><?=json_encode($this, JSON_PRETTY_PRINT)?></pre>
+
       <?php
 
       foreach ($memberships as $membership) {
-        echo $membership->get_card();
+        echo $membership->get_card($app);
       }
 
       ?>

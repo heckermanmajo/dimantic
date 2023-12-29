@@ -39,10 +39,10 @@ try {
     ## todo: load parent space and display it here and its rules for child rooms
   }
 
-  $all_spaces = Space::getAllSpaces($app);
-  foreach ($all_spaces as $space) {
-    echo $space->getDisplayCard($app);
-  }
+  #$all_spaces = Space::getAllSpaces($app);
+  #foreach ($all_spaces as $space) {
+  #  echo $space->getDisplayCard($app);
+  #}
 
   ?>
 

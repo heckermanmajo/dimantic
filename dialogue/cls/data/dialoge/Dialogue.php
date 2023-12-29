@@ -6,7 +6,7 @@ namespace cls\data\dialoge;
 use cls\App;
 use cls\data\account\Account;
 use cls\data\account\NewsEntry;
-use cls\data\dialogue_blue_print\DialogueBluePrint;
+use cls\data\conversation_blue_print\ConversationBluePrint;
 use cls\DataClass;
 use cls\RequestError;
 use Exception;
@@ -40,9 +40,9 @@ class Dialogue extends DataClass {
   ###########################################################################
 
   /**
-   * @var int The id of the inducement, this dialogue is created from.
+   * @var int The id of the blue-print, this dialogue is created from.
    */
-  var int $inducement_id = 0;
+  var int $blue_print_id = 0;
 
   /**
    * The state of the dialogue.

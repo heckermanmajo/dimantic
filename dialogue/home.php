@@ -69,6 +69,7 @@ try {
 
     <?php
     $all_spaces = Space::getAllSpaces($app);
+    $all_spaces = array_reverse($all_spaces);
     foreach ($all_spaces as $space) {
       echo $space->getDisplayCard($app);
     }
