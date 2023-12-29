@@ -1,13 +1,11 @@
-BIS ENDE DES JAHRES
-
-TODO 1: Create Test case for creating dialogue by blueprint
-TODO 2: Remove all other accept/reject logic
-
-
+-> invite and reject to space.
+    -> Plan this beforehand on drawio.
+-> Space function-base package.
+-> What document functions to start with.
 
 
 
--> Dafür brauche ich einen Plan.
+
 -> Likes anhand der Menge an zeichen in einem dialog
    - der menge von likes die man schon als like markiert hat
 -> Summary, wie die regeln machen -> es sind regeln nur mit extra daten

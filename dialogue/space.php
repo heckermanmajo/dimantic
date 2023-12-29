@@ -8,6 +8,7 @@ use cls\data\space\pageviews\SpacePageFilter;
 use cls\data\space\pageviews\SpacePageInfo;
 use cls\data\space\pageviews\SpacePageMembers;
 use cls\data\space\pageviews\SpacePageMyMembershipSettings;
+use cls\data\space\pageviews\SpacePageSubSpaces;
 use cls\data\space\pageviews\SpacePageWiki;
 use cls\data\space\Space;
 use cls\HtmlUtils;
@@ -49,11 +50,13 @@ try {
 
   ?>
 
+  <a href="/index.php"> ◀️ Back </a>
   <h2><?= StringUtils::get_title_from_md_content($space->content)?></h2>
   <div style="display:inline-block">
 
     <a class="tab-button" href="/space.php?p=wiki&id=<?=$_GET["id"]?>"> Wiki📚 </a> <!--(documents & closed Conversations) -->
     <a class="tab-button" href="/space.php?p=agora&id=<?=$_GET["id"]?>"> Agora💬 </a>
+    <a class="tab-button" href="/space.php?p=subspaces&id=<?=$_GET["id"]?>"> Rooms🌳 </a>
 
     <a class="tab-button" href="/space.php?p=filter&id=<?=$_GET["id"]?>"> by 👑 </a> <!--by Authority -->
     <a class="tab-button" href="/space.php?p=filter&id=<?=$_GET["id"]?>"> by 🧠 </a> <!--by Most Matching -->
@@ -78,6 +81,9 @@ try {
       break;
     case "filter":
       echo SpacePageFilter::display($space,$app);
+      break;
+    case "subspaces":
+      echo SpacePageSubSpaces::display($space,$app);
       break;
     case "edit":
       echo SpacePageEdit::display($space,$app);

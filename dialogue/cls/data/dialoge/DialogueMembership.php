@@ -6,7 +6,6 @@ namespace cls\data\dialoge;
 use cls\App;
 use cls\data\account\Account;
 use cls\DataClass;
-use cls\RequestError;
 use PDO;
 
 

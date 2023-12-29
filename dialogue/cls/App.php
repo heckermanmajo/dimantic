@@ -571,7 +571,7 @@ class App {
       if ($_POST["action"] === $request_name) {
         $log("<span style='color: purple'>IMPORTANT: executing action: $request_name</span>");
         $this->executed_action = $request_name;
-        $request_function = require($requests_mapped_on_name[$request_name]);
+        $request_function = require($request_file_path);
         $result = $request_function($this, $_POST);
         if ($result instanceof RequestError) {
           $this->action_error = $result;

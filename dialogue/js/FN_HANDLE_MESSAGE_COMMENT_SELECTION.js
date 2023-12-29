@@ -52,7 +52,9 @@ function FN_HANDLE_UPDATE_TEXT_SELECTION(
     let like_selection_error_div = "like_error_div_" + message_id;
     let selection_is_too_long = selection_text.length > max_number_of_characters_to_like;
     let len_of_selected_text_in_like_form_span = "len_of_selected_text_in_like_form_" + message_id;
-    document.getElementById(len_of_selected_text_in_like_form_span).innerHTML = selection_text.length;
+    let cost_of_like_of_selected_text_div = "cost_of_like_of_selected_text_" + message_id;
+    document.getElementById(cost_of_like_of_selected_text_div).innerHTML = selection_text.length.toString();
+    document.getElementById(len_of_selected_text_in_like_form_span).innerHTML = selection_text.length.toString()
     if(selection_is_too_long) {
       document.getElementById(like_selection_form).style.display = "none";
       document.getElementById(like_selection_error_div).style.display = "block";

@@ -69,11 +69,11 @@ class Space extends DataClass {
         <a style="text-decoration: none" href="/space.php?id=<?= $this->id ?>">
           <?= StringUtils::get_title_from_md_content($this->content) ?>
         </a>
-        <div class="w3-right">
+        <!--<div class="w3-right">
           <button> Wiki </button>
           <button> Agora </button>
           <button> Members</button>
-        </div>
+        </div>-->
       </h3>
 
       <div class="w3-row">
