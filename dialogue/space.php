@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\space\pageviews\SpacePageAgora;
 use cls\data\space\pageviews\SpacePageBlueprints;
 use cls\data\space\pageviews\SpacePageConversations;
 use cls\data\space\pageviews\SpacePageEdit;
@@ -10,8 +9,9 @@ use cls\data\space\pageviews\SpacePageFilter;
 use cls\data\space\pageviews\SpacePageInfo;
 use cls\data\space\pageviews\SpacePageMembers;
 use cls\data\space\pageviews\SpacePageMyMembershipSettings;
-use cls\data\space\pageviews\SpacePageSubSpaces;
-use cls\data\space\pageviews\SpacePageWiki;
+use cls\data\space\pageviews\SpacePageNewBlueprint;
+use cls\data\space\pageviews\SpacePageNewDocument;
+use cls\data\space\pageviews\SpacePageNewSubspace;
 use cls\data\space\Space;
 use cls\HtmlUtils;
 use cls\StringUtils;
@@ -45,6 +45,10 @@ try {
       .tab-button:hover{
         background-color: #ddd;
       }
+      .currently-open-tag{
+        background-color: lightblue;
+        color: white;
+      }
     "
   );
 
@@ -53,14 +57,24 @@ try {
   <a href="/index.php"> ◀️ Back </a>
   <?php
   if ($space->current_user_has_access($app)) {
+
+    $is_selected = function ($p) {
+      if (($_GET["p"] ?? "filter") == $p)echo "currently-open-tag";
+    };
+
     ?>
 
 
     <h2><?= StringUtils::get_title_from_md_content($space->content) ?></h2>
     <div style="display:inline-block">
-      <a class="tab-button" href="/space.php?p=filter&id=<?= $_GET["id"] ?>"> Main </a>
-      <a class="tab-button" href="/space.php?p=blueprints&id=<?= $_GET["id"] ?>"> My Blueprints </a>
-      <a class="tab-button" href="/space.php?p=conversations&id=<?= $_GET["id"] ?>"> My Conversations </a>
+      <a class="tab-button <?php $is_selected("filter")?>" href="/space.php?p=filter&id=<?= $_GET["id"] ?>"> Main </a>
+      <a class="tab-button <?php $is_selected("blueprints")?>" href="/space.php?p=blueprints&id=<?= $_GET["id"] ?>"> My Blueprints </a>
+      <a class="tab-button <?php $is_selected("conversations")?>" href="/space.php?p=conversations&id=<?= $_GET["id"] ?>"> My Conversations </a>
+
+
+      <a class="tab-button <?php $is_selected("new_subspace")?>" href="/space.php?p=new_subspace&id=<?= $_GET["id"] ?>"> ➕ new Subspace </a>
+      <a class="tab-button <?php $is_selected("new_blueprint")?>" href="/space.php?p=new_blueprint&id=<?= $_GET["id"] ?>"> ➕ new Blueprint </a>
+      <a class="tab-button <?php $is_selected("new_document")?>" href="/space.php?p=new_document&id=<?= $_GET["id"] ?>"> ➕ new Document </a>
       <!--<a class="tab-button" href="/space.php?p=wiki&id=<?= $_GET["id"] ?>"> Wiki📚 </a>-->
       <!--(documents & closed Conversations) -->
       <!-- <a class="tab-button" href="/space.php?p=agora&id=<?= $_GET["id"] ?>"> Agora💬 </a>-->
@@ -82,17 +96,9 @@ try {
     </div>
 
     <?php
+    # todo: empty ond default??
     switch ($_GET["p"] ?? "default") {
-      # these are just filter settings:
-      /*case "agora":
-        echo SpacePageAgora::display($space, $app);
-        break;
-      case "wiki":
-        echo SpacePageWiki::display($space, $app);
-        break;
-      case "subspaces":
-        echo SpacePageSubSpaces::display($space, $app);
-        break;*/
+
       case "filter":
         echo SpacePageFilter::display($space, $app);
         break;
@@ -101,6 +107,18 @@ try {
         break;
       case "conversations":
         echo SpacePageConversations::display($space, $app);
+        break;
+
+      case "new_subspace":
+        echo SpacePageNewSubspace::display($space, $app);
+        break;
+
+      case "new_blueprint":
+        echo SpacePageNewBlueprint::display($space, $app);
+        break;
+
+      case "new_document":
+        echo SpacePageNewDocument::display($space, $app);
         break;
 
 

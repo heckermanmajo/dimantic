@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace cls;
 
 class HtmlUtils {
+
+  const NO_AJAX_ENDPOINT = "";
   static function head(string $language = "en", string $style = ""): void {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     #lang="<?= !$language ? "en" : $language #"

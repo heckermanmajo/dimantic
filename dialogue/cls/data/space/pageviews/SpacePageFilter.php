@@ -14,6 +14,7 @@ class SpacePageFilter {
     <button> All </button>
     <button> Subspaces </button>
     <button> Conversations </button>
+    <button> Conversation-Offerings </button>
     <button> Documents </button>
     <br>
 

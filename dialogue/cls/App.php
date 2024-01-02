@@ -6,6 +6,8 @@ namespace cls;
 use cls\data\account\Account;
 use cls\data\account\NewsEntry;
 use cls\data\conversation_blue_print\ConversationBluePrint;
+use cls\data\conversation_blue_print\Lobby;
+use cls\data\conversation_blue_print\LobbyMembership;
 use cls\data\conversation_blue_print\ProtoRule;
 use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMembership;
@@ -204,6 +206,12 @@ class App {
    * @see App::handle_action_requests
    */
   public ?RequestError $action_error = null;
+
+  /**
+   * @var mixed|null This field contains the result of the action if the action was successful.
+   * @see App::handle_action_requests
+   */
+  public mixed $success_result = null;
 
   /**
    * Returns all the logs.
@@ -417,6 +425,8 @@ class App {
     SpaceDocument::create_table($db);
     ConversationBluePrint::create_table($db);
     ProtoRule::create_table($db);
+    Lobby::create_table($db);
+    LobbyMembership::create_table($db);
 
     # add new tables (Dataclasses) here ...
     # ...
@@ -579,13 +589,17 @@ class App {
         $this->executed_action = $request_name;
         $request_function = require($request_file_path);
         $result = $request_function($this, $_POST);
+
+        # result is a RequestError -> action failed
         if ($result instanceof RequestError) {
           $this->action_error = $result;
           $warn("action error: " . $result->dev_message);
         }
+        # result is null -> action success
         else {
           $log("<span style='color:green'>action success</span>");
           $this->action_error = null;
+          $this->success_result = $result;
         }
       }
     }

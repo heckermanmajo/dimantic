@@ -3,8 +3,7 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\conversation_blue_print\ConversationBluePrint;
-use cls\data\space\Space;
+use cls\data\conversation_blue_print\Lobby;
 use cls\Protocol;
 use cls\RequestError;
 
@@ -16,16 +15,16 @@ if (count(debug_backtrace()) == 0) {
 
 
 /**
- * This request edits a conversation blueprint.
+ * This request creates a new lobby for a conversation blueprint.
  *
  * @param App $app
  * @param array $post_data
- * @return Space|RequestError
+ * @return Lobby|RequestError
  */
-function edit_conversation_blueprint(
+function create_lobby(
   App   $app,
   array $post_data,
-): ConversationBluePrint|RequestError {
+): Lobby|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
@@ -45,25 +44,15 @@ function edit_conversation_blueprint(
       );
     }
 
-    if (!isset($post_data['description'])) {
-      return new RequestError(
-        dev_message: "\$post_data['description'] not set",
-        code: RequestError::BAD_REQUEST,
-      );
-    }
+    # todo: check that blueprint exists and is not in use and user is allowed to create lobby
 
-    # todo: check if user is allowed to create a new conversation blueprint in this space
-    # todo: check if blueprint exists
-    # todo: check that blueprint is not in use yet
+    $lobby = new Lobby();
+    $lobby->conversation_blueprint_id = (int)$post_data['blue_print_id'];
+    $lobby->author_id = $app->get_currently_logged_in_account()->id;
 
-    $blueprint = ConversationBluePrint::getDefaultConfigurationDialogue();
-    $blueprint->description = $post_data['description'];
+    # todo: match users to this lobby via interests, tags, embeddings, etc. ...
 
-    $blueprint->save($app->get_database());
-
-    # todo: here would be the place to match members to the blue print
-
-    return $blueprint;
+    return $lobby;
 
   }
 
@@ -79,6 +68,6 @@ function edit_conversation_blueprint(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: edit_conversation_blueprint(...),
+  function: create_lobby(...),
   app: App::get(),
 );
