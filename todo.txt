@@ -1,3 +1,10 @@
+REFACTOR THE SPACE-PAGES!!!!
+
+
+
+
+
+
 -> invite and reject to space.
     -> Plan this beforehand on drawio.
 -> Space function-base package.

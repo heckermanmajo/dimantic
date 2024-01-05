@@ -83,7 +83,7 @@ class Space extends DataClass {
     );
 
     ?>
-    <div class="w3-card w3-margin w3-padding">
+    <div class="sketch-card w3-margin w3-padding">
 
       <h3>
         <a style="text-decoration: none" href="/space.php?id=<?= $this->id ?>">

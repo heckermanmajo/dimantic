@@ -32,11 +32,11 @@ try {
   else {
     ?>
     <div class="w3-row">
-      <div class="w3-col m9 s9 l9">
-        <div class="w3-card-4 w3-margin w3-padding">
+      <div class="w3-col m8 s8 l8">
+        <div class=w3-margin w3-padding">
           <h1 class="w3-center"> Dimantic </h1>
-          <h3 class="w3-center"> Social-Networks Solved </h3>
-
+          <h3 class="w3-center"> The Communication Game </h3>
+<!-- Social-Networks Solved-->
           <div class="w3-center">
             <img src="/res/diamant.svg" width="300px">
           </div>
@@ -54,7 +54,7 @@ try {
       <div class="w3-rest">
 
         <form
-          class="w3-margin w3-padding w3-card-4"
+          class="w3-margin w3-padding sketch-card "
           method="post">
           <input type="hidden" name="action" value="login">
           <h4>Login</h4>
@@ -69,10 +69,10 @@ try {
             <br>
             <input type="password" name="password" value="">
           </label><br><br>
-          <button class="button" type="submit">Login</button>
+          <button class="sketch-button" type="submit">Login</button>
         </form>
 
-        <form class="w3-margin w3-padding w3-card-4" method="post">
+        <form class="w3-margin w3-padding sketch-card " method="post">
           <h4>Register</h4>
           <?= ($app->executed_action == "register") ?: $app->action_error?->get_error_card() ?>
           <input type="hidden" name="action" value="register">
@@ -91,7 +91,7 @@ try {
             <br>
             <input type="password" name="password" value="">
           </label><br><br>
-          <button class="button" type="submit">Register</button>
+          <button class="sketch-button" type="submit">Register</button>
         </form>
       </div>
     </div>

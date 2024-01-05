@@ -2,6 +2,8 @@
 
 namespace cls\data\prestige;
 
+use cls\DataClass;
+
 /**
  * Prestige is the currency of the platform.
  *
@@ -12,9 +14,9 @@ namespace cls\data\prestige;
  * - adding a post to the attention-Board of a space
  * - creating a task or supporting a task
  * - support persons
- * - support spaces??? Wie sieht das aus?
+ * - support spaces??? How does this work??
  *
  */
-class Prestige {
+class Prestige extends DataClass {
 
 }

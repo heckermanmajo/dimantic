@@ -290,7 +290,7 @@ class Dialogue extends DataClass {
     $content = "Empty, but load later from blueprint.";
     ?>
 
-    <div class="w3-card w3-margin w3-padding">
+    <div class="sketch-card w3-margin w3-padding">
       <small><?= $this->get_header_bar($app) ?></small>
       <a style="text-decoration: none" href="/dialogue.php?id=<?= $this->id ?>">
         <?= $content ?>

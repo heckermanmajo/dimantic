@@ -4,7 +4,9 @@ declare(strict_types=1);
 use cls\App;
 use cls\data\space\pageviews\SpacePageBlueprints;
 use cls\data\space\pageviews\SpacePageConversations;
+use cls\data\space\pageviews\SpacePageCreate;
 use cls\data\space\pageviews\SpacePageEdit;
+use cls\data\space\pageviews\SpacePageFeed;
 use cls\data\space\pageviews\SpacePageFilter;
 use cls\data\space\pageviews\SpacePageInfo;
 use cls\data\space\pageviews\SpacePageMembers;
@@ -54,12 +56,12 @@ try {
 
   $space = Space::get_by_id(pdo: $app->get_database(), id: (int)$_GET["id"]);
   ?>
-  <a href="/index.php"> ◀️ Back </a>
+  <a href="/index.php" class="sketch-button " style="margin-top: 6px"> <img src="/res/back.svg" width="30px"></a>
   <?php
   if ($space->current_user_has_access($app)) {
 
     $is_selected = function ($p) {
-      if (($_GET["p"] ?? "filter") == $p)echo "currently-open-tag";
+      if (($_GET["p"] ?? "feed") == $p) echo "currently-open-tag";
     };
 
     ?>
@@ -67,33 +69,51 @@ try {
 
     <h2><?= StringUtils::get_title_from_md_content($space->content) ?></h2>
     <div style="display:inline-block">
-      <a class="tab-button <?php $is_selected("filter")?>" href="/space.php?p=filter&id=<?= $_GET["id"] ?>"> Main </a>
-      <a class="tab-button <?php $is_selected("blueprints")?>" href="/space.php?p=blueprints&id=<?= $_GET["id"] ?>"> My Blueprints </a>
-      <a class="tab-button <?php $is_selected("conversations")?>" href="/space.php?p=conversations&id=<?= $_GET["id"] ?>"> My Conversations </a>
 
+      <a
+        class="sketch-button tab-button <?php $is_selected("feed") ?>"
+        href="/space.php?p=feed&id=<?= $_GET["id"] ?>"
+      > Mainfeed </a>
 
-      <a class="tab-button <?php $is_selected("new_subspace")?>" href="/space.php?p=new_subspace&id=<?= $_GET["id"] ?>"> ➕ new Subspace </a>
-      <a class="tab-button <?php $is_selected("new_blueprint")?>" href="/space.php?p=new_blueprint&id=<?= $_GET["id"] ?>"> ➕ new Blueprint </a>
-      <a class="tab-button <?php $is_selected("new_document")?>" href="/space.php?p=new_document&id=<?= $_GET["id"] ?>"> ➕ new Document </a>
-      <!--<a class="tab-button" href="/space.php?p=wiki&id=<?= $_GET["id"] ?>"> Wiki📚 </a>-->
-      <!--(documents & closed Conversations) -->
-      <!-- <a class="tab-button" href="/space.php?p=agora&id=<?= $_GET["id"] ?>"> Agora💬 </a>-->
-      <!--<a class="tab-button" href="/space.php?p=subspaces&id=<?= $_GET["id"] ?>"> Rooms🌳 </a>-->
-      <!-- JUST FILTER SETTINGS-->
-      <?php /* <a class="tab-button" href="/space.php?p=filter&id=<?= $_GET["id"] ?>"> by 👑 </a> <!--by Authority -->
-      <a class="tab-button" href="/space.php?p=filter&id=<?= $_GET["id"] ?>"> by 🧠 </a> <!--by Most Matching -->
-      <a class="tab-button" href="/space.php?p=filter&id=<?= $_GET["id"] ?>"> by ⏱️ </a> <!-- by Recency-->
-      */ ?>
+      <a
+        class="sketch-button tab-button <?php $is_selected("create") ?>"
+        href="/space.php?p=create&id=<?= $_GET["id"] ?>"
+      > Create </a>
 
+      <a class="sketch-button tab-button <?php $is_selected("filter") ?>" href="/space.php?p=filter&id=<?= $_GET["id"] ?>">
+        Search </a>
+      <a class="sketch-button tab-button <?php $is_selected("blueprints") ?>" href="/space.php?p=blueprints&id=<?= $_GET["id"] ?>"> My
+        Blueprints </a>
+      <a class="sketch-button tab-button <?php $is_selected("conversations") ?>"
+         href="/space.php?p=conversations&id=<?= $_GET["id"] ?>"> My Conversations </a>
     </div>
 
     <div class="w3-right" style="display:inline-block">
-      <a class="tab-button" href="/space.php?p=info&id=<?= $_GET["id"] ?>"> ℹ️ </a>
-      <a class="tab-button" href="/space.php?p=members&id=<?= $_GET["id"] ?>"> 👥 </a>
-      <a class="tab-button" href="/space.php?p=my_membership_settings&id=<?= $_GET["id"] ?>"> ⚙️👤 </a>
+      <a
+        class="tab-button sketch-button "
+        href="/space.php?p=info&id=<?= $_GET["id"] ?>">
+        <img width="12px" src="/res/info.svg">
+      </a>
+      <a
+        class="tab-button sketch-button "
+        href="/space.php?p=members&id=<?= $_GET["id"] ?>">
+        <img width="26px" src="/res/members.svg">
+      </a>
+      <a
+        class="tab-button sketch-button "
+        href="/space.php?p=my_membership_settings&id=<?= $_GET["id"] ?>">
+        <img width="20px" src="/res/my_settings.svg">
+      </a>
       <!-- My settings -->
-      <a class="tab-button" href="/space.php?p=edit&id=<?= $_GET["id"] ?>"> Edit Space🛠️ </a>
+      <a
+        class="tab-button sketch-button "
+        href="/space.php?p=edit&id=<?= $_GET["id"] ?>">
+        <img width="40px" src="/res/space_settings.svg">
+      </a>
     </div>
+    <br><br>
+
+
 
     <?php
     # todo: empty ond default??
@@ -119,6 +139,14 @@ try {
 
       case "new_document":
         echo SpacePageNewDocument::display($space, $app);
+        break;
+
+      case "feed":
+        echo SpacePageFeed::display($space, $app);
+        break;
+
+      case "create":
+        echo SpacePageCreate::display($space, $app);
         break;
 
 
