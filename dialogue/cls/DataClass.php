@@ -499,15 +499,4 @@ abstract class DataClass implements JsonSerializable {
     return null;
   }
 
-
-  function get_escaped_copy_instance(): static {
-    $copy = clone $this;
-    foreach (get_object_vars($copy) as $key => $value) {
-      if (is_string($value)) {
-        $copy->$key = Interpreter::parse($value);
-      }
-    }
-    return $copy;
-  }
-
 }

@@ -12,6 +12,14 @@ if (count(debug_backtrace()) == 0) {
   App::init_context(basename(__FILE__));
 }
 
+/**
+ * Edit the profile of a logged-in account.
+ *
+ * @param App $app The application instance.
+ * @param array $post_data The profile data to be edited.
+ * @return Account|RequestError The edited account or an error if the edit failed.
+ * @throws Exception
+ */
 function edit_profile(
   App   $app,
   array $post_data,

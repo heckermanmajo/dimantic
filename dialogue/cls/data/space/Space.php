@@ -28,6 +28,7 @@ class Space extends DataClass {
   var string $content = "# Empty Space";
   var int $created_at = 0;
   var int $author_id = 0;
+  
 
   /**
    * @throws Exception

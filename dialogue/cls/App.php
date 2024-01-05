@@ -168,6 +168,12 @@ if (session_status() !== PHP_SESSION_ACTIVE) session_start();
  * and want more control over the "simulated" state of the application.
  */
 class App {
+  
+  /**
+   * @var bool If true, then the inline tests are run
+   * This means tests that are put beneath classes in the source file.
+   */
+  public static bool $run_inline_tests = true;
 
   /**
    * On the server we only have one instance of App.

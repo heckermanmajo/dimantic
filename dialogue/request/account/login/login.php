@@ -55,6 +55,7 @@ function login(
   }
 
   $app->login($account);
+  
 
   return $account;
 
