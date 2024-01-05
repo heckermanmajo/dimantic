@@ -87,7 +87,8 @@ class HtmlUtils {
   static function main_header() {
     ?>
     <nav class="w3-margin">
-      <a class="button" href="/home.php">Focus</a>
+      <a class="button" href="/feed.php">Feed</a>
+      <a class="button" href="/home.php">Home</a>
       <a class="button" href="/search.php">Search</a>
       <!--<a class="button" href="/my_news.php">News</a>-->
       <!--<a class="button" href="/members.php">Members</a>-->

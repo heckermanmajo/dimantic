@@ -34,12 +34,20 @@ try {
     <div class="w3-row">
       <div class="w3-col m9 s9 l9">
         <div class="w3-card-4 w3-margin w3-padding">
-
-          <h3>Menschenwürde auf den Prozess bringen</h3>
+          <h1 class="w3-center"> Dimantic </h1>
+          <h3 class="w3-center"> Social-Networks Solved </h3>
 
           <div class="w3-center">
-            <img src="/res/dasein.png" width="300px">
+            <img src="/res/diamant.svg" width="300px">
           </div>
+
+          <p>
+            Make Social networks great again!
+          </p>
+
+          <p>
+            Hier die Mission.
+          </p>
 
         </div>
       </div>

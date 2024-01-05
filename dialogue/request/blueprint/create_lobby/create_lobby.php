@@ -50,6 +50,8 @@ function create_lobby(
     $lobby->conversation_blueprint_id = (int)$post_data['blue_print_id'];
     $lobby->author_id = $app->get_currently_logged_in_account()->id;
 
+    $lobby->save($app->get_database());
+
     # todo: match users to this lobby via interests, tags, embeddings, etc. ...
 
     return $lobby;

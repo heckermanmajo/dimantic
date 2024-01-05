@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\conversation_blue_print\ConversationBluePrint;
+use cls\data\conversation_blue_print\Lobby;
 use cls\data\conversation_blue_print\ProtoRule;
 use cls\HtmlUtils;
 
@@ -33,6 +34,8 @@ try {
     (int)$_GET["id"]
   );
 
+  $current_user_is_blue_print_author = $blueprint->author_id === $app->get_currently_logged_in_account()->id;
+
   ?>
   <a href="/index.php"> ◀️ Back </a>
   <?php
@@ -41,10 +44,10 @@ try {
 
   # todo: add a form to edit the blueprint content
 
-  ?>
-  <h4> Add rules to blueprint </h4>
-
-  <?php
+  $lobbies = Lobby::get_lobbies_of_conversation_blueprint(
+    $app,
+    $blueprint->id
+  );
 
   $proto_rules = ProtoRule::get_array(
     $app->get_database(),
@@ -62,8 +65,27 @@ try {
     }
   }
 
-  ?>
 
+  ?>
+  <form method="post" class="w3-card-4 w3-padding">
+    <h4> Edit Blueprint </h4>
+
+    <input type="hidden" name="action" value="edit_conversation_blueprint">
+    <input type="hidden" name="blue_print_id" value="<?= $blueprint->id ?>">
+    <?=
+    HtmlUtils::get_markdown_editor_field_for_ajax(
+      field_name: "content",
+      ajax_end_point_path_from_root: HtmlUtils::NO_AJAX_ENDPOINT,
+      init_text: "### Describe ONE rule for the conversation you want to have",
+      extra_json_fields: []
+    )
+    ?>
+
+  </form>
+
+  <hr>
+
+  <h4> Add rules to blueprint </h4>
   <form method="post" class="w3-card w3-margin w3-padding">
     <input type="hidden" name="action" value="create_proto_rule">
     <input type="hidden" value="<?= $blueprint->id ?>" name="blue_print_id">
@@ -83,12 +105,40 @@ try {
 
   <h3> Rules </h3>
   <?php
+
   foreach ($proto_rules as $proto_rule) {
     echo $proto_rule->get_card($app);
   }
 
+  if ($app->executed_action == "edit_proto_rule") {
+    if ($app->action_error) {
+      echo $app->action_error->get_error_card($app);
+    }
+    else {
+      # success
+    }
+  }
+
+  ?>
+  <h3> Lobbies </h3>
+  <form method="post" class="w3-card w3-margin w3-padding">
+    <h5> Create Lobby </h5>
+    <input type="hidden" name="action" value="create_lobby">
+    <input type="hidden" value="<?= $blueprint->id ?>" name="blue_print_id">
+
+    <div class="w3-margin">
+      <button type="submit" class="w3-button w3-blue"> Create Lobby</button>
+    </div>
+  </form>
+  <?php
+
+  foreach ($lobbies as $lobby) {
+    echo $lobby->display_card($app);
+  }
+
 
   HtmlUtils::footer($app);
+
 }
 catch (Throwable $e) {
   App::dump_logs(t: $e);

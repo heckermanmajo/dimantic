@@ -22,7 +22,7 @@ if (count(debug_backtrace()) == 0) {
  * @param array $post_data
  * @return Space|RequestError
  */
-function edit_conversation_blueprint(
+function edit_conversation_blueprint_description(
   App   $app,
   array $post_data,
 ): ConversationBluePrint|RequestError {
@@ -79,6 +79,6 @@ function edit_conversation_blueprint(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: edit_conversation_blueprint(...),
+  function: edit_conversation_blueprint_description(...),
   app: App::get(),
 );

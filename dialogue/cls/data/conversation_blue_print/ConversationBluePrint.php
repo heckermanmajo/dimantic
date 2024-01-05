@@ -168,7 +168,7 @@ class ConversationBluePrint extends DataClass {
     <div class="w3-card w3-margin">
       <div class="w3-container">
 
-        <!-- If you have received a counter offer, you can see it here. -->
+        <!-- If you have received a counter-offer, you can see it here. -->
         <div class="w3-padding">
           <i>
             📜 You have received an COUNTER-OFFER on this blueprint.
@@ -185,8 +185,6 @@ class ConversationBluePrint extends DataClass {
 
         <!-- Number of JOINED  members: who has said: yes lets start talking -->
 
-
-
         <a href="/blueprint.php?id=<?= $this->id ?>">
           <h3><?= StringUtils::get_title_from_md_content($this->description) ?></h3>
         </a>
@@ -194,7 +192,14 @@ class ConversationBluePrint extends DataClass {
         <p><?= $app->markdown_to_html(StringUtils::get_md_content_without_title($this->description)) ?></p>
 
       </div>
-      <pre><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>
+
+      <div>
+        <button> Clone this blueprint </button>
+      </div>
+
+      <pre style="display: none"><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>
+
+
 
     </div>
     <?php
