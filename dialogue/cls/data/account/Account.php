@@ -5,6 +5,7 @@ namespace cls\data\account;
 
 use cls\App;
 use cls\DataClass;
+use Exception;
 
 
 /**
@@ -37,6 +38,10 @@ class Account extends DataClass {
   ###### Property-functions #######
   #################################
 
+  /**
+   * @inheritdoc
+   * @throws Exception
+   */
   static function check_value(
     string $field_name,
     mixed  $value,
@@ -74,12 +79,42 @@ class Account extends DataClass {
     return null;
   }
 
+  /**
+   * Retrieves an Account object based on the provided email address.
+   *
+   * @param App $app The application instance.
+   * @param string $email The email address used to search for the Account.
+   *
+   * @return Account|null The Account object found for the specified email address,
+   *         or null if none exists.
+   * @throws Exception
+   */
+  static function get_by_email(
+    App $app,
+    string $email
+  ): ?Account {
+    return static::get_one(
+      pdo: $app->get_database(),
+      sql: "SELECT * FROM Account WHERE email = ?",
+      params: [$email],
+      throw_on_null: false
+    );
+  }
+
   ###########################################################################
   #                                                                         #
   #  Model-Queries                                                          #
   #                                                                         #
   ###########################################################################
 
+  /**
+   * Retrieves a user account by username or email.
+   *
+   * @param string $username_or_email The username or email to search for in the Account table.
+   * @param App $app The application instance.
+   * @return Account|null The matching user account, or null if no match is found.
+   * @throws Exception
+   */
   static function get_user_by_username_or_mail(
     string $username_or_email,
     App    $app
@@ -90,6 +125,27 @@ class Account extends DataClass {
       params: [
         "name" => $username_or_email,
         "email" => $username_or_email,
+      ]
+    );
+  }
+
+  /**
+   * Get a user account by username.
+   *
+   * @param string $username The username of the user.
+   * @param App $app The application instance.
+   * @return Account|null The user account object if found, or null if not found.
+   * @throws Exception
+   */
+  static function get_user_by_username(
+    string $username,
+    App    $app
+  ): Account|null {
+    return static::get_one(
+      pdo: $app->get_database(),
+      sql: "SELECT * FROM Account WHERE `name` = :name",
+      params: [
+        "name" => $username,
       ]
     );
   }

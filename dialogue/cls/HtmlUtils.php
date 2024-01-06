@@ -6,6 +6,7 @@ namespace cls;
 class HtmlUtils {
 
   const NO_AJAX_ENDPOINT = "";
+
   static function head(string $language = "en", string $style = ""): void {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     #lang="<?= !$language ? "en" : $language #"
@@ -85,12 +86,22 @@ class HtmlUtils {
    * @return void
    */
   static function main_header() {
+    $base_name_of_script = basename($_SERVER["SCRIPT_NAME"]);
+    #echo $base_name_of_script;
+    $style = "
+      background-color: blue;
+      color: white;
+    ";
     ?>
     <nav class="w3-margin">
-      <a class=" sketch-button " href="/feed.php">Feed</a>
-      <a class=" sketch-button " href="/home.php">Home</a>
-      <a class=" sketch-button " href="/search.php">Search</a>
-      <a class=" sketch-button " href="/marked.php">Marked</a>
+      <a style="<?= $base_name_of_script === "feed.php" ? $style : "" ?>" class="sketch-button"
+         href="/feed.php">Feed</a>
+      <a style="<?= $base_name_of_script === "home.php" ? $style : "" ?>" class="sketch-button"
+         href="/home.php">Home</a>
+      <a style="<?= $base_name_of_script === "news.php" ? $style : "" ?>" class="sketch-button"
+         href="/news.php">News</a>
+      <a style="<?= $base_name_of_script === "search.php" ? $style : "" ?>" class="sketch-button" href="/search.php">Search</a>
+      <a style="<?= $base_name_of_script === "marked.php" ? $style : "" ?>" class="sketch-button" href="/marked.php">Marked</a>
       <!--<a class="button" href="/my_news.php">News</a>-->
       <!--<a class="button" href="/members.php">Members</a>-->
 
@@ -280,7 +291,7 @@ class HtmlUtils {
           event.preventDefault();
           event.stopPropagation();
           return false;
-        "
+          "
       >
         <?= $emoji ?>
       </button>

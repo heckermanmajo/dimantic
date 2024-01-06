@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\account\Account;
-use cls\data\account\NewsEntry;
 use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMembership;
 use cls\data\conversation_blue_print\ConversationBluePrint;
@@ -148,20 +147,20 @@ function create_dialogue_by_blueprint(
 
     if ($create_news_entries) {
       foreach ($accounts as $account) {
-        $news_entry = new NewsEntry();
-        $news_entry->account_id = $account->id;
-        $news_entry->type = NewsEntry::TYPE_DIALOGUE_HAS_STARTED;
-        $news_entry->dialogue_id = $dialogue->id;
-        $news_entry->save($app->get_database());
+        #$news_entry = new NewsEntry();
+        #$news_entry->account_id = $account->id;
+        #$news_entry->type = NewsEntry::TYPE_DIALOGUE_HAS_STARTED;
+        #$news_entry->dialogue_id = $dialogue->id;
+        #$news_entry->save($app->get_database());
       }
 
       if (isset($moderator_account) && $moderator_account != null) {
-        $news_entry = new NewsEntry();
-        $news_entry->account_id = $moderator_account->id;
+        #$news_entry = new NewsEntry();
+        #$news_entry->account_id = $moderator_account->id;
         # todo: add more specific type -> I am moderator ...
-        $news_entry->type = NewsEntry::TYPE_DIALOGUE_HAS_STARTED;
-        $news_entry->dialogue_id = $dialogue->id;
-        $news_entry->save($app->get_database());
+        #$news_entry->type = NewsEntry::TYPE_DIALOGUE_HAS_STARTED;
+        #$news_entry->dialogue_id = $dialogue->id;
+        #$news_entry->save($app->get_database());
       }
     }
 

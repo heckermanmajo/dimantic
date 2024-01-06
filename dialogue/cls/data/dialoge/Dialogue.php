@@ -5,10 +5,8 @@ namespace cls\data\dialoge;
 
 use cls\App;
 use cls\data\account\Account;
-use cls\data\account\NewsEntry;
-use cls\data\conversation_blue_print\ConversationBluePrint;
 use cls\DataClass;
-use cls\RequestError;
+
 use Exception;
 
 /**

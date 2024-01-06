@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\account\NewsEntry;
 use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMessage;
 use cls\Protocol;
@@ -68,11 +67,11 @@ function write_message(
       if ($membership->account_id == $app->get_currently_logged_in_account()->id) {
         continue;
       }
-      $news_entry = new NewsEntry();
-      $news_entry->account_id = $membership->account_id;
-      $news_entry->type = NewsEntry::TYPE_INVITED_TO_NEW_DIALOGUE;
-      $news_entry->dialogue_id = $dialogue->id;
-      $news_entry->save($app->get_database());
+      #$news_entry = new NewsEntry();
+      #$news_entry->account_id = $membership->account_id;
+      #$news_entry->type = NewsEntry::TYPE_INVITED_TO_NEW_DIALOGUE;
+      #$news_entry->dialogue_id = $dialogue->id;
+      #$news_entry->save($app->get_database());
     }
 
     return $message;

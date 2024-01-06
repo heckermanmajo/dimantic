@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\account\Account;
-use cls\data\account\NewsEntry;
-use cls\data\dialoge\Dialogue;
 use cls\HtmlUtils;
-use cls\RequestError;
 
 include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 

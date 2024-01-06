@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\account\NewsEntry;
+
 use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMessage;
 use cls\Protocol;

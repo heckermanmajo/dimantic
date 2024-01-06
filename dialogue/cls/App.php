@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace cls;
 
 use cls\data\account\Account;
-use cls\data\account\NewsEntry;
+
+use cls\data\account\news\InviteToLobbyNewsEntry;
 use cls\data\conversation_blue_print\ConversationBluePrint;
 use cls\data\conversation_blue_print\Lobby;
 use cls\data\conversation_blue_print\LobbyMembership;
@@ -424,7 +425,6 @@ class App {
     DialogueMessageComment::create_table($db);
     DialogueRule::create_table($db);
     DialogueRuleRating::create_table($db);
-    NewsEntry::create_table($db);
     DialogueMessageSelectionLike::create_table($db);
     Space::create_table($db);
     SpaceMembership::create_table($db);
@@ -433,6 +433,7 @@ class App {
     ProtoRule::create_table($db);
     Lobby::create_table($db);
     LobbyMembership::create_table($db);
+    InviteToLobbyNewsEntry::create_table($db);
 
     # add new tables (Dataclasses) here ...
     # ...

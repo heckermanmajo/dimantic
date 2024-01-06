@@ -2,10 +2,7 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\account\Account;
-use cls\data\account\NewsEntry;
-use cls\data\dialoge\Dialogue;
-use cls\data\dialoge\DialogueMembership;
+
 use cls\data\dialoge\DialogueMessageSelectionLike;
 use cls\Protocol;
 use cls\RequestError;

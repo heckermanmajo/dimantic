@@ -31,13 +31,12 @@
 input {
     background-color: #ffffff;
     border-style: none;
-    border-bottom: solid 1px<?=$main_color?>;
+    border-bottom: solid 1px <?=$main_color?>;
     color: #0c0c0c;
 }
 
 input:focus {
     outline: none;
-    border-bottom: solid 3px<?=$main_color?>;
 }
 
 textarea {
