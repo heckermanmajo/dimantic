@@ -17,6 +17,9 @@ if (count(debug_backtrace()) == 0) {
 # todo: change this from create message from post
 #       to publish draft from membership table ...
 
+/**
+ * @throws Exception
+ */
 function publish_message_from_draft(
   App   $app,
   array $post_data,
@@ -32,9 +35,14 @@ function publish_message_from_draft(
     );
   }
 
+ if (!isset($post_data["dialogue_id"])) {
+    return new RequestError(
+      dev_message: "\$post_data['dialogue_id'] not set",
+      code: RequestError::BAD_REQUEST,
+    );
+  }
 
-  $dialogue_id = $post_data["dialogue_id"] ?? throw new Exception("dialogue_id");
-  #$content = $post_data["content"] ?? throw new Exception("content");
+  $dialogue_id = $post_data["dialogue_id"];
 
   $dialogue = Dialogue::get_by_id($app->get_database(), (int)$dialogue_id);
 
@@ -78,6 +86,7 @@ function publish_message_from_draft(
     if($in_loop_membership->account_id == $app->get_currently_logged_in_account()->id){
       continue;
     }
+    # todo: send notification to all members of the dialogue
     #$news_entry = new NewsEntry();
     #$news_entry->account_id = $in_loop_membership->account_id;
     #$news_entry->type = NewsEntry::TYPE_NEW_MESSAGE_IN_DIALOGUE;

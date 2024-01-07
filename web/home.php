@@ -31,15 +31,15 @@ try {
       $all_my_dialogues = Dialogue::get_my_dialoges(
         0, 20, $app
       );
+
+      # align 3 dialogues per row -> GRID, max 9 dialogues on the start page
       $counter = 0;
       $mappedOn3 = [];
       foreach ($all_my_dialogues as $dialoge) {
         if(!isset($mappedOn3[(int)($counter / 3) ])){
           $mappedOn3[(int)($counter / 3) ] = [];
         }
-        $mappedOn3[(int)($counter / 3) ][] = $dialoge->get_overview_card(
-          $app
-        );
+        $mappedOn3[(int)($counter / 3) ][] = $dialoge->get_overview_card();
         $counter++;
         if ($counter >= 9) {
           break;

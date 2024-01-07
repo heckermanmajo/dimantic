@@ -143,7 +143,7 @@ ob_start();
  */
 function FN_AUTOLOAD($class): void {
   $class = str_replace(search: '\\', replace: '/', subject: $class);
-  if (php_sapi_name() == "cli") {
+  if (FN_IS_CLI()) {
     $file = __DIR__ . "/../" . "$class.php";
   }
   else {
@@ -250,17 +250,19 @@ class App {
   }
 
   /**
-   * This function is a helper to create standard test instances.
-   * @todo: implement ...
-   */
-  static function get_test_instance(): App { }
-
-  /**
    * This function is used when a script is run in cli mode.
    * This makes sense for tests and also for cli-run-analysis.
    * @return void
    */
   static function init_cli_test_context(): void { }
+
+  /**
+   * This function is a helper to create standard test instances.
+   * @todo: implement ...
+   */
+  static function get_test_instance(): App { }
+
+
 
   /**
    * Init context is called at the start of each page and each request (if the request is called directly).

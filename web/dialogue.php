@@ -57,7 +57,7 @@ try {
 
   <?php
 
-  echo $dialogue->get_overview_card($app);
+  echo $dialogue->get_overview_card();
   $messages = DialogueMessage::get_all_messages_of_dialogue($app, $dialogue->id);
   $my_membership = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
 

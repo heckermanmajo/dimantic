@@ -55,11 +55,15 @@ class Dialogue extends DataClass {
   /**
    * The id of the account that has created the dialogue.
    */
-  # todo: set to to 0
   var int $author_id = 0;
 
   var int $created_at = 0;
 
+  /**
+   * The description of the dialogue.
+   * Just a copy of the description of the blueprint.
+   *
+   */
   var string $description = '';
 
   #################################
@@ -88,13 +92,15 @@ class Dialogue extends DataClass {
   }
 
   /**
-   * @param App $app
-   * @return array<DialogueMembership>
-   * @throws Exception
+   * Retrieves the memberships associated with the dialogue.
+   *
+   * @return array<DialogueMembership> The DialogueMembership objects representing the memberships of the dialogue.
+   * @throws Exception If an error occurs while retrieving the memberships.
+   *
    */
-  function get_memberships(App $app): array {
+  function get_memberships(): array {
     return DialogueMembership::get_array(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "SELECT * FROM `DialogueMembership` WHERE `dialogue_id` = ?",
       params: [$this->id]
     );
@@ -169,21 +175,34 @@ class Dialogue extends DataClass {
     return $members_that_have_left;
   }
 
-  function get_last_message(App $app): ?DialogueMessage {
+  /**
+   * Get the last message of the dialogue.
+   *
+   * @return ?DialogueMessage Returns the last message of the dialogue, or null if no message exists.
+   * @throws Exception
+   */
+  function get_last_message(): ?DialogueMessage {
     return DialogueMessage::get_one(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "SELECT * FROM `DialogueMessage` WHERE `dialogue_id` = ? ORDER BY `create_date` DESC LIMIT 1",
       params: [$this->id]
     );
   }
 
+  /**
+   * @throws Exception
+   */
   function current_user_is_member(App $app): bool {
-    return $this->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id) != null;
+    return $this->get_membership_of_given_account(
+      $app, $app->
+      get_currently_logged_in_account()->id
+      ) != null;
   }
 
   /**
    * @param App $app
    * @return array<DialogueRule>
+   * @throws Exception
    */
   function get_rules_of_dialogue(App $app): array {
     $rules = DialogueRule::get_array(
@@ -208,6 +227,7 @@ class Dialogue extends DataClass {
    * @param int $limit
    * @param App $app
    * @return array<Dialogue>
+   * @throws Exception
    */
   static function get_my_dialoges(int $offset, int $limit, App $app): array {
     return static::get_array(
@@ -254,10 +274,17 @@ class Dialogue extends DataClass {
 #  Views                                                                  #
 #                                                                         #
 ###########################################################################
-  function get_header_bar(App $app): string {
+  /**
+   * This function returns the header bar of the dialogue card as string.
+   *
+   * @throws Exception
+   */
+  function get_header_bar(): string {
 
     [$log, $warn, $err, $todo]
       = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+
+    $app = App::get();
 
     $my_membership = $this->get_membership_of_given_account(
       app: $app,
@@ -279,7 +306,7 @@ class Dialogue extends DataClass {
     $state_hint = match ($this->state) {
       Dialogue::STATE_OPEN => "<small style='color: greenyellow'>Open</small>",
       Dialogue::STATE_CLOSED => "<small style='color: #b4aa50'>Closed</small>",
-      default => "DEPRECATED",
+      default => "DEPRECATED-State",
     };
 
     $number_of_members = $this->get_number_of_memberships($app);
@@ -302,9 +329,10 @@ class Dialogue extends DataClass {
     return ob_get_clean();
   }
 
-  function get_overview_card(
-    App $app,
-  ): string {
+  /**
+   * @throws Exception
+   */
+  function get_overview_card(): string {
     [$log, $warn, $err, $todo]
       = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     ob_start();
@@ -312,9 +340,9 @@ class Dialogue extends DataClass {
     ?>
 
     <div class="sketch-card w3-margin w3-padding">
-      <small><?= $this->get_header_bar($app) ?></small>
+      <small><?= $this->get_header_bar() ?></small>
       <a style="text-decoration: none" href="/dialogue.php?id=<?= $this->id ?>">
-        <?= $app->markdown_to_html($this->description) ?>
+        <?= App::get()->markdown_to_html($this->description) ?>
       </a>
     </div>
     <?php
@@ -326,19 +354,32 @@ class Dialogue extends DataClass {
   }
 
   /**
-   * @throws Exception
+   * This function creates a dialogue from a given blueprint and lobby.
+   * It also creates the memberships and rules.
+   *
+   * @param ConversationBluePrint $blueprint The blueprint to create the dialogue from.
+   * @param Lobby $lobby The lobby to create the dialogue from.
+   * @param bool $save_directly_to_db If true, the dialogue, memberships and rules are saved directly to the database.
+   * @param bool $create_news_for_users If true, news-entries are created for the users.
    *
    * @return array{
    *   dialogue: Dialogue,
    *   memberships: array<DialogueMembership>,
    *   rules: array<DialogueRule>,
    * }
+   *
+   * @throws Exception
+   * @see DialogueMembership
+   *
+   * @see DialogueRule
    */
   static function create_dialogue_from_given_blueprint_and_lobby(
     ConversationBluePrint $blueprint,
     Lobby $lobby,
-    bool $save_directly_to_db = false
+    bool $save_directly_to_db = false,
+    bool $create_news_for_users = false,
   ): array {
+
     [$log, $warn, $err, $todo]
       = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
@@ -348,6 +389,7 @@ class Dialogue extends DataClass {
     $dialogue->blue_print_id = $lobby->conversation_blueprint_id;
     $dialogue->description = $blueprint->description;
     $dialogue->author_id = $blueprint->author_id;
+
     if($save_directly_to_db){
       $dialogue->save($app->get_database());
     }
@@ -358,17 +400,26 @@ class Dialogue extends DataClass {
     );
 
     $memberships = [];
+
     foreach ($lobby_memberships as $lobby_membership) {
+
       $user_to_create_membership_for = $lobby_membership->account_id;
       $dialogue_membership = new DialogueMembership();
       $dialogue_membership->dialogue_id = $dialogue->id;
       $dialogue_membership->account_id = $user_to_create_membership_for;
       $dialogue_membership->state = DialogueMembership::STATE_ACTIVE;
+
       if($save_directly_to_db){
         $dialogue_membership->save($app->get_database());
       }
+
       $memberships[] = $dialogue_membership;
-      # todo: create news for the users
+
+      if ($create_news_for_users) {
+        # todo: create news for the users
+        $warn("IMPLEMENT ME: create news for the users");
+      }
+
     }
 
 
@@ -377,17 +428,22 @@ class Dialogue extends DataClass {
       "SELECT * FROM ProtoRule WHERE blue_print_id = ?",
       [$blueprint->id]
     );
+
     $rules = [];
+
     foreach ($proto_rules as $proto_rule) {
+
       $dialogue_rule = new DialogueRule();
       $dialogue_rule->dialogue_id = $dialogue->id;
       $dialogue_rule->rule_text = $proto_rule->content;
+      # the creator of the blueprint is the author of the rule
       $dialogue_rule->account_id = $blueprint->author_id;
       $dialogue_rule->was_proto_rule = 1;
-      #$dialogue_rule->
+
       if ($save_directly_to_db) {
         $dialogue_rule->save($app->get_database());
       }
+
       $rules[] = $dialogue_rule;
     }
 
@@ -396,6 +452,7 @@ class Dialogue extends DataClass {
       'memberships' => $memberships,
       'rules' => $rules,
     ];
-  }
+
+  } // end function create_dialogue_from_given_blueprint_and_lobby(...)
 
 }
