@@ -96,7 +96,11 @@ function create_lobby_membership(
        * @var DialogueMembership[] $memberships
        * @var DialogueRule[] $rules
        */
-      [$dialogue, $memberships, $rules] = Dialogue::create_dialogue_from_given_blueprint_and_lobby(
+      [
+        "dialogue" => $dialogue,
+        "memberships" => $memberships,
+        "rules" => $rules
+      ] = Dialogue::create_dialogue_from_given_blueprint_and_lobby(
         blueprint: $blueprint,
         lobby: $lobby,
         save_directly_to_db: true,

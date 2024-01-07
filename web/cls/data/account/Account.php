@@ -29,6 +29,7 @@ class Account extends DataClass {
   var string $language = "de";
   var string $content = "";
   var string $create_date = "";
+  var string $style = "default";
 
   #################################
   ###### Joined Values      #######

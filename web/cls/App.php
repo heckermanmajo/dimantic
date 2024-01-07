@@ -578,6 +578,29 @@ class App {
       return;
     }
 
+    #######################################################################
+    # This code prevents re-execution of the same request
+    #######################################################################
+
+    $hash_of_all_post_fields = md5(serialize($_POST));
+
+    $last_hash = $this->get_session_field(name:"hash_of_post_data_of_last_request", default: "");
+
+    if ($last_hash === $hash_of_all_post_fields) {
+      # if you need to resend the request, then set this field to true in post
+      if(!isset($_POST["allow_resend_of_request"]) && $_POST["allow_resend_of_request"] !== "true"){
+        $warn("same request as last time -> skip");
+        $warn(json_encode($_POST, JSON_PRETTY_PRINT));
+        return;
+      }
+    }
+
+    $this->set_session_field(name: "hash_of_post_data_of_last_request", value: $hash_of_all_post_fields);
+
+    #######################################################################
+
+
+
     $all_requests = $_SERVER["DOCUMENT_ROOT"] . "/request/*/*/*.php";
     $all_requests = glob(pattern: $all_requests);
     $requests_mapped_on_name = [];

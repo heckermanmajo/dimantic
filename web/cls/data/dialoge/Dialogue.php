@@ -11,9 +11,7 @@ use cls\data\conversation_blue_print\LobbyMembership;
 use cls\data\conversation_blue_print\ProtoRule;
 use cls\DataClass;
 
-use cls\RequestError;
 use Exception;
-use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * This class represents one dialogue between multiple
@@ -75,7 +73,9 @@ class Dialogue extends DataClass {
   /**
    * Return the messages in descending id order.
    * @param App $app
+   * @param bool $cache
    * @return array<DialogueMessage>
+   * @throws Exception
    */
   function get_all_messages(App $app, bool $cache = false): array {
     # static $cache = [];
@@ -90,6 +90,7 @@ class Dialogue extends DataClass {
   /**
    * @param App $app
    * @return array<DialogueMembership>
+   * @throws Exception
    */
   function get_memberships(App $app): array {
     return DialogueMembership::get_array(
@@ -99,6 +100,16 @@ class Dialogue extends DataClass {
     );
   }
 
+  /**
+   * Retrieves the membership of a given account in the dialogue.
+   *
+   * @param App $app The application instance.
+   * @param int $account_id The ID of the account to retrieve the membership for.
+   *
+   * @return DialogueMembership|null The DialogueMembership object representing the membership of the account in the dialogue, or null if the account is not a member.
+   * @throws Exception If an error occurs during the database query.
+   *
+   */
   function get_membership_of_given_account(App $app, int $account_id): ?DialogueMembership {
     return DialogueMembership::get_one(
       pdo: $app->get_database(),
@@ -298,13 +309,12 @@ class Dialogue extends DataClass {
       = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     ob_start();
 
-    $content = "Empty, but load later from blueprint.";
     ?>
 
     <div class="sketch-card w3-margin w3-padding">
       <small><?= $this->get_header_bar($app) ?></small>
       <a style="text-decoration: none" href="/dialogue.php?id=<?= $this->id ?>">
-        <?= $content ?>
+        <?= $app->markdown_to_html($this->description) ?>
       </a>
     </div>
     <?php
@@ -372,6 +382,9 @@ class Dialogue extends DataClass {
       $dialogue_rule = new DialogueRule();
       $dialogue_rule->dialogue_id = $dialogue->id;
       $dialogue_rule->rule_text = $proto_rule->content;
+      $dialogue_rule->account_id = $blueprint->author_id;
+      $dialogue_rule->was_proto_rule = 1;
+      #$dialogue_rule->
       if ($save_directly_to_db) {
         $dialogue_rule->save($app->get_database());
       }

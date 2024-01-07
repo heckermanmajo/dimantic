@@ -56,6 +56,7 @@ function create_proto_rule(
     $proto_rule = new ProtoRule();
     $proto_rule->blue_print_id = (int)$post_data['blue_print_id'];
     $proto_rule->content = $post_data['content'];
+    $proto_rule->author_id = $app->get_currently_logged_in_account()->id;
 
     $proto_rule->save($app->get_database());
 

@@ -1,25 +1,67 @@
 <?php
 
+
+use cls\App;
+
+try{
+
+    $style = App::get()->get_currently_logged_in_account()->style;
+
+    switch($style) {
+
+        default:
+            $main_color = "blue";
+            $info_color = "#a6ff44";
+            $header_color = "dodgerblue";
+            $default_card_border_color = "dodgerblue";
+            $background_color = "gray";
+            $card_background_color = "gray";
+            break;
+
+        case "default_darkmode" :
+            $main_color = "white";
+            $info_color = "#a6ff44";
+            $header_color = "dodgerblue";
+            $default_card_border_color = "dodgerblue";
+            $background_color = "#232323";
+            $card_background_color = "gray";
+            break;
+
+    }
+
+}catch(Exception $e){
+    // this is the style for not logged in users
+    $background_color = "gray";
+    $card_background_color = "gray";
     $main_color = "blue";
     $info_color = "#a6ff44";
     $header_color = "dodgerblue";
     $default_card_border_color = "dodgerblue";
 
+}
+
 ?>
 
+body {
+    background-color: <?=$background_color?>;
+}
+
 .w3-card {
+    background-color: <?=$card_background_color?>;
     border-color: <?=$default_card_border_color?>;
     border-style: solid;
     border-width: 1px;
 }
 
 .w3-card-4 {
+    background-color: <?=$card_background_color?>;
     border-color: <?=$default_card_border_color?>;
     border-style: solid;
     border-width: 1px;
 }
 
 .info-card {
+    background-color: <?=$card_background_color?>;
     border-style: solid;
     border-width: 1px;
     border-color: <?=$info_color?>;
@@ -31,7 +73,7 @@
 input {
     background-color: #ffffff;
     border-style: none;
-    border-bottom: solid 1px <?=$main_color?>;
+    border-bottom: solid 1px<?=$main_color?>;
     color: #0c0c0c;
 }
 
@@ -40,6 +82,7 @@ input:focus {
 }
 
 textarea {
+    background-color: <?=$card_background_color?> !important;
     border-left-style: none;
     border-right-style: none;
     border-bottom: solid 1px<?=$main_color?>;
@@ -108,7 +151,7 @@ blockquote {
 /* CSS */
 .sketch-button {
     align-self: center;
-    background-color: #fff;
+    background-color: <?=$card_background_color?>;
     background-position: 0 90%;
     background-repeat: repeat no-repeat;
     background-size: 4px 3px;
@@ -141,8 +184,8 @@ blockquote {
 
 
 .sketch-card {
+    background-color: <?=$card_background_color?>;
     align-self: center;
-    background-color: #fff;
     background-image: none;
     background-position: 0 90%;
     background-repeat: repeat no-repeat;

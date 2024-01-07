@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\conversation_blue_print\Lobby;
+use cls\data\conversation_blue_print\ProtoRule;
 use cls\Protocol;
 use cls\RequestError;
 
@@ -15,16 +15,16 @@ if (count(debug_backtrace()) == 0) {
 
 
 /**
- * This request creates a new lobby for a conversation blueprint.
+ * This request creates a new proto-rule for a conversation blueprint.
  *
  * @param App $app
  * @param array $post_data
- * @return Lobby|RequestError
+ * @return ProtoRule|RequestError
  */
-function create_lobby(
+function get_proto_rule_card(
   App   $app,
   array $post_data,
-): Lobby|RequestError {
+): string|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
@@ -37,24 +37,28 @@ function create_lobby(
       );
     }
 
-    if (!isset($post_data['blue_print_id'])) {
+    if (!isset($post_data['proto_rule_id'])) {
       return new RequestError(
-        dev_message: "\$post_data['blue_print_id'] not set",
+        dev_message: "\$post_data['proto_rule_id'] not set",
         code: RequestError::BAD_REQUEST,
       );
     }
 
-    # todo: check that blueprint exists and is not in use and user is allowed to create lobby
+    # todo: check that blueprint exists and is not in use and user is allowed to edit it
 
-    $lobby = new Lobby();
-    $lobby->conversation_blueprint_id = (int)$post_data['blue_print_id'];
-    $lobby->author_id = $app->get_currently_logged_in_account()->id;
+    $proto_rule = ProtoRule::get_by_id(
+      $app->get_database(),
+      (int)$post_data['proto_rule_id']
+    );
 
-    $lobby->save($app->get_database());
+    if ($proto_rule === null) {
+      return new RequestError(
+        dev_message: "Proto rule not found",
+        code: RequestError::NOT_FOUND,
+      );
+    }
 
-    # todo: match users to this lobby via interests, tags, embeddings, etc. ...
-
-    return $lobby;
+    return $proto_rule->get_card();
 
   }
 
@@ -70,6 +74,6 @@ function create_lobby(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: create_lobby(...),
+  function: get_proto_rule_card(...),
   app: App::get(),
 );

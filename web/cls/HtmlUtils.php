@@ -170,7 +170,8 @@ class HtmlUtils {
     string $field_name,
     string $ajax_end_point_path_from_root,
     string $init_text,
-    array  $extra_json_fields
+    array  $extra_json_fields,
+    string $onchange_js_code = ""
   ): false|string {
 
     ob_start();
@@ -256,13 +257,19 @@ class HtmlUtils {
                 console.log(data);
               }
 
+              // onchange js code
+              <?php echo $onchange_js_code ?>
+
             })
             .catch((error) => {
               console.error('Error:', error);
             });
 
-          // send an ajax request to the endpoint
-        });
+
+
+
+
+        }); // end of onchange
 
       });
     </script>
