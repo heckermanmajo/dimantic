@@ -5,7 +5,7 @@ use cls\App;
 use cls\HtmlUtils;
 
 
-include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
+require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 try {
 
   App::init_context(basename(__FILE__));

@@ -5,7 +5,7 @@ use cls\App;
 use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMembership;
 
-include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
+require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 
 if (!\cls\FN_IS_LOCAL_HOST()){
   die("This script can only be executed on local host");

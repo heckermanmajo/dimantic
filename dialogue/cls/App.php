@@ -38,7 +38,7 @@ function FN_IS_CLI(): bool {
 /**
  * This function detects if the user is on a mobile device.
  *
- * Used for different css style-includes and possibly
+ * Used for different css style-requires and possibly
  * different html structure.
  *
  * @todo: implement ...
@@ -132,7 +132,7 @@ ob_start();
  * \cls\Protocol is in the file cls/Protocol.php
  *
  * The autoloader does NOT work for functions.
- * Therefore we need to include all functions
+ * Therefore we need to require all functions
  * via require_once.
  *
  * -> functions are only used
@@ -149,7 +149,7 @@ function FN_AUTOLOAD($class): void {
   else {
     $file = $_SERVER['DOCUMENT_ROOT'] . "/$class.php";
   }
-  if (file_exists(filename: $file)) include_once $file;
+  if (file_exists(filename: $file)) require_once $file;
 }
 
 // autoloader: classes on namespace

@@ -3,14 +3,16 @@
 namespace cls\data\conversation_blue_print;
 
 use cls\App;
+use cls\data\account\Account;
 use cls\DataClass;
+use cls\GetDisplayCardInterface;
 use cls\StringUtils;
 use Exception;
 
 /**
  * Initiation of a conversation.
  */
-class ConversationBluePrint extends DataClass {
+class ConversationBluePrint extends DataClass implements GetDisplayCardInterface {
 
   public int $author_id = 0;
 
@@ -162,11 +164,43 @@ class ConversationBluePrint extends DataClass {
       ) > 0;
   }
 
-  function get_card(App $app): string {
+  /**
+   * @throws Exception
+   */
+  function get_display_card(App $app): string {
+    [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+
+    if (!$this->user_is_allowed_to_see_blueprint(
+      $app,
+      $app->get_currently_logged_in_account()->id)
+    ) {
+      $warn("User is not allowed to see blueprint, but display function was called, so has he some access???");
+      return '<div class="sketch-card w3-margin"> You are not allowed to see this blueprint. </div>';
+    }
+
+    # todo: improve ...
+    $author_account = Account::get_by_id(
+      $app->get_database(),
+      $this->author_id
+    );
+
+
     ob_start();
     ?>
     <div class="sketch-card w3-margin">
+      <div>
+        <b style="color: #3f51b5">Conversation Blueprint</b>
+        by <b>
+          <?= $author_account->name ?>
+        </b> -
+        <?= ($this->published == 1) ? "<b>Published</b>" : "NOT published" ?>
+        <div class="w3-right">
+          <?= $author_account->get_gravtar_profile_image() ?>
+        </div>
+      </div>
+
       <div class="w3-container">
+
 
         <!-- If you have received a counter-offer, you can see it here. -->
         <!--<div class="w3-padding">
@@ -184,21 +218,24 @@ class ConversationBluePrint extends DataClass {
         </div>-->
 
         <!-- Number of JOINED  members: who has said: yes lets start talking -->
-
+          <!--<pre><?php var_dump($this)?></pre>-->
         <a href="/blueprint.php?id=<?= $this->id ?>">
           <h3><?= StringUtils::get_title_from_md_content($this->description) ?></h3>
         </a>
 
         <p><?= $app->markdown_to_html(StringUtils::get_md_content_without_title($this->description)) ?></p>
 
+        <p>Number of lobbies: <?=Lobby::get_number_of_lobbies_for_blueprint(
+          blueprint_id: $this->id
+          )?></p>
+
       </div>
 
-      <div>
-        <button> Clone this blueprint </button>
-      </div>
+      <!--<div>
+        <button> Clone this blueprint</button>
+      </div>-->
 
       <pre style="display: none"><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>
-
 
 
     </div>
@@ -214,15 +251,15 @@ class ConversationBluePrint extends DataClass {
    * @return array<ConversationBluePrint>
    */
   static function search_by_search_text_in_space(
-    App $app,
-    int $user,
-    int $space_id,
+    App    $app,
+    int    $user,
+    int    $space_id,
     string $search_string,
   ): array {
 
     return static::get_array(
-      $app->get_database(),
-      "
+      pdo: $app->get_database(),
+      sql: "
             SELECT * FROM ConversationBluePrint 
                 WHERE 
                     space_id = ? 
@@ -231,9 +268,83 @@ class ConversationBluePrint extends DataClass {
                         author_id = ? OR published = 1
                     )
                     AND description LIKE ?",
-      [$space_id, $user, '%' . $search_string . '%']
+      params: [
+        $space_id,                 # [0]
+        $user,                     # [1]
+        '%' . $search_string . '%' # [2]
+      ],
+      fields_to_not_escape: [2]
     );
 
+  }
+
+  function user_is_allowed_to_publish_blueprint(
+    App $app,
+    int $user_id
+  ): bool {
+    return $this->author_id === $user_id;
+  }
+
+  function user_is_allowed_to_unpublish_blueprint(
+    App $app,
+    int $user_id
+  ): bool {
+    return $this->author_id === $user_id;
+  }
+
+  function user_is_allowed_to_edit_blueprint(
+    App $app,
+    int $user_id
+  ): bool {
+    return $this->author_id === $user_id;
+  }
+
+  function user_is_allowed_to_see_blueprint(
+    App $app,
+    int $user_id
+  ): bool {
+
+    if ($this->published === 1) {
+      return true;
+    }
+
+    if ($this->given_user_is_invited($app, $user_id)) {
+      return true;
+    }
+
+    return $this->author_id === $user_id;
+  }
+
+  function given_user_is_invited(
+    App $app,
+    int $user_id
+  ): bool {
+    # todo: implement ...
+    return false;
+  }
+
+  function user_is_allowed_to_create_lobby(App $app, int $user_id): bool {
+    return $this->author_id === $user_id;
+  }
+
+  /**
+   * Retrieve all published blueprints for a given space.
+   *
+   * @param int $space_id The ID of the space for which to retrieve the blueprints.
+   *
+   * @return array<static> An array containing all published blueprints for the given space.
+   *
+   * @throws Exception If an error occurs while retrieving the blueprints.
+   */
+  static function get_all_published_blueprints(
+    int $space_id
+  ): array {
+    return static::get_array(
+      pdo: App::get()->get_database(),
+      sql: "SELECT * FROM ConversationBluePrint 
+         WHERE published = 1 AND space_id = ?",
+      params: [$space_id]
+    );
   }
 
 }

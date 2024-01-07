@@ -4,17 +4,16 @@ declare(strict_types=1);
 use cls\App;
 use cls\data\conversation_blue_print\ConversationBluePrint;
 use cls\data\dialoge\Dialogue;
-use cls\data\dialoge\DialogueRule;
-use cls\data\dialoge\DialogueRuleRating;
 use cls\data\space\Space;
 use cls\data\space\SpaceDocument;
 use cls\data\space\SpaceMembership;
+use cls\GetDisplayCardInterface;
 use cls\Protocol;
 use cls\RequestError;
 
 
 if (count(debug_backtrace()) == 0) {
-  include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
+  require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
   App::init_context(basename(__FILE__));
 }
 
@@ -22,7 +21,7 @@ if (count(debug_backtrace()) == 0) {
 /**
  * @param App $app
  * @param array $post_data
- * @return array<ConversationBluePrint|SpaceDocument|SpaceMembership|Dialogue|Space>|RequestError
+ * @return array<GetDisplayCardInterface>|RequestError
  */
 function space_text_search(
   App   $app,
@@ -45,7 +44,6 @@ function space_text_search(
       );
     }
 
-
     if (!isset($post_data["search_string"])) {
       return new RequestError(
         dev_message: "\$post_data[\"search_string\"] not set",
@@ -53,10 +51,34 @@ function space_text_search(
       );
     }
 
+    $space = Space::get_by_id($app->get_database(), (int)$post_data["space_id"]);
+
+    if ($space == null) {
+      return new RequestError(
+        dev_message: "Space not found.",
+        code: RequestError::BAD_REQUEST,
+      );
+    }
+
+    $search_string = $post_data["search_string"];
+
+    # todo: check search string
+
+    $results = [];
+
+    $blueprints = ConversationBluePrint::search_by_search_text_in_space(
+      $app,
+      $app->get_currently_logged_in_account()->id,
+      $space->id,
+      $search_string,
+    );
+
+    $results = array_merge($results, $blueprints);
+
+    # todo: search in documents, memberships, dialogues, spaces
 
 
-
-    return [];
+    return $results;
 
   }
   catch (Throwable $e) {

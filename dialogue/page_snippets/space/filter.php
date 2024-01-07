@@ -2,6 +2,7 @@
 
 use cls\App;
 use cls\data\space\Space;
+use cls\GetDisplayCardInterface;
 
 return function (Space $space, App $app): string {
   ob_start();
@@ -12,6 +13,25 @@ return function (Space $space, App $app): string {
     <input type="text" name="search_string" placeholder="Search">
     <button class="sketch-button"> <img src="/res/search.svg" width="20"> </button>
   </form>
+
+  <?php
+  if($app->executed_action == "space_text_search"){
+    if($app->action_error != null){
+      echo $app->action_error->get_error_card($app);
+    }
+    else{
+      /**
+       * @var $array_of_search_results GetDisplayCardInterface[]
+       */
+      $array_of_search_results = $app->success_result;
+      foreach($array_of_search_results as $search_result){
+        echo $search_result->get_display_card($app);
+      }
+    }
+  }
+
+
+  ?>
   <!--
   <button> All </button>
   <button> Subspaces </button>

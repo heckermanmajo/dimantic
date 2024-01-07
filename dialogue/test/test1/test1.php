@@ -2,7 +2,7 @@
 
 use cls\App;
 
-include __DIR__ . "/../../cls/App.php";
+require_once __DIR__ . "/../../cls/App.php";
 
 App::init_context(basename(__FILE__));
 # get logging functions

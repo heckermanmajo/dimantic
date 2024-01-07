@@ -62,7 +62,7 @@ Was kann man man technisch machen, das keine user input features erfordert.
 ### Einzelne zeilen in den messages hervorheben
 -> sich auf einzelne Zeilen beziehen
 
-### Commands: include link
+### Commands: require link
 - ref other messages/dialogues
 
 ### Word definitions

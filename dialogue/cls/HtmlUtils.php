@@ -50,7 +50,7 @@ class HtmlUtils {
           <?php endif; ?>
           }
 
-          <?php include($_SERVER["DOCUMENT_ROOT"] . "/res/main.css.php");?>
+          <?php require($_SERVER["DOCUMENT_ROOT"] . "/res/main.css.php");?>
 
           <?=$style?>
       </style>
@@ -86,6 +86,7 @@ class HtmlUtils {
    * @return void
    */
   static function main_header() {
+    assert(App::get()->somebody_logged_in());
     $base_name_of_script = basename($_SERVER["SCRIPT_NAME"]);
     #echo $base_name_of_script;
     $style = "
@@ -119,6 +120,8 @@ class HtmlUtils {
 
       </div>
     </nav>
+    Logged in as: <b><?= App::get()->get_currently_logged_in_account()->name; ?></b>
+
     <?php
   }
 
@@ -191,7 +194,7 @@ class HtmlUtils {
       // todo: this is the only jquery code so far
       // todo: maybe we can remove jquery and use vanilla js instead
       $(document).ready(function () {
-        <?=$editor_name?> = new EasyMDE({
+        <?php echo $editor_name?> = new EasyMDE({
           element: document.getElementById('<?=$random_css_id?>'),
           spellChecker: false,
           // log the content of the textarea to the console when changed

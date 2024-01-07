@@ -3,16 +3,18 @@
 declare(strict_types=1);
 
 use cls\App;
+use cls\data\conversation_blue_print\ConversationBluePrint;
 use cls\data\conversation_blue_print\Lobby;
 use cls\data\conversation_blue_print\LobbyMembership;
 use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMembership;
+use cls\data\dialoge\DialogueRule;
 use cls\Protocol;
 use cls\RequestError;
 
 
 if (count(debug_backtrace()) == 0) {
-  include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
+  require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
   App::init_context(basename(__FILE__));
 }
 
@@ -27,7 +29,7 @@ if (count(debug_backtrace()) == 0) {
 function create_lobby_membership(
   App   $app,
   array $post_data,
-): LobbyMembership|RequestError {
+): LobbyMembership|Dialogue|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
@@ -59,9 +61,21 @@ function create_lobby_membership(
       );
     }
 
+    $blueprint = ConversationBluePrint::get_by_id(
+      $app->get_database(),
+      $lobby->conversation_blueprint_id
+    );
+
+    if ($blueprint === null) {
+      return new RequestError(
+        dev_message: "Conversation blueprint not found",
+        code: RequestError::NOT_FOUND,
+      );
+    }
+
     # todo: check rights and stuff
 
-    if(LobbyMembership::is_given_user_member_of_lobby($app, $lobby->id)){
+    if (LobbyMembership::is_given_user_member_of_lobby($app, $lobby->id)) {
       return new RequestError(
         dev_message: "You are already a member of this lobby.",
         code: RequestError::RULE_ERROR,
@@ -74,27 +88,26 @@ function create_lobby_membership(
 
     $lobby_membership->save($app->get_database());
 
-    if($lobby->lobby_has_enough_members($app)){
+    if ($lobby->lobby_has_enough_members($app)) {
       // create the conversation from the blueprint
 
-      $dialogue = new Dialogue();
-      $dialogue->blue_print_id = $lobby->conversation_blueprint_id;
-      $dialogue->save($app->get_database());
-
-      $lobby_memberships = LobbyMembership::get_memberships_of_lobby(
-        $app,
-        $lobby->id
+      /**
+       * @var Dialogue $dialogue
+       * @var DialogueMembership[] $memberships
+       * @var DialogueRule[] $rules
+       */
+      [$dialogue, $memberships, $rules] = Dialogue::create_dialogue_from_given_blueprint_and_lobby(
+        blueprint: $blueprint,
+        lobby: $lobby,
+        save_directly_to_db: true,
       );
 
-      foreach ($lobby_memberships as $lobby_membership) {
-        $user_to_create_membership_for = $lobby_membership->account_id;
-        $dialogue_membership = new DialogueMembership();
-        $dialogue_membership->dialogue_id = $dialogue->id;
-        $dialogue_membership->account_id = $user_to_create_membership_for;
-        $dialogue_membership->state = DialogueMembership::STATE_ACTIVE;
-        $dialogue_membership->save($app->get_database());
-        # todo: create news for the users
-      }
+
+      # todo: copy all the proto rules to real rules
+
+      # delete the lobby
+      # todo: delete all lobby memberships
+      $lobby->delete($app->get_database());
 
     }
 

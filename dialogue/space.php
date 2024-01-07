@@ -2,20 +2,12 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\space\pageviews\SpacePageCreate;
-use cls\data\space\pageviews\SpacePageFeed;
-use cls\data\space\pageviews\SpacePageFilter;
-use cls\data\space\pageviews\SpacePageMembers;
-use cls\data\space\pageviews\SpacePageMyMembershipSettings;
-use cls\data\space\pageviews\SpacePageNewBlueprint;
-use cls\data\space\pageviews\SpacePageNewDocument;
-use cls\data\space\pageviews\SpacePageNewSubspace;
 use cls\data\space\Space;
 use cls\HtmlUtils;
 use cls\StringUtils;
 
 
-include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
+require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 
 try {
 

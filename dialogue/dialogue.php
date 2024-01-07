@@ -6,7 +6,7 @@ use cls\data\dialoge\Dialogue;
 use cls\data\dialoge\DialogueMessage;
 use cls\RequestError;
 
-include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
+require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 
 try {
 

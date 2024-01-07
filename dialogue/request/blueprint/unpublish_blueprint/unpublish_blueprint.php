@@ -16,13 +16,13 @@ if (count(debug_backtrace()) == 0) {
 
 
 /**
- * This request edits a conversation blueprint.
+ * This requests publishes a conversation blueprint.
  *
  * @param App $app
  * @param array $post_data
  * @return Space|RequestError
  */
-function edit_conversation_blueprint_description(
+function unpublish_blueprint(
   App   $app,
   array $post_data,
 ): ConversationBluePrint|RequestError {
@@ -45,17 +45,6 @@ function edit_conversation_blueprint_description(
       );
     }
 
-    if (!isset($post_data['description'])) {
-      return new RequestError(
-        dev_message: "\$post_data['description'] not set",
-        code: RequestError::BAD_REQUEST,
-      );
-    }
-
-    # todo: check if user is allowed to create a new conversation blueprint in this space
-    # todo: check if blueprint exists
-    # todo: check that blueprint is not in use yet
-
     $blueprint = ConversationBluePrint::get_by_id($app->get_database(), (int)$post_data['blue_print_id']);
 
     if ($blueprint == null) {
@@ -65,11 +54,30 @@ function edit_conversation_blueprint_description(
       );
     }
 
-    $blueprint->description = $post_data['description'];
+    if (
+      $blueprint->user_is_allowed_to_unpublish_blueprint(
+        $app,
+        $app->get_currently_logged_in_account()->id
+      ) === false
+    ) {
+      return new RequestError(
+        dev_message: "You are not allowed to unpublish this blueprint.",
+        code: RequestError::RULE_ERROR,
+      );
+    }
+
+    if ($blueprint->published === 0) {
+      return new RequestError(
+        dev_message: "This blueprint is already unpublished.",
+        code: RequestError::RULE_ERROR,
+      );
+    }
+
+    $blueprint->published = 0;
 
     $blueprint->save($app->get_database());
 
-    # todo: here would be the place to match members to the blue print
+    # todo: send notifications/invitations, etc.
 
     return $blueprint;
 
@@ -87,6 +95,6 @@ function edit_conversation_blueprint_description(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: edit_conversation_blueprint_description(...),
+  function: unpublish_blueprint(...),
   app: App::get(),
 );

@@ -78,7 +78,7 @@ class InviteToLobbyNewsEntry extends DataClass implements GetDisplayCardInterfac
    * Retrieves the HTML markup for the display card of an invitation to a conversation.
    *
    * This method generates the HTML markup for a display card that represents an invitation to a conversation.
-   * The card includes information about the inviter and a brief description of the conversation.
+   * The card requires information about the inviter and a brief description of the conversation.
    *
    * @return string The HTML markup for the display card.
    */

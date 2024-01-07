@@ -5,9 +5,15 @@ namespace cls\data\dialoge;
 
 use cls\App;
 use cls\data\account\Account;
+use cls\data\conversation_blue_print\ConversationBluePrint;
+use cls\data\conversation_blue_print\Lobby;
+use cls\data\conversation_blue_print\LobbyMembership;
+use cls\data\conversation_blue_print\ProtoRule;
 use cls\DataClass;
 
+use cls\RequestError;
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * This class represents one dialogue between multiple
@@ -55,6 +61,8 @@ class Dialogue extends DataClass {
   var int $author_id = 0;
 
   var int $created_at = 0;
+
+  var string $description = '';
 
   #################################
   ###### Joined Values      #######
@@ -236,6 +244,10 @@ class Dialogue extends DataClass {
 #                                                                         #
 ###########################################################################
   function get_header_bar(App $app): string {
+
+    [$log, $warn, $err, $todo]
+      = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+
     $my_membership = $this->get_membership_of_given_account(
       app: $app,
       account_id: $app->get_currently_logged_in_account()->id
@@ -282,7 +294,8 @@ class Dialogue extends DataClass {
   function get_overview_card(
     App $app,
   ): string {
-
+    [$log, $warn, $err, $todo]
+      = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     ob_start();
 
     $content = "Empty, but load later from blueprint.";
@@ -300,6 +313,76 @@ class Dialogue extends DataClass {
 
   static function check_value(string $field_name, mixed $value, App $app): string|null {
     return null;
+  }
+
+  /**
+   * @throws Exception
+   *
+   * @return array{
+   *   dialogue: Dialogue,
+   *   memberships: array<DialogueMembership>,
+   *   rules: array<DialogueRule>,
+   * }
+   */
+  static function create_dialogue_from_given_blueprint_and_lobby(
+    ConversationBluePrint $blueprint,
+    Lobby $lobby,
+    bool $save_directly_to_db = false
+  ): array {
+    [$log, $warn, $err, $todo]
+      = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+
+    $app = App::get();
+
+    $dialogue = new Dialogue();
+    $dialogue->blue_print_id = $lobby->conversation_blueprint_id;
+    $dialogue->description = $blueprint->description;
+    $dialogue->author_id = $blueprint->author_id;
+    if($save_directly_to_db){
+      $dialogue->save($app->get_database());
+    }
+
+    $lobby_memberships = LobbyMembership::get_memberships_of_lobby(
+      $app,
+      $lobby->id
+    );
+
+    $memberships = [];
+    foreach ($lobby_memberships as $lobby_membership) {
+      $user_to_create_membership_for = $lobby_membership->account_id;
+      $dialogue_membership = new DialogueMembership();
+      $dialogue_membership->dialogue_id = $dialogue->id;
+      $dialogue_membership->account_id = $user_to_create_membership_for;
+      $dialogue_membership->state = DialogueMembership::STATE_ACTIVE;
+      if($save_directly_to_db){
+        $dialogue_membership->save($app->get_database());
+      }
+      $memberships[] = $dialogue_membership;
+      # todo: create news for the users
+    }
+
+
+    $proto_rules = ProtoRule::get_array(
+      $app->get_database(),
+      "SELECT * FROM ProtoRule WHERE blue_print_id = ?",
+      [$blueprint->id]
+    );
+    $rules = [];
+    foreach ($proto_rules as $proto_rule) {
+      $dialogue_rule = new DialogueRule();
+      $dialogue_rule->dialogue_id = $dialogue->id;
+      $dialogue_rule->rule_text = $proto_rule->content;
+      if ($save_directly_to_db) {
+        $dialogue_rule->save($app->get_database());
+      }
+      $rules[] = $dialogue_rule;
+    }
+
+    return [
+      'dialogue' => $dialogue,
+      'memberships' => $memberships,
+      'rules' => $rules,
+    ];
   }
 
 }

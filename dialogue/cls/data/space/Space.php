@@ -64,8 +64,7 @@ class Space extends DataClass {
     return static::get_array(
       $app->get_database(),
       "SELECT * FROM space",
-      [],
-      Space::class
+      []
     );
   }
 

@@ -29,7 +29,7 @@ return function (Space $space, App $app): string {
 
   <?php
   foreach ($blueprints as $blueprint) {
-    echo $blueprint->get_card($app);
+    echo $blueprint->get_display_card($app);
   }
   ?>
 

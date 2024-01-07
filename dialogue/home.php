@@ -6,7 +6,7 @@ use cls\data\dialoge\Dialogue;
 use cls\data\space\Space;
 use cls\HtmlUtils;
 
-include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
+require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 
 try {
 
@@ -24,14 +24,6 @@ try {
   HtmlUtils::head();
   HtmlUtils::main_header();
 
-  $sql = "SELECT * FROM Account WHERE password LIKE ?";
-  $pdo = $app->get_database();
-  $stmt = $pdo->prepare($sql);
-  #$stmt->bindValue(1, "$2y%");
-  $stmt->execute([$pdo->quote("$2y%")]);
-  $all_accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  var_dump($all_accounts);
-  exit();
   ?>
   <div>
 

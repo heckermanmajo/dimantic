@@ -7,7 +7,7 @@ use cls\Protocol;
 use cls\RequestError;
 
 if (count(debug_backtrace()) == 0) {
-  include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
+  require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
   App::init_context(basename(__FILE__));
 }
 

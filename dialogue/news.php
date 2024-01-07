@@ -7,7 +7,7 @@ use cls\GetDisplayCardInterface;
 use cls\HtmlUtils;
 
 
-include $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
+require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
 
 try {
 
