@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\space\Space;
-use cls\data\space\SpaceMembership;
 use cls\Protocol;
 use cls\RequestError;
 
@@ -22,18 +21,18 @@ if (count(debug_backtrace()) == 0) {
 /**
  * This request creates a new space.
  *
- * @param App $app
  * @param array<string,string> $post_data
  * @return Space|RequestError
  */
 function delete_space(
-  App   $app,
   array $post_data,
 ): null|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
   try {
+    
+    $app = App::get();
 
     if (!$app->somebody_logged_in()) {
       return new RequestError(
@@ -90,5 +89,4 @@ function delete_space(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: delete_space(...),
-  app: App::get(),
 );

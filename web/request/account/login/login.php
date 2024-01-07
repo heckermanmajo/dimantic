@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\account\Account;
-use cls\data\dialoge\Dialogue;
 use cls\Protocol;
 use cls\RequestError;
 
@@ -13,11 +12,10 @@ if (count(debug_backtrace()) == 0) {
 }
 
 function login(
-  App   $app,
   array $post_data,
 ): Account|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
-
+  $app = App::get();
   if (!isset($post_data["username_or_email"])) {
     return new RequestError(
       dev_message: "\$post_data[\"username_or_email\"] not set",
@@ -36,8 +34,7 @@ function login(
   $password = $post_data["password"];
 
   $account = Account::get_user_by_username_or_mail(
-    username_or_email: $username_or_email,
-    app: $app
+    username_or_email: $username_or_email
   );
 
   if ($account === null) {
@@ -65,5 +62,4 @@ function login(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: login(...),
-  app: App::get(),
 );

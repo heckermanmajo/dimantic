@@ -152,13 +152,12 @@ class ConversationBluePrint extends DataClass implements GetDisplayCardInterface
    *   number of days it is published and the number of conversations
    *   after which it is unpublished.
    *
-   * @param App $app
    * @return bool
    * @throws Exception
    */
-  function is_in_use(App $app): bool {
+  function is_in_use(): bool {
     return ConversationBluePrint::get_count(
-        pdo: $app->get_database(),
+        pdo: App::get()->get_database(),
         sql: "SELECT COUNT(*) FROM `Dialogue` WHERE `blue_print_id` = ?",
         params: [$this->id]
       ) > 0;
@@ -167,12 +166,13 @@ class ConversationBluePrint extends DataClass implements GetDisplayCardInterface
   /**
    * @throws Exception
    */
-  function get_display_card(App $app): string {
+  function get_display_card(): string {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
-    if (!$this->user_is_allowed_to_see_blueprint(
-      $app,
-      $app->get_currently_logged_in_account()->id)
+    if (
+      !$this->user_is_allowed_to_see_blueprint(
+        user_id: App::get()->get_currently_logged_in_account()->id
+      )
     ) {
       $warn("User is not allowed to see blueprint, but display function was called, so has he some access???");
       return '<div class="sketch-card w3-margin"> You are not allowed to see this blueprint. </div>';
@@ -180,7 +180,7 @@ class ConversationBluePrint extends DataClass implements GetDisplayCardInterface
 
     # todo: improve ...
     $author_account = Account::get_by_id(
-      $app->get_database(),
+      App::get()->get_database(),
       $this->author_id
     );
 
@@ -223,7 +223,7 @@ class ConversationBluePrint extends DataClass implements GetDisplayCardInterface
           <h3><?= StringUtils::get_title_from_md_content($this->description) ?></h3>
         </a>
 
-        <p><?= $app->markdown_to_html(StringUtils::get_md_content_without_title($this->description)) ?></p>
+        <p><?= App::get()->markdown_to_html(StringUtils::get_md_content_without_title($this->description)) ?></p>
 
         <p>Number of lobbies: <?=Lobby::get_number_of_lobbies_for_blueprint(
           blueprint_id: $this->id
@@ -242,23 +242,22 @@ class ConversationBluePrint extends DataClass implements GetDisplayCardInterface
     <?php
     return ob_get_clean();
   }
-
+  
   /**
-   * @param App $app
    * @param int $user
    * @param int $space_id
    * @param string $search_string
    * @return array<ConversationBluePrint>
+   * @throws Exception
    */
   static function search_by_search_text_in_space(
-    App    $app,
     int    $user,
     int    $space_id,
     string $search_string,
   ): array {
 
     return static::get_array(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "
             SELECT * FROM ConversationBluePrint 
                 WHERE 
@@ -279,28 +278,24 @@ class ConversationBluePrint extends DataClass implements GetDisplayCardInterface
   }
 
   function user_is_allowed_to_publish_blueprint(
-    App $app,
     int $user_id
   ): bool {
     return $this->author_id === $user_id;
   }
 
   function user_is_allowed_to_unpublish_blueprint(
-    App $app,
     int $user_id
   ): bool {
     return $this->author_id === $user_id;
   }
 
   function user_is_allowed_to_edit_blueprint(
-    App $app,
     int $user_id
   ): bool {
     return $this->author_id === $user_id;
   }
 
   function user_is_allowed_to_see_blueprint(
-    App $app,
     int $user_id
   ): bool {
 
@@ -308,7 +303,7 @@ class ConversationBluePrint extends DataClass implements GetDisplayCardInterface
       return true;
     }
 
-    if ($this->given_user_is_invited($app, $user_id)) {
+    if ($this->given_user_is_invited($user_id)) {
       return true;
     }
 
@@ -316,14 +311,13 @@ class ConversationBluePrint extends DataClass implements GetDisplayCardInterface
   }
 
   function given_user_is_invited(
-    App $app,
     int $user_id
   ): bool {
     # todo: implement ...
     return false;
   }
 
-  function user_is_allowed_to_create_lobby(App $app, int $user_id): bool {
+  function user_is_allowed_to_create_lobby(int $user_id): bool {
     return $this->author_id === $user_id;
   }
 

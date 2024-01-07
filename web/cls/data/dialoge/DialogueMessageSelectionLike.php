@@ -20,7 +20,6 @@ class DialogueMessageSelectionLike extends DataClass {
    * This is therefore the number of used like credits
    * within the dialogue.
    *
-   * @param App $app
    * @param int $dialogue_id
    * @param int $account_id
    * @return int
@@ -28,7 +27,6 @@ class DialogueMessageSelectionLike extends DataClass {
    * @throws Exception
    */
   static function get_all_used_like_credits_per_person_per_dialogue(
-    App $app,
     int $dialogue_id,
     int $account_id
   ): int {
@@ -43,7 +41,7 @@ class DialogueMessageSelectionLike extends DataClass {
       "account_id" => $account_id,
     ];
     $result = static::get_sum(
-      $app->get_database(),
+      App::get()->get_database(),
       $sql,
       $params
     );
@@ -52,16 +50,14 @@ class DialogueMessageSelectionLike extends DataClass {
 
   /**
    * @throws Exception
-   * @param App $app
    * @param int $dialogue_message_id
    * @return DialogueMessageSelectionLike[]
    */
   static function get_all_like_selections_of_message(
-    App $app,
     int $dialogue_message_id
   ): array {
     return static::get_array(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "
         SELECT *
         FROM DialogueMessageSelectionLike

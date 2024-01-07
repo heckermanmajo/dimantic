@@ -22,18 +22,18 @@ if (count(debug_backtrace()) == 0) {
 /**
  * This request deletes a space membership.
  *
- * @param App $app
  * @param array<string,string> $post_data
  * @return Space|RequestError
  */
 function delete_space_membership(
-  App   $app,
   array $post_data,
 ): Space|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
   try {
+    
+    $app = App::get();
 
     if (!$app->somebody_logged_in()) {
       return new RequestError(
@@ -116,5 +116,4 @@ function delete_space_membership(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: delete_space_membership(...),
-  app: App::get(),
 );

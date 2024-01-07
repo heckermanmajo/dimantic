@@ -8,7 +8,7 @@ class TestDataLib {
   /**
    * @throws \Exception
    */
-  static function insertUsers(App $app): array {
+  static function insertUsers(): array {
 
     $data = [
       [
@@ -37,13 +37,13 @@ class TestDataLib {
       foreach ($account_data as $key => $value) {
         $account->$key = $value;
       }
-      $account->save(db: $app->get_database());
+      $account->save(db: App::get()->get_database());
       $accounts[] = $account;
     }
     return $accounts;
   }
 
-  static function create_default_dialogue_blue_prints(App $app): array {
+  static function create_default_dialogue_blue_prints(): array {
     $data = [];
 
     $blueprints = [];
@@ -54,7 +54,7 @@ class TestDataLib {
       foreach ($blue_print_data as $key => $value) {
         $blue_print->$key = $value;
       }
-      $blue_print->save($app->get_database());
+      $blue_print->save(App::get()->get_database());
       $blueprints[] = $blue_print;
     }
 

@@ -57,7 +57,7 @@ try {
     </div>
   </form>
 <?php
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 }
 catch (Throwable $e) {
   App::dump_logs(t: $e);

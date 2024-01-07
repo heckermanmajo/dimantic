@@ -21,13 +21,15 @@ if (count(debug_backtrace()) == 0) {
  * @throws Exception
  */
 function publish_message_from_draft(
-  App   $app,
   array $post_data,
 ): DialogueMessage|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   # todo: check input and rights ...
 
+  
+  $app = App::get();
+  
   if(!$app->somebody_logged_in()){
     return new RequestError(
       dev_message: "You are not logged in.",
@@ -47,7 +49,6 @@ function publish_message_from_draft(
   $dialogue = Dialogue::get_by_id($app->get_database(), (int)$dialogue_id);
 
   $membership = $dialogue->get_membership_of_given_account(
-    $app,
     $app->get_currently_logged_in_account()->id,
   );
 
@@ -105,5 +106,4 @@ function publish_message_from_draft(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: publish_message_from_draft(...),
-  app: App::get(),
 );

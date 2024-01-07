@@ -42,12 +42,12 @@ try {
   HtmlUtils::head();
   HtmlUtils::main_header();
 
-  $all_members = Account::get_all_accounts(0, 50, $app);
+  $all_members = Account::get_all_accounts(0, 50);
   foreach ($all_members as $member) {
-    echo $member->get_display_card($app);
+    echo $member->get_display_card();
   }
 
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 }
 catch (Throwable $e) {
   App::dump_logs(t: $e);

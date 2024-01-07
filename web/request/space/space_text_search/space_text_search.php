@@ -3,10 +3,7 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\conversation_blue_print\ConversationBluePrint;
-use cls\data\dialoge\Dialogue;
 use cls\data\space\Space;
-use cls\data\space\SpaceDocument;
-use cls\data\space\SpaceMembership;
 use cls\GetDisplayCardInterface;
 use cls\Protocol;
 use cls\RequestError;
@@ -19,16 +16,16 @@ if (count(debug_backtrace()) == 0) {
 
 
 /**
- * @param App $app
  * @param array $post_data
  * @return array<GetDisplayCardInterface>|RequestError
  */
 function space_text_search(
-  App   $app,
   array $post_data,
 ): array|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   try {
+    
+    $app = App::get();
 
     if(!$app->somebody_logged_in()){
       return new RequestError(
@@ -67,7 +64,6 @@ function space_text_search(
     $results = [];
 
     $blueprints = ConversationBluePrint::search_by_search_text_in_space(
-      $app,
       $app->get_currently_logged_in_account()->id,
       $space->id,
       $search_string,
@@ -93,5 +89,4 @@ function space_text_search(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: space_text_search(...),
-  app: App::get(),
 );

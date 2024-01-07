@@ -29,7 +29,7 @@ try {
 
       <?php
       $all_my_dialogues = Dialogue::get_my_dialoges(
-        0, 20, $app
+        0, 20
       );
 
       # align 3 dialogues per row -> GRID, max 9 dialogues on the start page
@@ -68,10 +68,10 @@ try {
 
 
     <?php
-    $all_spaces = Space::getAllSpaces($app);
+    $all_spaces = Space::getAllSpaces();
     $all_spaces = array_reverse($all_spaces);
     foreach ($all_spaces as $space) {
-      echo $space->getDisplayCard($app);
+      echo $space->getDisplayCard();
     }
     ?>
 
@@ -84,7 +84,7 @@ try {
   <?php
 
 
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 }
 catch (Throwable $e) {
   App::dump_logs(t: $e);

@@ -16,12 +16,13 @@ if (count(debug_backtrace()) == 0) {
 
 
 function edit_rule(
-  App   $app,
   array $post_data,
 ): DialogueRule|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   try {
 
+    $app = App::get();
+    
     if(!$app->somebody_logged_in()){
       return new RequestError(
         dev_message: "You are not logged in.",
@@ -104,6 +105,5 @@ function edit_rule(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: edit_rule(...),
-  app: App::get(),
+  function: edit_rule(...)
 );

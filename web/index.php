@@ -54,6 +54,7 @@ try {
           class="w3-margin w3-padding sketch-card "
           method="post">
           <input type="hidden" name="action" value="login">
+          <input type="hidden" name="allow_resend_of_request" value="true">
           <h4>Login</h4>
           <?= ($app->executed_action == "login") ?: $app->action_error?->get_error_card() ?>
           <label>
@@ -73,6 +74,7 @@ try {
           <h4>Register</h4>
           <?= ($app->executed_action == "register") ?: $app->action_error?->get_error_card() ?>
           <input type="hidden" name="action" value="register">
+          <input type="hidden" name="allow_resend_of_request" value="true">
           <label>
             <span><small>Username</small></span>
             <br>
@@ -95,7 +97,7 @@ try {
     <?php
   }
 
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 }
 catch (\Throwable $e) {
   App::dump_logs(t: $e);

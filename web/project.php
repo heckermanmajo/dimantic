@@ -106,8 +106,8 @@ try {
     </pre>
   </div>
   <?php
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 }
-catch (\Throwable $e) {
+catch (Throwable $e) {
   App::dump_logs(t: $e);
 }

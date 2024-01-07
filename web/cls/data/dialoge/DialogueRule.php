@@ -45,19 +45,25 @@ class DialogueRule extends DataClass {
     parent::__construct($data_from_db);
 
   }
-
-
-  function get_current_ratings(App $app): array {
+  
+  
+  /**
+   * @throws \Exception
+   */
+  function get_current_ratings(): array {
     return DialogueRuleRating::get_array(
-      $app->get_database(),
+      App::get()->get_database(),
       "SELECT * FROM DialogueRuleRating WHERE dialogue_rule_id = ?",
       [$this->id]
     );
   }
-
-  function get_dialogue_by_id(App $app): Dialogue {
+  
+  /**
+   * @throws \Exception
+   */
+  function get_dialogue_by_id(): Dialogue {
     return Dialogue::get_by_id(
-      $app->get_database(),
+      App::get()->get_database(),
       $this->dialogue_id
     );
   }
@@ -67,22 +73,21 @@ class DialogueRule extends DataClass {
    * @return string
    * @throws \Exception
    */
-  function get_display_card(App $app): string {
+  function get_display_card(): string {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     ob_start();
 
     $author = Account::get_by_id(
-      $app->get_database(),
+      App::get()->get_database(),
       $this->account_id,
     );
 
-    $all_ratings = $this->get_current_ratings($app);
+    $all_ratings = $this->get_current_ratings();
 
-    $dialogue = $this->get_dialogue_by_id($app);
+    $dialogue = $this->get_dialogue_by_id();
 
     $my_membership = DialogueMembership::get_my_membership_by_dialogue(
       $dialogue->id,
-      $app
     );
 
     $my_rating = null;
@@ -92,7 +97,7 @@ class DialogueRule extends DataClass {
      * @var DialogueRuleRating $rating
      */
     foreach ($all_ratings as $rating) {
-      if ($rating->account == $app->get_currently_logged_in_account()->id) {
+      if ($rating->account == App::get()->get_currently_logged_in_account()->id) {
         $my_rating = $rating;
       }
       if (
@@ -115,7 +120,7 @@ class DialogueRule extends DataClass {
       $warn("Rule order not set in db request of rules ");
     }
 
-    $i_am_author = $author->id == $app->get_currently_logged_in_account()->id;
+    $i_am_author = $author->id == App::get()->get_currently_logged_in_account()->id;
 
     // todo: mark if the rule was declined -> But in theaory the author cvan edit it until it is accepted
     //       need news for declined and news for edited after declined
@@ -163,7 +168,7 @@ class DialogueRule extends DataClass {
       }
       ?>
       <br>
-      <div><?= $app->markdown_to_html($this->rule_text) ?></div>
+      <div><?= App::get()->markdown_to_html($this->rule_text) ?></div>
 
       <?php if ($this->was_proto_rule == 0): ?>
         <?php if (!$i_am_author && $my_rating != null
@@ -220,7 +225,7 @@ class DialogueRule extends DataClass {
         if ($rating->rating == DialogueRuleRating::RATING_REJECT) {
           ?>
           <div class="w3-card-4 w3-padding">
-          <?= $app->markdown_to_html($rating->reason_text) ?>
+          <?= App::get()->markdown_to_html($rating->reason_text) ?>
           </div>
           <?php
         }
@@ -233,7 +238,7 @@ class DialogueRule extends DataClass {
           <?php
           $style = "display: none";
           if (
-            ($app->executed_action == "edit_rule")
+            (App::get()->executed_action == "edit_rule")
             && $_POST["dialogue_rule_id"] == $this->id
           ):
             $style = "";
@@ -247,9 +252,9 @@ class DialogueRule extends DataClass {
                 method="post"
 
               >
-                <?= ($app->executed_action == "edit_rule"
+                <?= (App::get()->executed_action == "edit_rule"
                   && $_POST["dialogue_rule_id"] == $this->id)
-                  ? $app->action_error?->get_error_card() : "" ?>
+                  ? App::get()->action_error?->get_error_card() : "" ?>
                 <input type="hidden" name="action" value="edit_rule">
                 <input type="hidden" name="dialogue_rule_id" value="<?= $this->id ?>">
                 <input type="hidden" name="dialogue_id" value="<?= $dialogue->id ?>">

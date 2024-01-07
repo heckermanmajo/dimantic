@@ -12,7 +12,6 @@ if (count(debug_backtrace()) == 0) {
 }
 
 function update_message_draft(
-  App   $app,
   array $post_data,
 ): \cls\data\dialoge\DialogueMembership|RequestError {
 
@@ -21,6 +20,8 @@ function update_message_draft(
   $log("Post_data", $post_data);
 
   try {
+    
+    $app = App::get();
 
     if (!$app->somebody_logged_in()) {
       return new RequestError(
@@ -54,7 +55,7 @@ function update_message_draft(
       );
     }
 
-    $my_membership = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
+    $my_membership = $dialogue->get_membership_of_given_account($app->get_currently_logged_in_account()->id);
     if (!$my_membership) {
       return new RequestError(
         dev_message: "You are not a member of this dialogue.",
@@ -89,5 +90,4 @@ function update_message_draft(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: update_message_draft(...),
-  app: App::get(),
 );

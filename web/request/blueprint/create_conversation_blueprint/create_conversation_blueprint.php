@@ -18,17 +18,17 @@ if (count(debug_backtrace()) == 0) {
 /**
  * This request creates a new conversation blueprint.
  *
- * @param App $app
  * @param array $post_data
  * @return Space|RequestError
  */
 function create_new_conversation_blueprint(
-  App   $app,
   array $post_data,
 ): ConversationBluePrint|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
+  $app = App::get();
+  
   try {
 
     if (!$app->somebody_logged_in()) {
@@ -82,5 +82,4 @@ function create_new_conversation_blueprint(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: create_new_conversation_blueprint(...),
-  app: App::get(),
 );

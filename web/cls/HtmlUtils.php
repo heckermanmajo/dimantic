@@ -64,7 +64,7 @@ class HtmlUtils {
     <?php
   }
 
-  static function footer(App $app): void {
+  static function footer(): void {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     ?>
     <br><br><br>    <br><br><br>    <br><br><br>    <br><br><br>    <br><br><br>
@@ -74,7 +74,7 @@ class HtmlUtils {
     </footer>
     <?php
     App::dump_logs();
-    $app->page_clean_up();
+    App::get()->page_clean_up();
     ?>
     </body>
     </html>

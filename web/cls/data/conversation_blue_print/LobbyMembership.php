@@ -13,17 +13,15 @@ class LobbyMembership extends DataClass {
   /**
    * Retrieves the memberships of a lobby.
    *
-   * @param App $app The application object.
    * @param int $lobby_id The ID of the lobby to retrieve memberships from.
    * @return array<static> An array containing the memberships of the lobby.
    * @throws Exception
    */
   static function get_memberships_of_lobby(
-    App $app,
     int $lobby_id,
   ): array {
     return self::get_array(
-      $app->get_database(),
+      App::get()->get_database(),
       "SELECT * FROM LobbyMembership WHERE lobby_id = ?",
       [$lobby_id]
     );
@@ -39,15 +37,13 @@ class LobbyMembership extends DataClass {
    * @throws Exception
    */
   static function is_given_user_member_of_lobby(
-    App $app,
     int $lobby_id,
   ){
     $memberships = self::get_memberships_of_lobby(
-      $app,
       $lobby_id
     );
     foreach ($memberships as $membership) {
-      if ($membership->account_id === $app->get_currently_logged_in_account()->id) {
+      if ($membership->account_id === App::get()->get_currently_logged_in_account()->id) {
         return true;
       }
     }

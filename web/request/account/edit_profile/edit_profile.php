@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 use cls\App;
 use cls\data\account\Account;
-use cls\data\dialoge\Dialogue;
 use cls\Protocol;
 use cls\RequestError;
 
@@ -21,7 +20,6 @@ if (count(debug_backtrace()) == 0) {
  * @throws Exception
  */
 function edit_profile(
-  App   $app,
   array $post_data,
 ): Account|RequestError {
 
@@ -41,14 +39,14 @@ function edit_profile(
     );
   }
 
-  $account = $app->get_currently_logged_in_account();
+  $account = App::get()->get_currently_logged_in_account();
 
   $todo("No checks for content done.");
   $account->content = $post_data["content"];
-  $account->save($app->get_database());
+  $account->save(App::get()->get_database());
 
   $log("Re-login of account, after account->content change.");
-  $app->login($account);
+  App::get()->login($account);
 
   return $account;
 
@@ -57,6 +55,5 @@ function edit_profile(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: edit_profile(...),
-  app: App::get(),
+  function: edit_profile(...)
 );

@@ -590,7 +590,7 @@ class App {
 
     if ($last_hash === $hash_of_all_post_fields) {
       # if you need to resend the request, then set this field to true in post
-      if(!isset($_POST["allow_resend_of_request"]) && $_POST["allow_resend_of_request"] !== "true"){
+      if((!isset($_POST["allow_resend_of_request"])) && ($_POST["allow_resend_of_request"]??"") !== "true") {
         $warn("same request as last time -> skip");
         $warn(json_encode($_POST, JSON_PRETTY_PRINT));
         return;
@@ -620,7 +620,7 @@ class App {
         $log("<span style='color: purple'>IMPORTANT: executing action: $request_name</span>");
         $this->executed_action = $request_name;
         $request_function = require($request_file_path);
-        $result = $request_function($this, $_POST);
+        $result = $request_function($_POST);
 
         # result is a RequestError -> action failed
         if ($result instanceof RequestError) {

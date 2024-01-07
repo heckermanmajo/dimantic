@@ -18,20 +18,20 @@ if (count(debug_backtrace()) == 0) {
 /**
  * This request creates a new lobby for a conversation blueprint.
  *
- * @param App $app
  * @param array $post_data
  * @return Lobby|RequestError
  */
 function create_lobby(
-  App   $app,
   array $post_data,
 ): Lobby|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
-
+  
   try {
+    
+    $app = App::get();
 
-    if (!$app->somebody_logged_in()) {
+    if (!App::get()->somebody_logged_in()) {
       return new RequestError(
         dev_message: "You are not logged in.",
         code: RequestError::RULE_ERROR,
@@ -77,6 +77,5 @@ function create_lobby(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: create_lobby(...),
-  app: App::get(),
+  function: create_lobby(...)
 );

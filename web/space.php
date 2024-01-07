@@ -46,7 +46,7 @@ try {
   ?>
   <a href="/index.php" class="sketch-button " style="margin-top: 6px"> <img src="/res/back.svg" width="30px"></a>
   <?php
-  if ($space->current_user_has_access($app)) {
+  if ($space->current_user_has_access()) {
 
     $is_selected = function ($p) {
       if (($_GET["p"] ?? "feed") == $p) echo "currently-open-tag";
@@ -147,7 +147,7 @@ try {
   }
 
 
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 }
 catch (Throwable $e) {
   App::dump_logs(t: $e);

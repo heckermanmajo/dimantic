@@ -12,10 +12,12 @@ if (count(debug_backtrace()) == 0) {
 }
 
 function register(
-  App   $app,
   array $post_data,
 ): Account|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+  
+  $app = App::get();
+  
   if (!isset($post_data["username"])) {
     return new RequestError(
       dev_message: "\$post_data[\"username\"] not set",
@@ -43,8 +45,7 @@ function register(
 
   $error_or_null = Account::check_value(
     field_name: "name",
-    value: $username,
-    app: $app
+    value: $username
   );
   if ($error_or_null !== null) {
     return new RequestError(
@@ -55,8 +56,7 @@ function register(
 
   $error_or_null = Account::check_value(
     field_name: "password",
-    value: $password,
-    app: $app
+    value: $password
   );
   if ($error_or_null !== null) {
     return new RequestError(
@@ -67,8 +67,7 @@ function register(
 
   $error_or_null = Account::check_value(
     field_name: "email",
-    value: $email,
-    app: $app
+    value: $email
   );
   if ($error_or_null !== null) {
     return new RequestError(
@@ -92,6 +91,5 @@ function register(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: register(...),
-  app: App::get(),
+  function: register(...)
 );

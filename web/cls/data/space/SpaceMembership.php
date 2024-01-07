@@ -44,40 +44,39 @@ class SpaceMembership extends DataClass {
   var int $created_at = 0;
 
   /**
-   * @param App $app
    * @param int $space_id
    * @return array<int,SpaceMembership>
    * @throws Exception
    */
   static function get_all_memberships_of_space(
-    App $app,
     int $space_id
   ): array {
     return static::get_array(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "SELECT * FROM SpaceMembership WHERE space_id = ?",
       params: [$space_id],
     );
   }
-
+  
   /**
    * @return string
+   * @throws Exception
    */
-  function get_card(App $app): string {
+  function get_card(): string {
     ob_start();
     ?>
     <div class="w3-card w3-margin w3-padding">
       <pre><?= json_encode($this, JSON_PRETTY_PRINT) ?></pre>
       <?php
-      if ($this->member_id == $app->get_currently_logged_in_account()->id) {
+      if ($this->member_id == App::get()->get_currently_logged_in_account()->id) {
         ?>
         <form class="w3-card w3-margin w3-padding" method="post">
           <?php
           if (
-            $app->executed_action == "delete_space_membership"
+            App::get()->executed_action == "delete_space_membership"
             && ($_POST["space_membership_id"] == 0) == $this->id
           ) {
-            echo $app->action_error?->get_error_card();
+            echo App::get()->action_error?->get_error_card();
           }
           ?>
           <input type="hidden" name="action" value="delete_space_membership">

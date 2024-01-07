@@ -35,14 +35,14 @@ abstract class DataClass implements JsonSerializable {
    */
   var int $id = 0;
   private bool $___DONT_SAVE_SINCE_IT_IS_SAVE_COPY = false;
-
+  
   public function __construct(array $data_from_db = []) {
     # set the created_at field in case it exists
     # if we load from the db it is just overwritten
     if (property_exists(object_or_class: $this, property: "created_at")) {
       $this->created_at = time();
     }
-
+    
     # set all the data
     # todo: here is the place to intercept and apply check functions for data
     #       consistency, so we can detect bad db state and fix it
@@ -54,10 +54,10 @@ abstract class DataClass implements JsonSerializable {
         $this->$key = $value;
       }
     }
-
+    
   } # end of constructor
-
-
+  
+  
   /**
    * Create a table.
    *
@@ -73,13 +73,13 @@ abstract class DataClass implements JsonSerializable {
     #var_dump($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
     $is_mysql = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === "mysql";
     $is_sqlite3 = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === "sqlite";
-
+    
     $sql_relevant_fields = static::get_relevant_fields();
     $reflection_class = new ReflectionClass(static::class);
     $table_name = $reflection_class->getShortName();
-
+    
     $statements = [];
-
+    
     if ($is_sqlite3) {
       $statements[] = "CREATE TABLE IF NOT EXISTS `$table_name` (
         `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
@@ -93,36 +93,33 @@ abstract class DataClass implements JsonSerializable {
     else {
       throw new Exception("Unknown database type");
     }
-
+    
     foreach ($sql_relevant_fields as $field_name => $field_type) {
       if ($field_name === "id") continue;
-      if ($field_type === "int") {
-        $field_type = "INTEGER";
-      }
+      if ($field_type === "int") $field_type = "INTEGER";
       elseif ($field_type === "string") $field_type = "TEXT";
       elseif ($field_type === "float") $field_type = "REAL";
       elseif ($field_type === "bool") $field_type = "INTEGER";
       elseif ($field_type === "array") $field_type = "TEXT";
       elseif ($field_type === "object") $field_type = "TEXT";
       else throw new Exception("Unknown field type: $field_type");
-
+      
       if (str_starts_with($field_name, "int64_")) $field_type = "BIGINT";
-
+      
       // get a default
       $default = "";
       if ($field_type === "INTEGER") $default = "DEFAULT 0";
       if ($field_type === "TEXT") $default = "DEFAULT ''";
       if ($field_type === "REAL") $default = "DEFAULT 0.0";
-
+      
       $statements[] = "ALTER TABLE `$table_name` ADD COLUMN `$field_name` $field_type $default;";
     }
     foreach ($statements as $statement) {
       try {
-
+        
         $pdo->exec($statement);
-
-      }
-      catch (PDOException $e) {
+        
+      } catch (PDOException $e) {
         $message = $e->getMessage();
         $properly_already_exists = str_contains($message, "already exists") || str_contains($message, "duplicate column name");
         if (!$properly_already_exists) {
@@ -134,7 +131,7 @@ abstract class DataClass implements JsonSerializable {
       }
     }
   }
-
+  
   /**
    * Return fields that don't start with "_".
    * @return array<string> all the fields that are relevant for the database
@@ -150,7 +147,7 @@ abstract class DataClass implements JsonSerializable {
     }
     return $fields;
   }
-
+  
   /**
    * If save is called and the id is not set, we anticipate that the entry
    * does not exist, and we insert it.
@@ -160,40 +157,40 @@ abstract class DataClass implements JsonSerializable {
   private function insert(PDO $db): void {
     $table_name = (new ReflectionClass(static::class))->getShortName();
     $relevant_fields = static::get_relevant_fields();
-
+    
     $columns = [];
     $values = [];
-
+    
     foreach ($relevant_fields as $field_name => $field_type) {
       if ($field_name !== 'id' && property_exists(static::class, $field_name)) {
         $columns[] = "`$field_name`";
         $values[] = ":$field_name";
       }
     }
-
+    
     $columns = implode(', ', $columns);
     $values = implode(', ', $values);
-
+    
     $sql = "INSERT INTO `$table_name` ($columns) VALUES ($values)";
-
+    
     $stmt = $db->prepare($sql);
-
+    
     foreach ($relevant_fields as $field_name => $field_type) {
       if ($field_name !== 'id' && property_exists(static::class, $field_name)) {
         $stmt->bindValue(":$field_name", $this->$field_name);
       }
     }
-
+    
     $stmt->execute();
     $last_insert_id = $db->lastInsertId();
     if ($last_insert_id === false) {
       throw new Exception("Could not get last insert id.");
     }
     $this->id = (int)$last_insert_id;
-
+    
     $this->on_create();
   }
-
+  
   /**
    * If save is called and the id is set, we anticipate that the entry
    * already exists, and we update it.
@@ -203,32 +200,32 @@ abstract class DataClass implements JsonSerializable {
   private function update(PDO $db): void {
     $table_name = (new ReflectionClass(static::class))->getShortName();
     $relevant_fields = static::get_relevant_fields();
-
+    
     $updates = [];
     foreach ($relevant_fields as $field_name => $field_type) {
       if ($field_name !== 'id' && property_exists(static::class, $field_name)) {
         $updates[] = "`$field_name` = :$field_name";
       }
     }
-
+    
     $updates = implode(', ', $updates);
-
+    
     $sql = "UPDATE `$table_name` SET $updates WHERE `id` = :id";
-
+    
     $stmt = $db->prepare($sql);
-
+    
     foreach ($relevant_fields as $field_name => $field_type) {
       if ($field_name !== 'id' && property_exists(static::class, $field_name)) {
         $stmt->bindValue(":$field_name", $this->$field_name);
       }
     }
     $stmt->bindValue(":id", $this->id);
-
+    
     $stmt->execute();
-
+    
     $this->on_update();
   }
-
+  
   function save(PDO $db): void {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     if ($this->___DONT_SAVE_SINCE_IT_IS_SAVE_COPY) {
@@ -244,9 +241,9 @@ abstract class DataClass implements JsonSerializable {
       $this->update($db);
       $log("Updated instance of " . static::class . " with id: " . $this->id);
     }
-
+    
   }
-
+  
   /**
    * This function can be overwritten by subclasses to inject
    * behaviour on create.
@@ -256,8 +253,8 @@ abstract class DataClass implements JsonSerializable {
   function on_create(): void {
     # implemented by subclass
   }
-
-
+  
+  
   /**
    * This function can be overwritten by subclasses to inject
    * behaviour on update.
@@ -265,8 +262,8 @@ abstract class DataClass implements JsonSerializable {
   function on_update(): void {
     # implemented by subclass
   }
-
-
+  
+  
   /**
    * This function can be overwritten by subclasses to inject
    * behaviour on delete.
@@ -274,7 +271,7 @@ abstract class DataClass implements JsonSerializable {
   function on_delete(): void {
     # implemented by subclass
   }
-
+  
   /**
    * Returns an array of instances of the dataclass.
    *
@@ -286,32 +283,32 @@ abstract class DataClass implements JsonSerializable {
   static function get_array(PDO $pdo, string $sql, array $params = [], array $fields_to_not_escape = []): array {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-
+    
     # todo: this CAN in theory lead to bugs if we insert stuff where we escape
     #       f.e. % in some markdown text
-    if(str_contains(haystack: $sql, needle: " LIKE ")){
+    if (str_contains(haystack: $sql, needle: " LIKE ")) {
       foreach ($params as $num => $param) {
-        if(is_string($param)){
-          if(in_array(needle: $num, haystack: $fields_to_not_escape)){
+        if (is_string($param)) {
+          if (in_array(needle: $num, haystack: $fields_to_not_escape)) {
             continue;
           }
-          else{
+          else {
             $params[$num] = $pdo->quote($param);
           }
         }
       }
     }
-
+    
     $results = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
       $dataclass = new static($row);
       $results[] = $dataclass;
     }
-
+    
     return $results;
   }
-
-
+  
+  
   /**
    * Returns a single instance of the dataclass.
    *
@@ -330,34 +327,34 @@ abstract class DataClass implements JsonSerializable {
   static function get_one(PDO $pdo, string $sql, array $params, bool $throw_on_null = false, array $fields_to_not_escape = []): ?static {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
-
+    
     # todo: this CAN in theory lead to bugs if we insert stuff where we escape
     #       f.e. % in some markdown text
-    if(str_contains(haystack: $sql, needle: " LIKE ")){
+    if (str_contains(haystack: $sql, needle: " LIKE ")) {
       foreach ($params as $num => $param) {
-        if(is_string($param)){
-          if(in_array(needle: $num, haystack: $fields_to_not_escape)){
+        if (is_string($param)) {
+          if (in_array(needle: $num, haystack: $fields_to_not_escape)) {
             continue;
           }
-          else{
+          else {
             $params[$num] = $pdo->quote($param);
           }
         }
       }
     }
-
+    
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
     if ($row === false) {
       if ($throw_on_null) {
         throw new Exception('Record not found.');
       }
       return null;
     }
-
+    
     return new static($row);
   }
-
+  
   /**
    * Returns the count-result of the given sql.
    *
@@ -378,28 +375,28 @@ abstract class DataClass implements JsonSerializable {
       $err("sql: $sql");
       throw new Exception("get_count called with sql that does not start with SELECT COUNT(*)");
     }
-
+    
     # todo: this CAN in theory lead to bugs if we insert stuff where we escape
     #       f.e. % in some markdown text
-    if(str_contains(haystack: $sql, needle: " LIKE ")){
+    if (str_contains(haystack: $sql, needle: " LIKE ")) {
       foreach ($params as $num => $param) {
-        if(is_string($param)){
-          if(in_array(needle: $num, haystack: $fields_to_not_escape)){
+        if (is_string($param)) {
+          if (in_array(needle: $num, haystack: $fields_to_not_escape)) {
             continue;
           }
-          else{
+          else {
             $params[$num] = $pdo->quote($param);
           }
         }
       }
     }
-
+    
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     return (int)$stmt->fetchColumn();  // COUNT(*) returns an integer,
   }
-
-
+  
+  
   static function get_sum(PDO $pdo, string $sql, array $params = [], array $fields_to_not_escape = []): int|float {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     if (
@@ -409,27 +406,27 @@ abstract class DataClass implements JsonSerializable {
       $err("sql: $sql");
       throw new Exception("get_sum called with sql that does not start with SELECT SUM");
     }
-
+    
     # todo: this CAN in theory lead to bugs if we insert stuff where we escape
     #       f.e. % in some markdown text
-    if(str_contains(haystack: $sql, needle: " LIKE ")){
+    if (str_contains(haystack: $sql, needle: " LIKE ")) {
       foreach ($params as $num => $param) {
-        if(is_string($param)){
-          if(in_array(needle: $num, haystack: $fields_to_not_escape)){
+        if (is_string($param)) {
+          if (in_array(needle: $num, haystack: $fields_to_not_escape)) {
             continue;
           }
-          else{
+          else {
             $params[$num] = $pdo->quote($param);
           }
         }
       }
     }
-
+    
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     return (int)$stmt->fetchColumn();  //
   }
-
+  
   /**
    * Returns an instance by id.
    *
@@ -444,12 +441,12 @@ abstract class DataClass implements JsonSerializable {
   static function get_by_id(PDO $pdo, int $id, bool $throw_on_null = false): ?static {
     $table_name = (new ReflectionClass(static::class))->getShortName();
     $sql = "SELECT * FROM `$table_name` WHERE `id` = :id LIMIT 1";
-
+    
     $params = [':id' => $id];
-
+    
     return static::get_one($pdo, $sql, $params, $throw_on_null);
   }
-
+  
   /**
    * Since all fields in a dataclass are std-types or
    * Dataclasses, we can just use json_encode to get a
@@ -460,15 +457,15 @@ abstract class DataClass implements JsonSerializable {
   public function jsonSerialize(): array {
     return get_object_vars($this);
   }
-
-
+  
+  
   # we dont want this function, since it is to dangerous
   #static function truncate_table(PDO $pdo): void {
   #  $table_name = (new ReflectionClass(static::class))->getShortName();
   #  $sql = "TRUNCATE TABLE `$table_name`";
   #  $pdo->exec($sql);
   #}
-
+  
   /**
    * Delete a dataclass instance from the database.
    *
@@ -484,13 +481,13 @@ abstract class DataClass implements JsonSerializable {
       $err("This is not allowed, since we don't know what to delete");
       throw new Exception("Delete called on instance with id 0");
     }
-
+    
     if ($this->___DONT_SAVE_SINCE_IT_IS_SAVE_COPY) {
       $err("DONT_SAVE_SINCE_IT_IS_SAVE_COPY");
       $err("Delete of instance not done, since you try to delete a html-escaped_copy");
       return;
     }
-
+    
     $log("Delete instance of " . static::class . " with id: " . $this->id);
     $table_name = (new ReflectionClass(static::class))->getShortName();
     $sql = "DELETE FROM `$table_name` WHERE `id` = :id";
@@ -499,7 +496,7 @@ abstract class DataClass implements JsonSerializable {
     $stmt->execute();
     $this->on_delete();
   }
-
+  
   /**
    * We use this function to get a copy of this dataclass,
    * but with escaped fields.
@@ -512,7 +509,7 @@ abstract class DataClass implements JsonSerializable {
     $warn("this is potentially a security risk, since we don't escape the values");
     return clone $this;
   }
-
+  
   #todo: is this function still needed?
   function __unserialize(array $data): void {
     foreach ($data as $key => $value) {
@@ -524,7 +521,7 @@ abstract class DataClass implements JsonSerializable {
       }
     }
   }
-
+  
   /**
    * This function returns client save values, for example to return as json to the end
    * user.
@@ -534,15 +531,14 @@ abstract class DataClass implements JsonSerializable {
    *
    * This function is intended to be overwritten by subclasses.
    *
-   * @param App $app
    * @return array
    */
-  function get_client_save_values(App $app): array {
+  function get_client_save_values(): array {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $warn("get_client_save_values not overwritten, but used in " . static::class);
     return get_object_vars($this);
   }
-
+  
   /**
    * This function allows to check if the given value is valid.
    *
@@ -550,15 +546,15 @@ abstract class DataClass implements JsonSerializable {
    *
    * @param string $field_name
    * @param string $value
-   * @param App $app
+   *
    * @return string|null
    */
-  static function check_value(string $field_name, string $value, App $app): string|null {
+  static function check_value(string $field_name, string $value): string|null {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     $warn("check_value not overwritten, but used in " . static::class);
     $warn("field_name: $field_name, value: $value");
     $warn("this is potentially a security risk, since we don't check the value");
     return null;
   }
-
+  
 }

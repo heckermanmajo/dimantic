@@ -64,10 +64,16 @@ class DialogueMembership extends DataClass {
   #################################
   ###### Property-functions #######
   #################################
+  /**
+   * @throws \Exception
+   */
   function get_associated_dialoge(PDO $connection): Dialogue {
     return Dialogue::get_by_id(pdo: $connection, id: $this->dialogue_id);
   }
-
+  
+  /**
+   * @throws \Exception
+   */
   function get_associated_account(PDO $connection): Account {
     return Account::get_by_id(pdo: $connection, id: $this->account_id);
   }
@@ -80,10 +86,9 @@ class DialogueMembership extends DataClass {
 
   static function get_my_membership_by_dialogue(
     int $dialogue_id,
-    App $app
   ): ?static {
     return static::get_one(
-      $app->get_database(),
+      App::get()->get_database(),
       "SELECT * FROM `DialogueMembership` WHERE `dialogue_id` = ? AND `account_id` = ?",
       [$dialogue_id, $app->get_currently_logged_in_account()->id],
     );
@@ -94,20 +99,22 @@ class DialogueMembership extends DataClass {
   #  Logic & Controller                                                     #
   #                                                                         #
   ###########################################################################
-
-  function get_absolute_amount_of_all_possible_like_credits(App $app): int {
-    $dialogue = $this->get_associated_dialoge($app->get_database());
-    $all_text_chars_in_dialogue = $dialogue->get_number_of_all_chars_in_messages_text($app);
+  
+  /**
+   * @throws \Exception
+   */
+  function get_absolute_amount_of_all_possible_like_credits(): int {
+    $dialogue = $this->get_associated_dialoge(App::get()->get_database());
+    $all_text_chars_in_dialogue = $dialogue->get_number_of_all_chars_in_messages_text();
     return (int)(((float)$all_text_chars_in_dialogue) * $this->like_percentage);
   }
 
   /**
    * @throws \Exception
    */
-  function get_absolute_amount_of_FREE_like_credits(App $app): int {
-    $all_possible_like_credits = $this->get_absolute_amount_of_all_possible_like_credits($app);
+  function get_absolute_amount_of_FREE_like_credits(): int {
+    $all_possible_like_credits = $this->get_absolute_amount_of_all_possible_like_credits();
     $all_used_like_credits = DialogueMessageSelectionLike::get_all_used_like_credits_per_person_per_dialogue(
-      $app,
       $this->dialogue_id,
       $this->account_id
     );

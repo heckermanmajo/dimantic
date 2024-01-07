@@ -42,7 +42,14 @@ class RequestError implements \JsonSerializable {
       "logs" => FN_IS_DEBUG() ? App::get_logs() : [],
     ]);
   }
-
+  
+  /**
+   * Can be called without an app since it could display an error that
+   * occurred before the app was created.
+   *
+   * @param App|null $app
+   * @return string
+   */
   function get_error_card(?App $app = null): string {
     ob_start();
     ?>

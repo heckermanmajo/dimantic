@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\account\Account;
 use cls\data\dialoge\Dialogue;
 use cls\Protocol;
 use cls\RequestError;
@@ -13,12 +12,14 @@ if (count(debug_backtrace()) == 0) {
 }
 
 function edit_dialogue(
-  App   $app,
   array $post_data,
 ): Dialogue|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
+  $app = App::get();
+  
+  
   if(!$app->somebody_logged_in()){
     return new RequestError(
       dev_message: "You are not logged in.",
@@ -57,8 +58,7 @@ function edit_dialogue(
 
   $error_or_null = Dialogue::check_value(
     field_name: "content",
-    value: $post_data["content"],
-    app: $app
+    value: $post_data["content"]
   );
   if ($error_or_null !== null) {
     return new RequestError(
@@ -79,5 +79,4 @@ function edit_dialogue(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: edit_dialogue(...),
-  app: App::get(),
 );

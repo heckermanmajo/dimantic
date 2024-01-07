@@ -30,7 +30,7 @@ try {
   </h3>
   <p>the top posts of all official spaces </p>
   <?php
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 }
 catch (Throwable $e) {
   App::dump_logs(t: $e);

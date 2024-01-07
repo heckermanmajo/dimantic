@@ -42,8 +42,22 @@ try{
 
 ?>
 
+@font-face {
+    font-family: comic-neue;
+    src: url("/res/fonts/ComicNeue-Regular.ttf");
+}
+
 body {
     background-color: <?=$background_color?>;
+    font-family: comic-neue, serif !important;
+}
+
+p{
+    font-family: comic-neue, serif !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: comic-neue, serif !important;
 }
 
 .w3-card {
@@ -51,6 +65,7 @@ body {
     border-color: <?=$default_card_border_color?>;
     border-style: solid;
     border-width: 1px;
+    font-family: comic-neue, serif !important;
 }
 
 .w3-card-4 {
@@ -58,6 +73,7 @@ body {
     border-color: <?=$default_card_border_color?>;
     border-style: solid;
     border-width: 1px;
+    font-family: comic-neue, serif !important;
 }
 
 .info-card {
@@ -68,6 +84,7 @@ body {
     border-left-width: 15px;
     padding: 10px;
     margin: 16px;
+    font-family: comic-neue, serif !important;
 }
 
 input {
@@ -75,6 +92,7 @@ input {
     border-style: none;
     border-bottom: solid 1px<?=$main_color?>;
     color: #0c0c0c;
+    font-family: comic-neue, serif !important;
 }
 
 input:focus {
@@ -88,6 +106,7 @@ textarea {
     border-bottom: solid 1px<?=$main_color?>;
     border-top: solid 1px<?=$main_color?>;
     color: #252525;
+    font-family: comic-neue, serif !important;
 }
 
 .button {
@@ -99,6 +118,7 @@ textarea {
     background-color: inherit;
     text-decoration: none;
     cursor: pointer;
+    font-family: comic-neue, serif !important;
 }
 
 .delete-button {
@@ -110,6 +130,7 @@ textarea {
     background-color: inherit;
     text-decoration: none;
     cursor: pointer;
+    font-family: comic-neue, serif !important;
 }
 
 .delete-button:hover {
@@ -125,6 +146,7 @@ textarea {
 pre {
     /* line break */
     white-space: pre-wrap !important;
+    font-family: comic-neue, serif !important;
 }
 
 .quote {
@@ -132,6 +154,7 @@ pre {
     border-left: solid 5px<?=$default_card_border_color?>;
     padding-left: 10px;
     font-style: italic;
+    font-family: comic-neue, serif !important;
 }
 
 blockquote {
@@ -163,7 +186,6 @@ blockquote {
     color: #0048ff;
     cursor: pointer;
     display: inline-block;
-    font-family: Neucha, sans-serif;
     font-size: 1rem;
     line-height: 23px;
     outline: none;
@@ -177,7 +199,7 @@ blockquote {
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-
+    font-family: comic-neue, serif !important;
 
     font-weight: bold;
 }
@@ -198,7 +220,6 @@ blockquote {
     color: #41403e;
     /*cursor: pointer;*/
     /*display: inline-block;*/
-    font-family: Neucha, sans-serif;
     font-size: 1rem;
     line-height: 23px;
     outline: none;
@@ -212,6 +233,7 @@ blockquote {
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
+    font-family: comic-neue, serif !important;
 }
 
 .sketch-button:hover {

@@ -31,7 +31,6 @@ try {
    */
   $news = [
     ...InviteToLobbyNewsEntry::get_news_for_account(
-      app:$app,
       account_id: $app->get_currently_logged_in_account()->id
     )
   ];
@@ -42,11 +41,11 @@ try {
 
   <?php
   foreach ($news as $n){
-    echo $n->get_display_card($app);
+    echo $n->get_display_card();
   }
 
 
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 }
 catch (Throwable $e) {
   App::dump_logs(t: $e);

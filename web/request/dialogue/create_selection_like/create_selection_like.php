@@ -16,7 +16,6 @@ if (count(debug_backtrace()) == 0) {
 # todo: problem: what if the same word/phrase occurs multiple times in the same message?
 #       this makes it necessary to store the selection number in the database as well
 function create_selection_like(
-  App   $app,
   array $post_data,
 ): DialogueMessageSelectionLike|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
@@ -28,6 +27,8 @@ function create_selection_like(
   #}
 
   try {
+    
+    $app = App::get();
 
     if (!$app->somebody_logged_in()) {
       return new RequestError(
@@ -66,9 +67,8 @@ function create_selection_like(
       );
     }
 
-    $dialogue = $dialoge_message->get_dialogue($app);
+    $dialogue = $dialoge_message->get_dialogue();
     $my_potential_membership = $dialogue->get_membership_of_given_account(
-      $app,
       $app->get_currently_logged_in_account()->id,
     );
     if ($my_potential_membership === null) {
@@ -81,7 +81,7 @@ function create_selection_like(
     # can we like the selection, or is it already liked?
     # and have we enough like credits?
 
-    $free_like_credits = $my_potential_membership->get_absolute_amount_of_FREE_like_credits($app);
+    $free_like_credits = $my_potential_membership->get_absolute_amount_of_FREE_like_credits();
 
     $enough_like_credits = $free_like_credits >= strlen($liked_selection);
 
@@ -117,5 +117,4 @@ function create_selection_like(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: create_selection_like(...),
-  app: App::get(),
 );

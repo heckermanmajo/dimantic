@@ -3,5 +3,5 @@
 namespace cls;
 
 interface GetDisplayCardInterface {
-  function get_display_card(App $app): string;
+  function get_display_card(): string;
 }

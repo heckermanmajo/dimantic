@@ -16,11 +16,12 @@ if (count(debug_backtrace()) == 0) {
 
 
 function accept_rule(
-  App   $app,
   array $post_data,
 ): DialogueRuleRating|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   try {
+    
+    $app = App::get();
 
     if(!$app->somebody_logged_in()){
       return new RequestError(
@@ -50,7 +51,6 @@ function accept_rule(
     $dialogue = Dialogue::get_by_id($app->get_database(), $dialogue_id);
 
     $membership = $dialogue->get_membership_of_given_account(
-      $app,
       $app->get_currently_logged_in_account()->id,
     );
 
@@ -112,6 +112,5 @@ function accept_rule(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: accept_rule(...),
-  app: App::get(),
+  function: accept_rule(...)
 );

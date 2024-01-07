@@ -90,9 +90,9 @@ class SpaceDocument extends DataClass {
   /**
    * @throws \Exception
    */
-  static function get_all_documents_of_space(App $app, int $space_id): array {
+  static function get_all_documents_of_space(int $space_id): array {
     return static::get_array(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "SELECT * FROM space_document WHERE space_id = :space_id",
       params: ["space_id" => $space_id],
     );

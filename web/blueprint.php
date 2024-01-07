@@ -36,7 +36,6 @@ try {
 
   if (
     !$blueprint->user_is_allowed_to_see_blueprint(
-      $app,
       $app->get_currently_logged_in_account()->id
     )
   ) {
@@ -50,12 +49,11 @@ try {
   <a href="/index.php"> ◀️ Back </a>
   <?php
 
-  echo $blueprint->get_display_card($app);
+  echo $blueprint->get_display_card();
 
   # todo: add a form to edit the blueprint content
 
   $lobbies = Lobby::get_lobbies_of_conversation_blueprint(
-    $app,
     $blueprint->id
   );
 
@@ -78,7 +76,6 @@ try {
 
   if (
     $blueprint->user_is_allowed_to_edit_blueprint(
-      $app,
       $app->get_currently_logged_in_account()->id
     )
   ):
@@ -122,7 +119,7 @@ try {
   <?php
 
   foreach ($proto_rules as $proto_rule) {
-    echo $proto_rule->get_card($app);
+    echo $proto_rule->get_card();
   }
 
   if ($app->executed_action == "edit_proto_rule") {
@@ -136,7 +133,6 @@ try {
 
   if (
     $blueprint->user_is_allowed_to_edit_blueprint(
-      $app,
       $app->get_currently_logged_in_account()->id
     )
   ):
@@ -195,7 +191,6 @@ try {
 
   <?php if (
     $blueprint->user_is_allowed_to_create_lobby(
-      $app,
       $app->get_currently_logged_in_account()->id
     )
   ): ?>
@@ -213,12 +208,12 @@ try {
   <?php
 
   foreach ($lobbies as $lobby) {
-    echo $lobby->display_card($app);
+    echo $lobby->display_card();
   }
 
 
   END_OF_PAGE:
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 
 }
 catch (Throwable $e) {

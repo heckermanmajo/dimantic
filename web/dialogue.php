@@ -58,20 +58,20 @@ try {
   <?php
 
   echo $dialogue->get_overview_card();
-  $messages = DialogueMessage::get_all_messages_of_dialogue($app, $dialogue->id);
-  $my_membership = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
+  $messages = DialogueMessage::get_all_messages_of_dialogue($dialogue->id);
+  $my_membership = $dialogue->get_membership_of_given_account( $app->get_currently_logged_in_account()->id);
 
 
   $log("Like Percentage: " . $my_membership->like_percentage);
-  $log("Number of all chars in messages text: " . $dialogue->get_number_of_all_chars_in_messages_text($app));
-  $log("Absolute amount of all like credits: " . $my_membership->get_absolute_amount_of_all_possible_like_credits($app));
+  $log("Number of all chars in messages text: " . $dialogue->get_number_of_all_chars_in_messages_text());
+  $log("Absolute amount of all like credits: " . $my_membership->get_absolute_amount_of_all_possible_like_credits());
   $log("Used like credits of this account: " . \cls\data\dialoge\DialogueMessageSelectionLike::get_all_used_like_credits_per_person_per_dialogue(
-      $app,
+    
       $dialogue->id,
       $app->get_currently_logged_in_account()->id
     )
   );
-  $log("Free like credits of this account: " . $my_membership->get_absolute_amount_of_FREE_like_credits($app));
+  $log("Free like credits of this account: " . $my_membership->get_absolute_amount_of_FREE_like_credits());
   #echo "<hr>";
   #echo $my_membership->like_percentage;
   #echo "<hr>";
@@ -199,9 +199,9 @@ try {
         <?php if ($app->executed_action != "edit_rule") echo 'style="display: none"' ?>
       >
         <?php
-        $rules = $dialogue->get_rules_of_dialogue($app);
+        $rules = $dialogue->get_rules_of_dialogue();
         foreach ($rules as $rule) {
-          echo $rule->get_display_card($app);
+          echo $rule->get_display_card();
         }
         ?>
       </div>
@@ -239,7 +239,7 @@ try {
 
       <?= ($app->executed_action == "publish_message_from_draft") ? $app->action_error?->get_error_card() : "" ?>
 
-      <?php if ($dialogue->next_turn_is_my_turn($app)): ?>
+      <?php if ($dialogue->next_turn_is_my_turn()): ?>
 
         <p class="w3-margin"><b>It is your turn to submit a message.</b></p>
         <span>Publish <b style="color: dodgerblue">§ <?= count($messages) + 1 ?></b> from <b>draft</b></span>
@@ -296,16 +296,15 @@ try {
     foreach ($messages as $number => $message) {
       $message_number = $all_messages_num - $number;
       echo $message->get_view_card(
-        $app,
         $message_number,
-        number_of_free_like_credits: $my_membership->get_absolute_amount_of_FREE_like_credits($app)
+        number_of_free_like_credits: $my_membership->get_absolute_amount_of_FREE_like_credits()
       );
     }
     ?>
   </div>
   <?php
 
-  \cls\HtmlUtils::footer($app);
+  \cls\HtmlUtils::footer();
 }
 catch (\Throwable $e) {
   App::dump_logs(t: $e);

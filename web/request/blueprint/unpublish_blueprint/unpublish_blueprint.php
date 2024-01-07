@@ -18,18 +18,18 @@ if (count(debug_backtrace()) == 0) {
 /**
  * This requests publishes a conversation blueprint.
  *
- * @param App $app
  * @param array $post_data
  * @return Space|RequestError
  */
 function unpublish_blueprint(
-  App   $app,
   array $post_data,
 ): ConversationBluePrint|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
   try {
+    
+    $app = App::get();
 
     if (!$app->somebody_logged_in()) {
       return new RequestError(
@@ -56,7 +56,6 @@ function unpublish_blueprint(
 
     if (
       $blueprint->user_is_allowed_to_unpublish_blueprint(
-        $app,
         $app->get_currently_logged_in_account()->id
       ) === false
     ) {
@@ -96,5 +95,4 @@ function unpublish_blueprint(
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
   function: unpublish_blueprint(...),
-  app: App::get(),
 );

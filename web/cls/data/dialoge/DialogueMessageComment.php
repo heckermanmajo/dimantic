@@ -7,6 +7,10 @@ use cls\data\account\Account;
 use cls\DataClass;
 use cls\lib\Parsedown;
 
+/**
+ * A comment for a message in a dialogue.
+ * todo: should also cost some stuff...
+ */
 class DialogueMessageComment extends DataClass {
   var int $dialogue_message_id = 0;
   var int $account_id = 0;
@@ -14,10 +18,10 @@ class DialogueMessageComment extends DataClass {
   var string $comment_text = '';
   var string $create_date = '';
 
-  function get_display_card(App $app, int $message_number = 0, int $comment_number = 0): string {
+  function get_display_card(int $message_number = 0, int $comment_number = 0): string {
     ob_start();
     $author = Account::get_by_id(
-      $app->get_database(),
+      App::get()->get_database(),
       $this->account_id,
     );
     if (trim($this->comment_text) == "") {

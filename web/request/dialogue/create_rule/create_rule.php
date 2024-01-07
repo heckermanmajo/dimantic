@@ -16,11 +16,12 @@ if (count(debug_backtrace()) == 0) {
 
 
 function create_rule(
-  App   $app,
   array $post_data,
 ): DialogueRule|RequestError {
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
   try {
+    
+    $app = App::get();
 
     if(!$app->somebody_logged_in()){
       return new RequestError(
@@ -48,7 +49,7 @@ function create_rule(
       );
     }
 
-    $my_membership = $dialogue->get_membership_of_given_account($app, $app->get_currently_logged_in_account()->id);
+    $my_membership = $dialogue->get_membership_of_given_account($app->get_currently_logged_in_account()->id);
     if (!$my_membership) {
       return new RequestError(
         dev_message: "You are not a member of this dialogue.",
@@ -112,6 +113,5 @@ function create_rule(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: create_rule(...),
-  app: App::get(),
+  function: create_rule(...)
 );

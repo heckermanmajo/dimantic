@@ -20,11 +20,10 @@ class Lobby extends DataClass {
    * @throws Exception
    */
   static function get_lobbies_of_conversation_blueprint(
-    App $app,
     int $conversation_blueprint_id,
   ): array {
     return self::get_array(
-      $app->get_database(),
+      App::get()->get_database(),
       "SELECT * FROM Lobby WHERE conversation_blueprint_id = ?",
       [$conversation_blueprint_id]
     );
@@ -33,20 +32,18 @@ class Lobby extends DataClass {
   /**
    * Determines if a lobby has enough members based on the associated blueprint.
    *
-   * @param App $app The application instance.
-   *
    * @return bool Returns true if the lobby has enough members, false otherwise.
    *
    * @throws Exception If an error occurs while fetching the associated blueprint or memberships.
    */
-  function lobby_has_enough_members(App $app): bool {
+  function lobby_has_enough_members(): bool {
     # as many memberships exist as there are set in the needed members field of the associated blueprint
     $blueprint = ConversationBlueprint::get_by_id(
-      $app->get_database(),
+      App::get()->get_database(),
       $this->conversation_blueprint_id
     );
     $memberships = LobbyMembership::get_memberships_of_lobby(
-      $app,
+      App::get(),
       $this->id
     );
     $min_needed_member_num = $blueprint->min_number_of_users;
@@ -56,20 +53,18 @@ class Lobby extends DataClass {
   /**
    * Checks if the lobby is full based on the number of max memberships.
    *
-   * @param App $app The application instance.
-   *
    * @return bool Returns true if the lobby is full, false otherwise.
    *
    * @throws Exception If an error occurs while retrieving the blueprint or memberships.
    */
-  function lobby_is_full(App $app): bool {
+  function lobby_is_full(): bool {
     # as many memberships exist as there are set in the needed members field of the associated blueprint
     $blueprint = ConversationBlueprint::get_by_id(
-      $app->get_database(),
+      App::get()->get_database(),
       $this->conversation_blueprint_id
     );
     $memberships = LobbyMembership::get_memberships_of_lobby(
-      $app,
+      App::get(),
       $this->id
     );
     $max_needed_member_num = $blueprint->max_number_of_users;
@@ -79,14 +74,13 @@ class Lobby extends DataClass {
   /**
    * @throws Exception
    */
-  function display_card(App $app): string {
+  function display_card(): string {
     ob_start();
     $blueprint = ConversationBlueprint::get_by_id(
-      $app->get_database(),
+      App::get()->get_database(),
       $this->conversation_blueprint_id
     );
     $memberships = LobbyMembership::get_memberships_of_lobby(
-      $app,
       $this->id
     );
     ?>
@@ -97,9 +91,9 @@ class Lobby extends DataClass {
 
       <?php
 
-      if ($app->executed_action === "create_lobby_membership") {
-        if ($app->action_error != null) {
-          echo $app->action_error->get_error_card($app);
+      if (App::get()->executed_action === "create_lobby_membership") {
+        if (App::get()->action_error != null) {
+          echo App::get()->action_error->get_error_card();
         }
       }
 
@@ -116,9 +110,9 @@ class Lobby extends DataClass {
 
         <?php
         $invite_error = false;
-        if ($app->executed_action === "invite_to_lobby") {
-          if ($app->action_error != null) {
-            echo $app->action_error->get_error_card($app);
+        if (App::get()->executed_action === "invite_to_lobby") {
+          if (App::get()->action_error != null) {
+            echo App::get()->action_error->get_error_card();
             $invite_error = true;
           }
           else {
@@ -147,7 +141,7 @@ class Lobby extends DataClass {
       foreach ($memberships as $member) {
         # todo: improve.. this is performance wise not good
         $member_account = Account::get_by_id(
-          $app->get_database(),
+          App::get()->get_database(),
           $member->account_id
         );
 

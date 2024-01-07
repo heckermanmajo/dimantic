@@ -45,8 +45,7 @@ class Account extends DataClass {
    */
   static function check_value(
     string $field_name,
-    mixed  $value,
-    App    $app
+    mixed  $value
   ): string|null {
 
     switch ($field_name) {
@@ -63,7 +62,7 @@ class Account extends DataClass {
         }
         // check that the account name is not already taken
         $account_is_taken = static::get_one(
-          pdo: $app->get_database(),
+          pdo: App::get()->get_database(),
           sql: "SELECT * FROM Account WHERE `name` = :name",
           params: [
             "name" => $value,
@@ -83,7 +82,6 @@ class Account extends DataClass {
   /**
    * Retrieves an Account object based on the provided email address.
    *
-   * @param App $app The application instance.
    * @param string $email The email address used to search for the Account.
    *
    * @return Account|null The Account object found for the specified email address,
@@ -91,11 +89,10 @@ class Account extends DataClass {
    * @throws Exception
    */
   static function get_by_email(
-    App $app,
     string $email
   ): ?Account {
     return static::get_one(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "SELECT * FROM Account WHERE email = ?",
       params: [$email],
       throw_on_null: false
@@ -118,10 +115,9 @@ class Account extends DataClass {
    */
   static function get_user_by_username_or_mail(
     string $username_or_email,
-    App    $app
   ): Account|null {
     return static::get_one(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "SELECT * FROM Account WHERE `name` = :name OR email = :email",
       params: [
         "name" => $username_or_email,
@@ -134,34 +130,34 @@ class Account extends DataClass {
    * Get a user account by username.
    *
    * @param string $username The username of the user.
-   * @param App $app The application instance.
+   *
    * @return Account|null The user account object if found, or null if not found.
+   *
    * @throws Exception
    */
   static function get_user_by_username(
-    string $username,
-    App    $app
+    string $username
   ): Account|null {
     return static::get_one(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "SELECT * FROM Account WHERE `name` = :name",
       params: [
         "name" => $username,
       ]
     );
   }
-
+  
   /**
    * @param int $offset
    * @param int $limit
-   * @param App $app
    * @return array<Account>
+   * @throws Exception
    */
   static function get_all_accounts(
-    int $offset, int $limit, App $app
+    int $offset, int $limit
   ): array {
     return static::get_array(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "SELECT * FROM Account LIMIT :offset, :limit",
       params: [
         "offset" => $offset,
@@ -186,7 +182,7 @@ class Account extends DataClass {
   /**
    * Returns the HTML for the account card.
    */
-  function get_display_card(App $app): string {
+  function get_display_card(): string {
     ob_start();
     ?>
     <div class="w3-card-4 w3-margin w3-padding">

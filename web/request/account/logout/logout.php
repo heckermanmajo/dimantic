@@ -13,12 +13,11 @@ if (count(debug_backtrace()) == 0) {
 }
 
 function logout(
-  App   $app,
   array $post_data,
 ): null|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
-
+  $app = App::get();
   if(!$app->somebody_logged_in()){
     return new RequestError(
       dev_message: "You are not logged in.",
@@ -33,6 +32,5 @@ function logout(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: logout(...),
-  app: App::get(),
+  function: logout(...)
 );

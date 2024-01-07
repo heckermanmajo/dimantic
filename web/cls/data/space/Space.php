@@ -32,22 +32,21 @@ class Space extends DataClass {
   /**
    * @throws Exception
    */
-  function current_user_as_delete_rights(App $app): bool {
-    return $this->author_id === $app->get_currently_logged_in_account()->id;
+  function current_user_as_delete_rights(): bool {
+    return $this->author_id === App::get()->get_currently_logged_in_account()->id;
   }
 
   /**
    * @throws Exception
    */
-  function current_user_has_access(App $app): bool {
+  function current_user_has_access(): bool {
     # for now: does a membership exists?
     # todo: not performant
     $all = SpaceMembership::get_all_memberships_of_space(
-      $app,
       $this->id,
     );
     foreach ($all as $membership) {
-      if ($membership->member_id === $app->get_currently_logged_in_account()->id) {
+      if ($membership->member_id === App::get()->get_currently_logged_in_account()->id) {
         return true;
       }
     }
@@ -56,13 +55,12 @@ class Space extends DataClass {
 
   /**
    *
-   * @param App $app
    * @return array<Space>
    * @throws Exception
    */
-  static function getAllSpaces(App $app): array {
+  static function getAllSpaces(): array {
     return static::get_array(
-      $app->get_database(),
+      App::get()->get_database(),
       "SELECT * FROM space",
       []
     );
@@ -71,9 +69,9 @@ class Space extends DataClass {
   /**
    * @throws Exception
    */
-  static function getByContent(App $app, string $content): array {
+  static function getByContent(string $content): array {
     return static::get_array(
-      pdo: $app->get_database(),
+      pdo: App::get()->get_database(),
       sql: "SELECT * FROM space WHERE content = :content",
       params: ["content" => $content]
     );
@@ -82,11 +80,10 @@ class Space extends DataClass {
   /**
    * @throws Exception
    */
-  function getDisplayCard(App $app): string {
+  function getDisplayCard(): string {
     ob_start();
 
     $memberships = SpaceMembership::get_all_memberships_of_space(
-      $app,
       $this->id,
     );
 
@@ -163,7 +160,7 @@ class Space extends DataClass {
       <?php
 
       foreach ($memberships as $membership) {
-        echo $membership->get_card($app);
+        echo $membership->get_card();
       }
 
       ?>

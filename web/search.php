@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\dialoge\Dialogue;
 use cls\HtmlUtils;
 
 require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
@@ -30,7 +29,7 @@ try {
   <?php
 
 
-  HtmlUtils::footer($app);
+  HtmlUtils::footer();
 }
 catch (Throwable $e) {
   App::dump_logs(t: $e);

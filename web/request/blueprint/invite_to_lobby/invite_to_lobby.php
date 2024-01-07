@@ -22,12 +22,10 @@ if (count(debug_backtrace()) == 0) {
  * This request invites a user to a lobby.
  * -> TODO: Make this work with just emails
  *
- * @param App $app
  * @param array $post_data
  * @return InviteToLobbyNewsEntry|RequestError
  */
 function invite_to_lobby(
-  App   $app,
   array $post_data,
 ): InviteToLobbyNewsEntry|RequestError {
 
@@ -38,6 +36,8 @@ function invite_to_lobby(
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
   try {
+    
+    $app = App::get();
 
     if (!$app->somebody_logged_in()) {
       return new RequestError(
@@ -119,7 +119,6 @@ function invite_to_lobby(
       # check if that user mail is already registered
 
       $user = Account::get_by_email(
-        app: $app,
         email: $value
       );
 
@@ -154,7 +153,6 @@ function invite_to_lobby(
       # this is a username
       $user = Account::get_user_by_username(
         username: $value,
-        app: $app
       );
 
       if ($user === null) {
@@ -190,6 +188,5 @@ function invite_to_lobby(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: invite_to_lobby(...),
-  app: App::get(),
+  function: invite_to_lobby(...)
 );

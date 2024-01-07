@@ -17,18 +17,18 @@ if (count(debug_backtrace()) == 0) {
 /**
  * This request creates a new proto-rule for a conversation blueprint.
  *
- * @param App $app
  * @param array $post_data
  * @return ProtoRule|RequestError
  */
 function create_proto_rule(
-  App   $app,
   array $post_data,
 ): ProtoRule|RequestError {
 
   [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
 
   try {
+    
+    $app = App::get();
 
     if (!$app->somebody_logged_in()) {
       return new RequestError(
@@ -76,6 +76,5 @@ function create_proto_rule(
 
 return Protocol::request(
   is_called_directly: count(debug_backtrace()) == 0,
-  function: create_proto_rule(...),
-  app: App::get(),
+  function: create_proto_rule(...)
 );
