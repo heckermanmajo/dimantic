@@ -165,11 +165,11 @@ class ConversationBluePrint extends DataClass {
   function get_card(App $app): string {
     ob_start();
     ?>
-    <div class="w3-card w3-margin">
+    <div class="sketch-card w3-margin">
       <div class="w3-container">
 
         <!-- If you have received a counter-offer, you can see it here. -->
-        <div class="w3-padding">
+        <!--<div class="w3-padding">
           <i>
             📜 You have received an COUNTER-OFFER on this blueprint.
           </i>
@@ -181,7 +181,7 @@ class ConversationBluePrint extends DataClass {
               Link to the counter offer 2
             </li>
           </ul>
-        </div>
+        </div>-->
 
         <!-- Number of JOINED  members: who has said: yes lets start talking -->
 
@@ -204,6 +204,36 @@ class ConversationBluePrint extends DataClass {
     </div>
     <?php
     return ob_get_clean();
+  }
+
+  /**
+   * @param App $app
+   * @param int $user
+   * @param int $space_id
+   * @param string $search_string
+   * @return array<ConversationBluePrint>
+   */
+  static function search_by_search_text_in_space(
+    App $app,
+    int $user,
+    int $space_id,
+    string $search_string,
+  ): array {
+
+    return static::get_array(
+      $app->get_database(),
+      "
+            SELECT * FROM ConversationBluePrint 
+                WHERE 
+                    space_id = ? 
+                    AND (
+                        /* Display mine or the offerings of other people that are published */
+                        author_id = ? OR published = 1
+                    )
+                    AND description LIKE ?",
+      [$space_id, $user, '%' . $search_string . '%']
+    );
+
   }
 
 }

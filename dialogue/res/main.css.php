@@ -154,7 +154,7 @@ blockquote {
     box-sizing: border-box;
     color: #41403e;
     /*cursor: pointer;*/
-    display: inline-block;
+    /*display: inline-block;*/
     font-family: Neucha, sans-serif;
     font-size: 1rem;
     line-height: 23px;

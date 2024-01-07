@@ -283,9 +283,24 @@ abstract class DataClass implements JsonSerializable {
    * @param array $params
    * @return array<static>
    */
-  static function get_array(PDO $pdo, string $sql, array $params = []): array {
+  static function get_array(PDO $pdo, string $sql, array $params = [], array $fields_to_not_escape = []): array {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
+
+    # todo: this CAN in theory lead to bugs if we insert stuff where we escape
+    #       f.e. % in some markdown text
+    if(str_contains(haystack: $sql, needle: " LIKE ")){
+      foreach ($params as $num => $param) {
+        if(is_string($param)){
+          if(in_array(needle: $num, haystack: $fields_to_not_escape)){
+            continue;
+          }
+          else{
+            $params[$num] = $pdo->quote($param);
+          }
+        }
+      }
+    }
 
     $results = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -312,9 +327,24 @@ abstract class DataClass implements JsonSerializable {
    *
    * @throws Exception
    */
-  static function get_one(PDO $pdo, string $sql, array $params, bool $throw_on_null = false): ?static {
+  static function get_one(PDO $pdo, string $sql, array $params, bool $throw_on_null = false, array $fields_to_not_escape = []): ?static {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
+
+    # todo: this CAN in theory lead to bugs if we insert stuff where we escape
+    #       f.e. % in some markdown text
+    if(str_contains(haystack: $sql, needle: " LIKE ")){
+      foreach ($params as $num => $param) {
+        if(is_string($param)){
+          if(in_array(needle: $num, haystack: $fields_to_not_escape)){
+            continue;
+          }
+          else{
+            $params[$num] = $pdo->quote($param);
+          }
+        }
+      }
+    }
 
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -339,7 +369,7 @@ abstract class DataClass implements JsonSerializable {
    *
    * @throws Exception
    */
-  static function get_count(PDO $pdo, string $sql, array $params = []): int {
+  static function get_count(PDO $pdo, string $sql, array $params = [], array $fields_to_not_escape = []): int {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     if (
       !str_starts_with($sql, "SELECT COUNT(*)")
@@ -348,13 +378,29 @@ abstract class DataClass implements JsonSerializable {
       $err("sql: $sql");
       throw new Exception("get_count called with sql that does not start with SELECT COUNT(*)");
     }
+
+    # todo: this CAN in theory lead to bugs if we insert stuff where we escape
+    #       f.e. % in some markdown text
+    if(str_contains(haystack: $sql, needle: " LIKE ")){
+      foreach ($params as $num => $param) {
+        if(is_string($param)){
+          if(in_array(needle: $num, haystack: $fields_to_not_escape)){
+            continue;
+          }
+          else{
+            $params[$num] = $pdo->quote($param);
+          }
+        }
+      }
+    }
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     return (int)$stmt->fetchColumn();  // COUNT(*) returns an integer,
   }
 
 
-  static function get_sum(PDO $pdo, string $sql, array $params = []): int|float {
+  static function get_sum(PDO $pdo, string $sql, array $params = [], array $fields_to_not_escape = []): int|float {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
     if (
       !str_starts_with(trim($sql), "SELECT SUM")
@@ -363,6 +409,22 @@ abstract class DataClass implements JsonSerializable {
       $err("sql: $sql");
       throw new Exception("get_sum called with sql that does not start with SELECT SUM");
     }
+
+    # todo: this CAN in theory lead to bugs if we insert stuff where we escape
+    #       f.e. % in some markdown text
+    if(str_contains(haystack: $sql, needle: " LIKE ")){
+      foreach ($params as $num => $param) {
+        if(is_string($param)){
+          if(in_array(needle: $num, haystack: $fields_to_not_escape)){
+            continue;
+          }
+          else{
+            $params[$num] = $pdo->quote($param);
+          }
+        }
+      }
+    }
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     return (int)$stmt->fetchColumn();  //

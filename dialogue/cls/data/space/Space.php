@@ -28,7 +28,13 @@ class Space extends DataClass {
   var string $content = "# Empty Space";
   var int $created_at = 0;
   var int $author_id = 0;
-  
+
+  /**
+   * @throws Exception
+   */
+  function current_user_as_delete_rights(App $app): bool {
+    return $this->author_id === $app->get_currently_logged_in_account()->id;
+  }
 
   /**
    * @throws Exception
@@ -74,6 +80,9 @@ class Space extends DataClass {
     );
   }
 
+  /**
+   * @throws Exception
+   */
   function getDisplayCard(App $app): string {
     ob_start();
 

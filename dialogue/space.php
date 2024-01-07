@@ -2,13 +2,9 @@
 declare(strict_types=1);
 
 use cls\App;
-use cls\data\space\pageviews\SpacePageBlueprints;
-use cls\data\space\pageviews\SpacePageConversations;
 use cls\data\space\pageviews\SpacePageCreate;
-use cls\data\space\pageviews\SpacePageEdit;
 use cls\data\space\pageviews\SpacePageFeed;
 use cls\data\space\pageviews\SpacePageFilter;
-use cls\data\space\pageviews\SpacePageInfo;
 use cls\data\space\pageviews\SpacePageMembers;
 use cls\data\space\pageviews\SpacePageMyMembershipSettings;
 use cls\data\space\pageviews\SpacePageNewBlueprint;
@@ -80,9 +76,11 @@ try {
         href="/space.php?p=create&id=<?= $_GET["id"] ?>"
       > Create </a>
 
-      <a class="sketch-button tab-button <?php $is_selected("filter") ?>" href="/space.php?p=filter&id=<?= $_GET["id"] ?>">
+      <a class="sketch-button tab-button <?php $is_selected("filter") ?>"
+         href="/space.php?p=filter&id=<?= $_GET["id"] ?>">
         Search </a>
-      <a class="sketch-button tab-button <?php $is_selected("blueprints") ?>" href="/space.php?p=blueprints&id=<?= $_GET["id"] ?>"> My
+      <a class="sketch-button tab-button <?php $is_selected("blueprints") ?>"
+         href="/space.php?p=blueprints&id=<?= $_GET["id"] ?>"> My
         Blueprints </a>
       <a class="sketch-button tab-button <?php $is_selected("conversations") ?>"
          href="/space.php?p=conversations&id=<?= $_GET["id"] ?>"> My Conversations </a>
@@ -112,59 +110,25 @@ try {
       </a>
     </div>
     <br><br>
-
-
-
     <?php
-    # todo: empty ond default??
-    switch ($_GET["p"] ?? "default") {
+    $snippet_path = fn($file_name) => $_SERVER["DOCUMENT_ROOT"] . "/page_snippets/space/$file_name";
 
-      case "filter":
-        echo SpacePageFilter::display($space, $app);
-        break;
-      case "blueprints":
-        echo SpacePageBluePrints::display($space, $app);
-        break;
-      case "conversations":
-        echo SpacePageConversations::display($space, $app);
-        break;
-
-      case "new_subspace":
-        echo SpacePageNewSubspace::display($space, $app);
-        break;
-
-      case "new_blueprint":
-        echo SpacePageNewBlueprint::display($space, $app);
-        break;
-
-      case "new_document":
-        echo SpacePageNewDocument::display($space, $app);
-        break;
-
-      case "feed":
-        echo SpacePageFeed::display($space, $app);
-        break;
-
-      case "create":
-        echo SpacePageCreate::display($space, $app);
-        break;
-
-
-      case "edit":
-        echo SpacePageEdit::display($space, $app);
-        break;
-      case "info":
-        echo SpacePageInfo::display($space, $app);
-        break;
-      case "my_membership_settings":
-        echo SpacePageMyMembershipSettings::display($space, $app);
-        break;
-      case "members":
-        echo SpacePageMembers::display($space, $app);
-        break;
-    }
-
-
+    echo match ($_GET["p"] ?? "default") {
+      "edit"                   => (require($snippet_path(file_name: "edit.php")))(space: $space, app: $app),
+      "info"                   => (require($snippet_path(file_name: "info.php")))(space: $space, app: $app),
+      "blueprint_manager"      => (require($snippet_path(file_name: "blueprint_manager.php")))(space: $space, app: $app),
+      "conversations"          => (require($snippet_path(file_name: "my_conversations.php")))(space: $space, app: $app),
+      "create"                 => (require($snippet_path(file_name: "create_stuff_menu.php")))(space: $space, app: $app),
+      "feed"                   => (require($snippet_path(file_name: "feed.php")))(space: $space, app: $app),
+      "filter"                 => (require($snippet_path(file_name: "filter.php")))(space: $space, app: $app),
+      "my_membership_settings" => (require($snippet_path(file_name: "my_membership_settings.php")))(space: $space, app: $app),
+      "blueprints"             => (require($snippet_path(file_name: "blueprint_manager.php")))(space: $space, app: $app),
+      "new_blueprint"          => (require($snippet_path(file_name: "new_blueprint.php")))(space: $space, app: $app),
+      "new_document"           => (require($snippet_path(file_name: "new_document.php")))(space: $space, app: $app),
+      "new_subspace"           => (require($snippet_path(file_name: "new_subspace.php")))(space: $space, app: $app),
+      "members"                => (require($snippet_path(file_name: "members.php")))(space: $space, app: $app),
+      default                  => (require($snippet_path(file_name: "feed.php")))(space: $space, app: $app),
+    };
   }
   else {
     ?>
