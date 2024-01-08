@@ -87,6 +87,7 @@ class DialogueMembership extends DataClass {
   static function get_my_membership_by_dialogue(
     int $dialogue_id,
   ): ?static {
+    $app = App::get();
     return static::get_one(
       App::get()->get_database(),
       "SELECT * FROM `DialogueMembership` WHERE `dialogue_id` = ? AND `account_id` = ?",

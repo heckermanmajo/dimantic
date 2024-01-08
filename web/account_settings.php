@@ -38,6 +38,8 @@ try {
       }
   }
 
+  $app->handle_action_requests();
+
   HtmlUtils::head();
   HtmlUtils::main_header();
 

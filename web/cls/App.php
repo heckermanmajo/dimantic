@@ -20,6 +20,7 @@ use cls\data\dialoge\DialogueRuleRating;
 use cls\data\space\Space;
 use cls\data\space\SpaceDocument;
 use cls\data\space\SpaceMembership;
+use cls\lib\Parsedown;
 use Exception;
 use PDO;
 use ReflectionException;
@@ -169,7 +170,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) session_start();
  * and want more control over the "simulated" state of the application.
  */
 class App {
-  
+
   /**
    * @var bool If true, then the inline tests are run
    * This means tests that are put beneath classes in the source file.
@@ -261,7 +262,6 @@ class App {
    * @todo: implement ...
    */
   static function get_test_instance(): App { }
-
 
 
   /**
@@ -385,7 +385,7 @@ class App {
     if ($this->db == null) {
       [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
       if (FN_IS_CLI()) {
-        if(static::$cli_db_path == ""){
+        if (static::$cli_db_path == "") {
           throw new Exception("static::\$cli_db_path is not set.");
         }
         $log("COMMAND_LINE_INTERFACE_DETECTED_CONNECTION");
@@ -584,13 +584,13 @@ class App {
     # This code prevents re-execution of the same request
     #######################################################################
 
-    $hash_of_all_post_fields = md5(serialize($_POST));
+    $hash_of_all_post_fields = md5(string:serialize(value: $_POST));
 
-    $last_hash = $this->get_session_field(name:"hash_of_post_data_of_last_request", default: "");
+    $last_hash = $this->get_session_field(name: "hash_of_post_data_of_last_request", default: "");
 
     if ($last_hash === $hash_of_all_post_fields) {
       # if you need to resend the request, then set this field to true in post
-      if((!isset($_POST["allow_resend_of_request"])) && ($_POST["allow_resend_of_request"]??"") !== "true") {
+      if ((!isset($_POST["allow_resend_of_request"])) && ($_POST["allow_resend_of_request"] ?? "") !== "true") {
         $warn("same request as last time -> skip");
         $warn(json_encode($_POST, JSON_PRETTY_PRINT));
         return;
@@ -600,7 +600,6 @@ class App {
     $this->set_session_field(name: "hash_of_post_data_of_last_request", value: $hash_of_all_post_fields);
 
     #######################################################################
-
 
 
     $all_requests = $_SERVER["DOCUMENT_ROOT"] . "/request/*/*/*.php";
@@ -674,9 +673,9 @@ class App {
     # todo: we dont want to allow underlined text in markdown
     #       since we need the underlining for hinting meta data
     #       for the text of the message, like comments, likes, etc.
-    $parsedown = new \cls\lib\Parsedown();
-    $parsedown->setSafeMode(true);
-    return $parsedown->text($markdown);
+    $parsedown = new Parsedown();
+    $parsedown->setSafeMode(safeMode: true);
+    return $parsedown->text(text: $markdown);
   }
 
 }

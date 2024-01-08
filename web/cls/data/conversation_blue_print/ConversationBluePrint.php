@@ -6,7 +6,7 @@ use cls\App;
 use cls\data\account\Account;
 use cls\DataClass;
 use cls\GetDisplayCardInterface;
-use cls\StringUtils;
+use cls\MarkdownUtils;
 use Exception;
 
 /**
@@ -220,10 +220,10 @@ class ConversationBluePrint extends DataClass implements GetDisplayCardInterface
         <!-- Number of JOINED  members: who has said: yes lets start talking -->
           <!--<pre><?php var_dump($this)?></pre>-->
         <a href="/blueprint.php?id=<?= $this->id ?>">
-          <h3><?= StringUtils::get_title_from_md_content($this->description) ?></h3>
+          <h3><?= MarkdownUtils::get_title_from_md_content($this->description) ?></h3>
         </a>
 
-        <p><?= App::get()->markdown_to_html(StringUtils::get_md_content_without_title($this->description)) ?></p>
+        <p><?= App::get()->markdown_to_html(MarkdownUtils::get_md_content_without_title($this->description)) ?></p>
 
         <p>Number of lobbies: <?=Lobby::get_number_of_lobbies_for_blueprint(
           blueprint_id: $this->id

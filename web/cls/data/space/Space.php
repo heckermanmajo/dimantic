@@ -4,7 +4,7 @@ namespace cls\data\space;
 
 use cls\App;
 use cls\DataClass;
-use cls\StringUtils;
+use cls\MarkdownUtils;
 use Exception;
 
 /**
@@ -92,7 +92,7 @@ class Space extends DataClass {
 
       <h3>
         <a style="text-decoration: none" href="/space.php?id=<?= $this->id ?>">
-          <?= StringUtils::get_title_from_md_content($this->content) ?>
+          <?= MarkdownUtils::get_title_from_md_content($this->content) ?>
         </a>
         <!--<div class="w3-right">
           <button> Wiki </button>

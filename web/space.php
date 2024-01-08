@@ -4,7 +4,7 @@ declare(strict_types=1);
 use cls\App;
 use cls\data\space\Space;
 use cls\HtmlUtils;
-use cls\StringUtils;
+use cls\MarkdownUtils;
 
 
 require $_SERVER["DOCUMENT_ROOT"] . "/cls/App.php";
@@ -44,7 +44,7 @@ try {
 
   $space = Space::get_by_id(pdo: $app->get_database(), id: (int)$_GET["id"]);
   ?>
-  <a href="/index.php" class="sketch-button " style="margin-top: 6px"> <img src="/res/back.svg" width="30px"></a>
+
   <?php
   if ($space->current_user_has_access()) {
 
@@ -55,8 +55,10 @@ try {
     ?>
 
 
-    <h2><?= StringUtils::get_title_from_md_content($space->content) ?></h2>
-    <div style="display:inline-block">
+    <h2 style="padding-left: 18px"><?= MarkdownUtils::get_title_from_md_content($space->content) ?></h2>
+    <div style="display:inline-block; padding-left: 18px;">
+
+      <?=HtmlUtils::get_back_button_html()?>
 
       <a
         class="sketch-button tab-button <?php $is_selected("feed") ?>"
@@ -78,7 +80,7 @@ try {
          href="/space.php?p=conversations&id=<?= $_GET["id"] ?>"> My Conversations </a>
     </div>
 
-    <div class="w3-right" style="display:inline-block">
+    <div class="w3-right" style="display:inline-block; padding-right: 18px">
       <a
         class="tab-button sketch-button "
         href="/space.php?p=info&id=<?= $_GET["id"] ?>">

@@ -80,42 +80,49 @@ try {
     )
   ):
     ?>
-      <h4> Edit Blueprint </h4>
-      <?=
-      HtmlUtils::get_markdown_editor_field_for_ajax(
-        field_name: "description",
-        ajax_end_point_path_from_root: "/request/blueprint/edit_conversation_blueprint_description/edit_conversation_blueprint_description.php",
-        init_text: $blueprint->description,
-        extra_json_fields: [
-          "blue_print_id" => $blueprint->id,
-        ]
-      )
-      ?>
-
+    <h4> Edit Blueprint </h4>
+    <?=
+    HtmlUtils::get_markdown_editor_field_for_ajax(
+      field_name: "description",
+      ajax_end_point_path_from_root: "/request/blueprint/edit_conversation_blueprint_description/edit_conversation_blueprint_description.php",
+      init_text: $blueprint->description,
+      extra_json_fields: [
+        "blue_print_id" => $blueprint->id,
+      ]
+    )
+    ?>
 
     <hr>
+    <div class="sketch-card w3-margin">
+      <script>
+        $(document).ready(function () {
+          $("#create_rule_form").hide();
+        });
+      </script>
 
-    <h4> Add rules to blueprint </h4>
-    <form method="post" class="w3-card w3-margin w3-padding">
-      <input type="hidden" name="action" value="create_proto_rule">
-      <input type="hidden" value="<?= $blueprint->id ?>" name="blue_print_id">
-      <?=
-      HtmlUtils::get_markdown_editor_field_for_ajax(
-        field_name: "content",
-        ajax_end_point_path_from_root: HtmlUtils::NO_AJAX_ENDPOINT,
-        init_text: "### Describe ONE rule for the conversation you want to have",
-        extra_json_fields: []
-      )
-      ?>
-      <div class="w3-margin">
-        <button type="submit" class="w3-button w3-blue"> Add rule</button>
-      </div>
+      <h3> Rules </h3>
 
-    </form>
+      <button class="sketch-button" onclick="FN_TOGGLE('create_rule_form')"> Add rules to blueprint </button>
+      <form method="post" id="create_rule_form">
+        <input type="hidden" name="action" value="create_proto_rule">
+        <input type="hidden" value="<?= $blueprint->id ?>" name="blue_print_id">
+        <?=
+        HtmlUtils::get_markdown_editor_field_for_ajax(
+          field_name: "content",
+          ajax_end_point_path_from_root: HtmlUtils::NO_AJAX_ENDPOINT,
+          init_text: "### Describe ONE rule for the conversation you want to have",
+          extra_json_fields: []
+        )
+        ?>
+        <div class="w3-margin">
+          <button type="submit" class="sketch-button"> Add rule </button>
+        </div>
+
+      </form>
+    </div>
 
   <?php endif; ?>
 
-  <h3> Rules </h3>
   <?php
 
   foreach ($proto_rules as $proto_rule) {
@@ -188,6 +195,7 @@ try {
 
   endif;
   ?>
+
 
   <?php if (
     $blueprint->user_is_allowed_to_create_lobby(

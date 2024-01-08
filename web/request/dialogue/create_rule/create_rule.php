@@ -80,15 +80,19 @@ function create_rule(
     $rule = new DialogueRule();
     $rule->dialogue_id = $dialogue->id;
     $rule->account_id = $app->get_currently_logged_in_account()->id;
-    // get latest messahe
-    $last_message = $dialogue->get_last_message($app);
-    $rule->post_message_id = $last_message->id;
+    // get latest message
+    $last_message = $dialogue->get_last_message();
+    // only set the post_message_id if there is a last message ->
+    // otherwise this is a rule added at the start of the conversation
+    if ($last_message){
+      $rule->post_message_id = $last_message->id;
+    }
     $rule->rule_text = $rule_text;
     $rule->save($app->get_database());
 
     // reset all ratings -> set them to pending
 
-    foreach ($rule->get_current_ratings($app) as $rating) {
+    foreach ($rule->get_current_ratings() as $rating) {
       // todo: create new if from active to pending
       // todo; also news if the state changes from declined to pending
       $rating->state = DialogueRuleRating::RATING_PENDING;

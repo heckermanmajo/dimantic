@@ -3,7 +3,7 @@
 
 use cls\App;
 
-try{
+if(App::get()->somebody_logged_in()){
 
     $style = App::get()->get_currently_logged_in_account()->style;
 
@@ -14,8 +14,8 @@ try{
             $info_color = "#a6ff44";
             $header_color = "dodgerblue";
             $default_card_border_color = "dodgerblue";
-            $background_color = "gray";
-            $card_background_color = "gray";
+            $background_color = "white";
+            $card_background_color = "white";
             break;
 
         case "default_darkmode" :
@@ -29,14 +29,27 @@ try{
 
     }
 
-}catch(Exception $e){
-    // this is the style for not logged in users
-    $background_color = "gray";
-    $card_background_color = "gray";
-    $main_color = "blue";
-    $info_color = "#a6ff44";
-    $header_color = "dodgerblue";
-    $default_card_border_color = "dodgerblue";
+}else{
+
+    if ((int)date("H") >= 18) {
+
+        $background_color = "#232323";
+        $card_background_color = "#232323";
+        $main_color = "white";
+        $info_color = "#a6ff44";
+        $header_color = "dodgerblue";
+        $default_card_border_color = "dodgerblue";
+
+    } else {
+
+        $background_color = "white";
+        $card_background_color = "white";
+        $main_color = "blue";
+        $info_color = "#a6ff44";
+        $header_color = "dodgerblue";
+        $default_card_border_color = "dodgerblue";
+
+    }
 
 }
 
@@ -52,8 +65,10 @@ body {
     font-family: comic-neue, serif !important;
 }
 
-p{
+p {
     font-family: comic-neue, serif !important;
+    margin-top: 2px !important;
+    margin-bottom: 2px !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -200,8 +215,15 @@ blockquote {
     -webkit-user-select: none;
     touch-action: manipulation;
     font-family: comic-neue, serif !important;
-
+    border-color: #3f51b5;
     font-weight: bold;
+}
+
+hr{
+    border: 0;
+    height: 1px;
+    background: #333;
+    background-image: linear-gradient(to right, #ccc, #333, #ccc);
 }
 
 
@@ -223,7 +245,7 @@ blockquote {
     font-size: 1rem;
     line-height: 23px;
     outline: none;
-    padding: .75rem;
+    padding: px;
     text-decoration: none;
     transition: all 235ms ease-in-out;
     border-bottom-left-radius: 15px 255px;

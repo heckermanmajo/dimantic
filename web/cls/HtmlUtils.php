@@ -40,19 +40,10 @@ class HtmlUtils {
       }
       ?>
       <style>
-          body {
-              background-color: #ffffff;
-              color: #1f1f1f;
-              overflow: hidden;
 
-          <?php if(!FN_IS_MOBILE()): ?> margin-left: 20%;
-              margin-right: 20%;
-          <?php endif; ?>
-          }
+        <?php require($_SERVER["DOCUMENT_ROOT"] . "/res/main.css.php");?>
 
-          <?php require($_SERVER["DOCUMENT_ROOT"] . "/res/main.css.php");?>
-
-          <?=$style?>
+        <?=$style?>
       </style>
 
       <title>Dimantic</title>
@@ -66,6 +57,7 @@ class HtmlUtils {
 
   static function footer(): void {
     [$log, $warn, $err, $todo] = App::get_logging_functions(__CLASS__, __FUNCTION__, __FILE__, __LINE__);
+    echo HtmlUtils::get_display_prestige_badge();
     ?>
     <br><br><br>    <br><br><br>    <br><br><br>    <br><br><br>    <br><br><br>
     <br><br><br>    <br><br><br>    <br><br><br>    <br><br><br>
@@ -266,9 +258,6 @@ class HtmlUtils {
             });
 
 
-
-
-
         }); // end of onchange
 
       });
@@ -314,6 +303,56 @@ class HtmlUtils {
     }
     return $ret;
 
+  }
+
+  /**
+   * @return string Button in the bottom left that displays the prestige amount
+   */
+  static function get_display_prestige_badge(): string {
+    ob_start();
+
+    $app = App::get();
+    $account = $app->get_currently_logged_in_account();
+
+    ?>
+    <div
+      style="
+        position: fixed;
+        bottom: 0;
+        left: 92vw;
+        width: 8vw;
+        padding: 10px;
+        text-align: center;
+        background-color: lightsteelblue;
+      "
+      class="sketch-button"
+    >
+
+      <a
+        href="/prestige.php"
+        style="text-decoration: none"
+      >
+        <img src="/res/prestige.svg" width="20px">
+        <br>
+        <?= 123 ?>
+        <br>
+        <small>Prestige</small>
+      </a>
+    </div>
+    <?php
+    return ob_get_clean();
+  }
+
+  static function get_back_button_html(): string {
+    return '
+      <a
+        href="javascript:history.back()"
+        style="text-decoration: none"
+        class="sketch-button"
+      >
+        <img src="/res/back.svg" width="30px">
+      </a>
+    ';
   }
 
 }

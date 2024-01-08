@@ -11,6 +11,7 @@ use cls\data\conversation_blue_print\LobbyMembership;
 use cls\data\conversation_blue_print\ProtoRule;
 use cls\DataClass;
 
+use cls\MarkdownUtils;
 use Exception;
 
 /**
@@ -338,10 +339,10 @@ class Dialogue extends DataClass {
     
     ?>
 
-    <div class="sketch-card w3-margin w3-padding">
+    <div class="sketch-card w3-margin">
       <small><?= $this->get_header_bar() ?></small>
       <a style="text-decoration: none" href="/dialogue.php?id=<?= $this->id ?>">
-        <?= App::get()->markdown_to_html($this->description) ?>
+        <?= App::get()->markdown_to_html(MarkdownUtils::get_short_desc_from_start($this->description, true,4 )) ?>
       </a>
     </div>
     <?php

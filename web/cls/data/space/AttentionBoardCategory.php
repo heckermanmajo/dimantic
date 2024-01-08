@@ -1,7 +1,7 @@
 <?php
 namespace cls\data\space;
 
-use cls\StringUtils;
+use cls\MarkdownUtils;
 
 /**
  * An attention board has always 3 times on the x-axis: short, mid, long term.
@@ -16,7 +16,7 @@ class AttentionBoardCategory extends \cls\DataClass {
    * The name of the category is the extracted title
    * from the markdown description.
    *
-   * @see StringUtils::get_title_from_md_content()
+   * @see MarkdownUtils::get_title_from_md_content()
    */
   var string $description = "";
 }

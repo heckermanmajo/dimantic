@@ -5,8 +5,6 @@ namespace cls\data\dialoge;
 use cls\App;
 use cls\data\account\Account;
 use cls\DataClass;
-use cls\HtmlUtils;
-use cls\RequestError;
 
 class DialogueRule extends DataClass {
 
@@ -45,8 +43,8 @@ class DialogueRule extends DataClass {
     parent::__construct($data_from_db);
 
   }
-  
-  
+
+
   /**
    * @throws \Exception
    */
@@ -57,7 +55,7 @@ class DialogueRule extends DataClass {
       [$this->id]
     );
   }
-  
+
   /**
    * @throws \Exception
    */
@@ -135,7 +133,7 @@ class DialogueRule extends DataClass {
 
     # if this is a proto rule, ignore all other stuff
     if ($this->was_proto_rule == 1) {
-      $state_color = "lightblue";
+      $state_color = "blue";
     }
 
     ?>
@@ -167,8 +165,11 @@ class DialogueRule extends DataClass {
         }
       }
       ?>
-      <br>
-      <div><?= App::get()->markdown_to_html($this->rule_text) ?></div>
+      <?php if (App::get()->get_currently_logged_in_account()->id == $this->account_id && !$all_have_accepted): ?>
+        <button onclick="FN_TOGGLE('edit_or_delete_dialogue_rule_<?= $this->id ?>')" class="button">Edit</button>
+      <?php endif; ?>
+
+      <?= App::get()->markdown_to_html($this->rule_text) ?>
 
       <?php if ($this->was_proto_rule == 0): ?>
         <?php if (!$i_am_author && $my_rating != null
@@ -220,18 +221,16 @@ class DialogueRule extends DataClass {
           </div>
         <?php endif; ?>
 
-        <pre>
-      <?php foreach ($all_ratings as $rating) {
-        if ($rating->rating == DialogueRuleRating::RATING_REJECT) {
-          ?>
-          <div class="w3-card-4 w3-padding">
-          <?= App::get()->markdown_to_html($rating->reason_text) ?>
-          </div>
-          <?php
-        }
-        #echo json_encode($rating, JSON_PRETTY_PRINT);
-      } ?>
-        </pre>
+        <?php foreach ($all_ratings as $rating) {
+          if ($rating->rating == DialogueRuleRating::RATING_REJECT) {
+            ?>
+            <div class="w3-card-4 w3-padding">
+              <?= App::get()->markdown_to_html($rating->reason_text) ?>
+            </div>
+            <?php
+          }
+          #echo json_encode($rating, JSON_PRETTY_PRINT);
+        } ?>
 
 
         <?php if ($i_am_author && !$all_have_accepted): ?>
@@ -245,8 +244,6 @@ class DialogueRule extends DataClass {
           endif;
           ?>
           <div>
-            <button onclick="FN_TOGGLE('edit_or_delete_dialogue_rule_<?= $this->id ?>')" class="button">Edit</button>
-            <br>
             <div class="w3-card-4" id="edit_or_delete_dialogue_rule_<?= $this->id ?>" style="<?= $style ?>">
               <form
                 method="post"
