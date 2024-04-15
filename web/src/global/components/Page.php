@@ -31,6 +31,7 @@ class Page extends Component {
       ?>
     </head>
     <body>
+    <?php (new OverlayTemplateAndJsCode())->render(); ?>
     <?php $this->body->render(); ?>
     </body>
     </html>

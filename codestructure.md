@@ -3,6 +3,7 @@
 ## Actions
 
 ## Components 
+- start with 'Get' like GetDevice, GetWhatever
 
 ## Tables
 

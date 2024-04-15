@@ -2,6 +2,7 @@
 
 namespace src\app\user\enums;
 
+
 enum AccountState: int {
 
   case ACTIVE = 1;

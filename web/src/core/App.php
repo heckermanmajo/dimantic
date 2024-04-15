@@ -1,121 +1,10 @@
 <?php
 namespace src\core;
 
-
-/**
- * Returns true if the script is running in cli mode.
- *
- * Cli mode is used for tests and possible analysis
- * where we want to use dataclasses and other
- * already written utility functions.
- */
-function FN_IS_CLI(): bool {
-  return php_sapi_name() == "cli";
-}
-
-/**
- * This function detects if the user is on a mobile device.
- *
- * Used for different css style-requires and possibly
- * different html structure.
- *
- * @todo: implement ...
- */
-function FN_IS_MOBILE(): bool {
-  # todo: make better ... -> use lib?
-  $userAgent = strtolower($_SERVER['HTTP_USER_AGENT']);
-
-  $mobileDevices = array(
-    'iphone', 'ipad', 'android', 'blackberry', 'nokia',
-    'opera mini', 'windows mobile', 'windows phone',
-    'iemobile', 'mobile');
-
-  foreach ($mobileDevices as $device) {
-    if (strpos($userAgent, $device) !== false) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-
-const DEVELOPERS_HOME_PATHS = [
-  "/home/majo/",
-  # ...
-  # add your home path here if you are a developer ...
-];
-
-/**
- * Debug mode allows to see error messages and also
- * get the application logs.
- *
- * If you develop on this project you should
- * add your name to the list of developers
- * with the home and username of your computer.
- *
- */
-function FN_IS_DEBUG(): bool {
-  # todo: remove the line below after debugging is done
-  return true; # for alpha ....
-# cli mode is always debug mode
-#if (FN_IS_CLI()) {
-#  return true;
-#}
-
-#$root_path = $_SERVER["DOCUMENT_ROOT"];
-#foreach (DEVELOPERS_HOME_PATHS as $developer) {
-#  if (str_contains(haystack: $root_path, needle: $developer)) {
-#    return true;
-#  }
-#}
-#return false;
-}
-
-/**
- * This function  returns true, if this is run on localhost.
- * @return bool
- */
-function FN_IS_LOCAL_HOST(): bool {
-  $root_path = $_SERVER["DOCUMENT_ROOT"];
-  foreach (DEVELOPERS_HOME_PATHS as $developer) {
-    if (str_contains(haystack: $root_path, needle: $developer)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function FN_GET_HOME_PATH(): string {
-  foreach (DEVELOPERS_HOME_PATHS as $developer) {
-    if (str_contains(haystack: $_SERVER["DOCUMENT_ROOT"], needle: $developer)) {
-      return $developer;
-    }
-  }
-  return "";
-}
-
-# set init to mbstring
-#mb_internal_encoding(encoding: "UTF-8");
-
-
-error_reporting(error_level: E_ALL);
-if (FN_IS_DEBUG()) {
-  ini_set(option: 'display_errors', value: '1');
-  ini_set(option: 'display_startup_errors', value: '1');
-  ini_set(option: 'log_errors', value: '0');
-} else {
-  ini_set(option: 'display_errors', value: '0');
-  ini_set(option: 'display_startup_errors', value: '0');
-  ini_set(option: 'log_errors', value: '1');
-}
-
-# start output buffering
-# all output is stored in a buffer and not sent to the client
-# until the buffer is flushed or the script ends.
-# this allows to cancel the output if an error occurs.
-# and don't send half rendered html to the client.
-ob_start();
+use Exception;
+use PDO;
+use src\core\settings\Settings;
+use src\global\compositions\GetEnvironmentMode;
 
 
 /**
@@ -144,7 +33,7 @@ ob_start();
  */
 function FN_AUTOLOAD($class): void {
   $class = str_replace(search: '\\', replace: '/', subject: $class);
-  if (FN_IS_CLI()) {
+  if (php_sapi_name() == "cli") {
     $file = __DIR__ . "/../" . "$class.php";
     $_SERVER['DOCUMENT_ROOT'] = __DIR__ . "/../";
   } else {
@@ -160,6 +49,28 @@ function FN_AUTOLOAD($class): void {
 // autoloader: classes on namespace
 spl_autoload_register(callback: FN_AUTOLOAD(...));
 
+
+error_reporting(error_level: E_ALL);
+if (GetEnvironmentMode::is_debug()) {
+  ini_set(option: 'display_errors', value: '1');
+  ini_set(option: 'display_startup_errors', value: '1');
+  ini_set(option: 'log_errors', value: '0');
+} else {
+  ini_set(option: 'display_errors', value: '0');
+  ini_set(option: 'display_startup_errors', value: '0');
+  ini_set(option: 'log_errors', value: '1');
+}
+
+# start output buffering
+# all output is stored in a buffer and not sent to the client
+# until the buffer is flushed or the script ends.
+# this allows to cancel the output if an error occurs.
+# and don't send half rendered html to the client.
+ob_start();
+
+
+
+
 // we want warnings  to be exceptions, so we can catch and log them
 // into the application problems database.
 set_error_handler(
@@ -170,15 +81,16 @@ set_error_handler(
       return;
     }
 
-    Problem::write_problem_message(
-      message: "PHP Warning",
-      extra_data: [
-        "errno" => $errno,
-        "errstr" => $errstr,
-        "errfile" => $errfile,
-        "errline" => $errline
-      ]
-    );
+    # todo: log all warnings into the problems database
+    #Problem::write_problem_message(
+    #  message: "PHP Warning",
+    #  extra_data: [
+    #    "errno" => $errno,
+    #    "errstr" => $errstr,
+    #    "errfile" => $errfile,
+     #   "errline" => $errline
+     # ]
+    #);
 
   }
 
@@ -198,5 +110,41 @@ if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
 
 final class App {
+
+  /**
+   * The default database connection; contains all the main data, like users
+   * spaces, posts and conversations.
+   */
+  private static ?PDO $db = null;
+
+  /**
+   * Contains all the embeddings for all entries that need to have embeddings.
+   */
+  private static ?PDO $embeddings_db = null;
+
+  /**
+   * Place to log errors, usage statistics and other data that is not needed
+   * for the main application to work, but is useful for the developer to
+   * understand how the application is used.
+   */
+  private static ?PDO $usage_db = null;
+
+  /**
+   * Returns the database connection.
+   *
+   * @param string $what_database "default" | "embeddings" | "usage"
+   *
+   * @throws Exception
+   * @see Settings::get_instance()
+   */
+  static function get_database(string $what_database = "default"): PDO {
+    $settings = Settings::get_instance();
+    return match ($what_database) {
+      "default" => self::$db ??= $settings->db_credentials->get_connection(),
+      "embeddings" => self::$embeddings_db ??= $settings->embeddings_db_credentials->get_connection(),
+      "usage" => self::$usage_db ??= $settings->usage_db_credentials->get_connection(),
+      default => throw new Exception("Unknown database requested: $what_database")
+    };
+  }
 
 }
