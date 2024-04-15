@@ -1,0 +1,9 @@
+.idea/
+dimantic.sqlite
+usage.sqlite
+embeddings.sqlite
+web.zip
+default.db
+embeddings.db
+usage.db
+doc/.obsidian/
