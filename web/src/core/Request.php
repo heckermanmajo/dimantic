@@ -9,6 +9,8 @@ use src\global\components\JsonError;
 
 abstract class Request {
 
+  public bool $is_done = false;
+
   /**
    * @var RequestException|null If the request is invalid, this is the reason.
    */
@@ -68,6 +70,10 @@ abstract class Request {
     ?>
     <input type="hidden" name="__request_id" value="<?= self::encrypt_class_name() ?>">
     <?php
+  }
+
+  public function is_done(): bool {
+    return $this->is_done;
   }
 
   private static function encrypt_class_name(): string {

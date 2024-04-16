@@ -65,11 +65,12 @@ class RegistrationRequest extends Request {
 
       $this->new_account = $a;
 
+      throw new BadValue("WE WANT TO SEE AN ERROR CARD");
+
 
       # is this is a proxy request we need to validate the account
       # and its context - otherwise we can skip this step
       if (!$this->is_proxy_request) {
-
 
         $av = new AccountValidator($a);
         $_ = $av->validate(throw: true, in_request: true);
@@ -81,7 +82,7 @@ class RegistrationRequest extends Request {
 
     } catch (RequestException $re) {
 
-      $this->why_not_allowed = $re;
+      $this->why_invalid = $re;
       $re->set_request($this);
 
       return false;

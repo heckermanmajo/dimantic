@@ -9,6 +9,17 @@ use src\global\compositions\GetLastRequestData;
 readonly class RegistrationForm extends Component {
 
   public function render(): void {
+
+    if(GetLastRequestData::get_last_request() instanceof RegistrationRequest) {
+        if(GetLastRequestData::get_last_request()->is_done()){
+          echo "<div class='w3-panel w3-green w3-padding w3-margin'>Account created</div>";
+        }
+        else{
+          GetLastRequestData::get_error_card_of_fast_request()?->render();
+        }
+    }
+
+
     ?>
     <form
       class="w3-margin"

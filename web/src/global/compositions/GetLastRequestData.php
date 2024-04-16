@@ -2,7 +2,9 @@
 
 namespace src\global\compositions;
 
+use src\core\Component;
 use src\core\Composition;
+use src\core\Request;
 
 /**
  * This composition provides the data the last request has gotten and
@@ -25,5 +27,15 @@ class GetLastRequestData extends Composition {
   static function get_last_path(): string {
     return $_SERVER["HTTP_REFERER"] ?? "/index.php";
   }
+
+  static function get_error_card_of_fast_request(): ?Component {
+    return $_SESSION['LAST_REQUEST']['error_card'] ?? null;
+  }
+
+  static function get_last_request(): ?Request {
+    return $_SESSION['LAST_REQUEST']['last_request'] ?? null;
+  }
+
+
 
 }
