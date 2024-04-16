@@ -4,7 +4,7 @@ namespace src\global\components;
 
 use src\core\Component;
 
-class MainNavigationBar extends Component {
+readonly class MainNavigationBar extends Component {
 
   function __construct(
     private readonly ?Component $middle = null,

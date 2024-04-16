@@ -2,6 +2,6 @@
 
 namespace src\core\exceptions;
 
-class SystemsFailure {
+class TableFieldContextException {
 
 }

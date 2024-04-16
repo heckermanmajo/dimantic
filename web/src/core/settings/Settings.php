@@ -26,6 +26,7 @@ final class Settings {
     public readonly DataBaseConnectionData $usage_db_credentials,
     public readonly DataBaseConnectionData $embeddings_db_credentials,
     public readonly string                 $cron_password,
+    public readonly string                 $request_password = "kek",
 
   ) {
   }

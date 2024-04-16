@@ -1,7 +1,7 @@
 <?php
 
-namespace exceptions;
+namespace src\core\exceptions;
 
-class BadValue {
+class BadValue extends RequestException {
 
 }

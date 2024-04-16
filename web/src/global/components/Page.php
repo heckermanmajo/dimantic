@@ -7,7 +7,7 @@ use src\core\Component;
 /**
  * Assembles the HTML page.
  */
-class Page extends Component {
+readonly class Page extends Component {
 
   function __construct(
     private readonly array $head_components,

@@ -1,7 +1,9 @@
 <?php
 
-namespace exceptions;
+namespace src\core\exceptions;
 
-class BadRequest {
+use src\core\exceptions\RequestException;
+
+class BadRequest extends RequestException{
 
 }

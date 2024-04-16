@@ -2,7 +2,7 @@
 
 namespace src\core;
 
-abstract class Component {
+readonly abstract class Component {
 
   abstract public function render(): void;
 

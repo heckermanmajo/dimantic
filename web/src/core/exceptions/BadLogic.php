@@ -1,6 +1,6 @@
 <?php
 
-namespace exceptions;
+namespace src\core\exceptions;
 
 class BadLogic {
 

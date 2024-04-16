@@ -5,7 +5,7 @@ namespace src\global\components;
 use src\app\user\data\compositions\GetDarkmodeActive;
 use src\core\Component;
 
-class OverlayTemplateAndJsCode extends Component {
+readonly class OverlayTemplateAndJsCode extends Component {
 
 
   public function render(): void {

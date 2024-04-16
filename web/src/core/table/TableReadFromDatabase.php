@@ -28,20 +28,20 @@ trait TableReadFromDatabase {
     #       f.e. % in some markdown text
     if (str_contains(haystack: $sql, needle: " LIKE ")) {
       foreach ($params as $num => $param) {
-        if (is_string($param)) {
-          if (in_array(needle: $num, haystack: $fields_to_not_escape)) {
-            continue;
-          }
-          else {
-            $params[$num] = $pdo->quote($param);
-          }
+        if (
+          is_string($param)
+          && !in_array(needle: $num, haystack: $fields_to_not_escape)
+        ) {
+          $params[$num] = $pdo->quote($param);
         }
       }
     }
 
+
     $results = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-      $dataclass = new static($row);
+      $dataclass = new
+      static (data_from_db: $row);
       $results[] = $dataclass;
     }
 
@@ -76,8 +76,7 @@ trait TableReadFromDatabase {
         if (is_string($param)) {
           if (in_array(needle: $num, haystack: $fields_to_not_escape)) {
             continue;
-          }
-          else {
+          } else {
             $params[$num] = $pdo->quote($param);
           }
         }
@@ -93,7 +92,7 @@ trait TableReadFromDatabase {
       return null;
     }
 
-    return new static($row);
+    return new static(data_from_db: $row);
   }
 
   /**
@@ -124,8 +123,7 @@ trait TableReadFromDatabase {
         if (is_string($param)) {
           if (in_array(needle: $num, haystack: $fields_to_not_escape)) {
             continue;
-          }
-          else {
+          } else {
             $params[$num] = $pdo->quote($param);
           }
         }
@@ -154,8 +152,7 @@ trait TableReadFromDatabase {
         if (is_string($param)) {
           if (in_array(needle: $num, haystack: $fields_to_not_escape)) {
             continue;
-          }
-          else {
+          } else {
             $params[$num] = $pdo->quote($param);
           }
         }
@@ -166,8 +163,6 @@ trait TableReadFromDatabase {
     $stmt->execute($params);
     return (float)$stmt->fetchColumn();  //
   }
-
-
 
 
   /**
@@ -190,8 +185,7 @@ trait TableReadFromDatabase {
         if (is_string($param)) {
           if (in_array(needle: $num, haystack: $fields_to_not_escape)) {
             continue;
-          }
-          else {
+          } else {
             $params[$num] = $pdo->quote($param);
           }
         }
@@ -223,7 +217,7 @@ trait TableReadFromDatabase {
 
     $params = [':id' => $id];
 
-    $instance = static::get_one( $sql, $params, $throw_on_null);
+    $instance = static::get_one($sql, $params, $throw_on_null);
 
     return $instance;
 
@@ -238,7 +232,7 @@ trait TableReadFromDatabase {
    *
    * @throws Exception Throws an exception if there is an error in retrieving the records.
    */
-  static function get_all() : array {
+  static function get_all(): array {
     $table_name = (new ReflectionClass(static::class))->getShortName();
     $sql = "SELECT * FROM `$table_name`";
     return static::get_array($sql);

@@ -7,7 +7,7 @@ use src\app\user\data\compositions\GetDarkmodeActive;
 use src\core\Component;
 use src\global\compositions\GetDevice;
 
-class HtmlHead extends Component {
+readonly class HtmlHead extends Component {
 
   public function render(): void {
     ?>

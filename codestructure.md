@@ -11,6 +11,11 @@
 
 ## Requests
 
+A request is sent to the api endpoint.
+A request is always a new http-call, and pages, etc. don't handle 
+any requests.
+
+
 ## Core-Directory
 
 ### App

@@ -4,7 +4,7 @@ namespace src\global\components;
 
 use src\core\Component;
 
-class InlineJavascript extends Component {
+readonly class InlineJavascript extends Component {
 
   public function render(): void {
     ?>

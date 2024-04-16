@@ -4,7 +4,7 @@ namespace src\global\components;
 
 use src\core\Component;
 
-class AttentionProfileSelect extends Component {
+readonly class AttentionProfileSelect extends Component {
 
   public function render(): void {
     ?>

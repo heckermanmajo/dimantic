@@ -15,7 +15,6 @@ abstract class Table {
   use TableReadFromDatabase;
   use TableSaveAndDeleteFunctions;
 
-
   private static function isEnum(string $class): bool {
     if($class === "int" || $class === "string" || $class === "float" || $class === "bool"){
       return false;

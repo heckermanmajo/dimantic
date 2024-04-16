@@ -2,6 +2,6 @@
 
 namespace src\app\user\components;
 
-class UserCardComponent {
+readonly class UserCardComponent {
 
 }
