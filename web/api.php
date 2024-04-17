@@ -59,12 +59,12 @@ try {
     }else{
 
       $err = new ErrorCard(
-        error_message: $request->why_invalid->getMessage(),
+        error_message: $request->why_invalid?->getMessage() ?? "Request invalid but no message",
         context_name: "Request invalid",
         additional_data: [],
         debug_logs: [],
         additional_debug_data: [
-          "why_invalid" => $request->why_invalid->getTraceAsString(),
+          "why_invalid" => $request->why_invalid?->getTraceAsString(),
         ],
       );
 
@@ -83,11 +83,11 @@ try {
 
         (new JsonError(
           context_name: "Request invalid",
-          error_message: $request->why_invalid->getMessage(),
+          error_message: $request->why_invalid?->getMessage(),
           additional_data: [],
           debug_logs: [],
           additional_debug_data: [
-            "why_invalid" => $request->why_invalid->getTraceAsString(),
+            "why_invalid" => $request->why_invalid?->getTraceAsString(),
           ],
         ))->render();
 
@@ -146,6 +146,7 @@ try {
   ob_get_clean();
   header("Location: $referring_page");
   die();
+
   (new JsonError(
     context_name: "Internal server error",
     error_message: $t->getMessage(),

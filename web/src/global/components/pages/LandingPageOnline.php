@@ -7,6 +7,34 @@ use src\core\Component;
 readonly class LandingPageOnline extends Component {
 
   public function render(): void {
-    // TODO: Implement render() method.
+
+    # this component needs to be the navigation component
+
+    switch($_GET["p"]){
+
+      case "balance":
+        $page = new BalancePage();
+        break;
+
+      case "space":
+        $page = new SpacePage();
+        break;
+
+      case "ap":
+        $page = new AttentionProfile();
+        break;
+
+      case "explore":
+        $page = new ExplorePage();
+        break;
+
+      default:
+        $page = new HomePage();
+    }
+
+    $page->render();
+
+    # todo: footer??
+
   }
 }

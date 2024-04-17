@@ -8,6 +8,7 @@ use src\core\table\Table;
 final class Account extends Table {
 
   use GetAllPlatformAdmins;
+  use GetAccountByUsernameOrEmail;
 
   function __construct(
     public string $username = "",

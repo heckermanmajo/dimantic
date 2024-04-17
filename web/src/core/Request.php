@@ -45,7 +45,23 @@ abstract class Request {
    *
    * No database or session change is allowed in this function.
    */
-  abstract function is_valid(): bool;
+  abstract function _is_valid(): void;
+
+  /**
+   * This function checks if the request is valid.
+   *
+   * @return bool
+   */
+  function is_valid(): bool {
+    try {
+      $this->_is_valid();
+      return true;
+    } catch (RequestException $e) {
+      $this->why_invalid = $e;
+      $e->set_request($this);
+      return false;
+    }
+  }
 
   /**
    * This function actually executes the request.

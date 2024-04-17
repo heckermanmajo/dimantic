@@ -36,10 +36,6 @@ readonly class HtmlHead extends Component {
             crossorigin="anonymous"></script>
 
     <style>
-        body {
-            background-color: darkslategray;
-            color: white;
-        }
 
         pre {
             white-space: pre-wrap; /* css-3 */

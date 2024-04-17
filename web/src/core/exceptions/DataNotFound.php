@@ -2,6 +2,8 @@
 
 namespace src\core\exceptions;
 
-class DataNotFound {
+use src\core\Request;
+
+class DataNotFound extends RequestException {
 
 }
