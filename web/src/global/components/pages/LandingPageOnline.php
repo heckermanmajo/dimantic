@@ -21,7 +21,7 @@ readonly class LandingPageOnline extends Component {
         break;
 
       case "ap":
-        $page = new AttentionProfile();
+        $page = new AttentionProfilePage();
         break;
 
       case "explore":

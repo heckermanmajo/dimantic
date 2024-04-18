@@ -12,7 +12,14 @@ readonly class HomePage extends Component {
   public function render(): void {
 
     $main_nav_bar = new MainNavigationBar(
-      middle: new View("HOME"),
+      middle: new readonly class extends Component{
+        public function render(): void {
+          ?>
+          <a href="?p=home"> <i class="fas fa-mountain"></i> Overview </a> &nbsp; &nbsp; | &nbsp; &nbsp;
+          <a href="?p=home&explore"> <i class="fas fa-binoculars"></i> Explore </a>
+          <?php
+        }
+      },
       right: new readonly class extends Component {
         public function render(): void {
           ?>
@@ -60,24 +67,7 @@ readonly class HomePage extends Component {
 
       <div class="w3-col l2 m2 s2">
         <div class="w3-card w3-padding w3-margin">
-          List of dialogues<br>
-          <hr>
-          <span style="color: #ff00ce"> NEWLY STARTED DIALOGUES: </span><br>
-          <i class="fas fa-people-arrows"></i> Dialogue 2<br><br>
-          <i class="fas fa-people-arrows"></i> Dialogue 3<br><br>
-          <hr>
-          <span style="color: #ff6a00"> NEW Threads: </span><br>
-          <i class="fas fa-people-arrows"></i> Dialogue 2<br><br>
-          <i class="fas fa-people-arrows"></i> Dialogue 3<br><br>
-          <hr>
-          <span style="color: red"> NEW MESSAGES: </span><br>
-          <i class="fas fa-people-arrows"></i> Dialogue 2<br><br>
-          <i class="fas fa-people-arrows"></i> Dialogue 3<br><br>
-          <hr>
-          <br>
-          <i class="fas fa-people-arrows"></i> Dialogue 1<br><br>
-          <i class="fas fa-people-arrows"></i> Dialogue 2<br><br>
-          <i class="fas fa-people-arrows"></i> Dialogue 3<br><br>
+
         </div>
 
       </div>

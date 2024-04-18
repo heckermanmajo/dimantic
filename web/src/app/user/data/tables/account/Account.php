@@ -2,7 +2,7 @@
 
 namespace src\app\user\data\tables\account;
 
-use src\app\user\enums\AccountState;
+use src\app\user\data\enums\AccountState;
 use src\core\table\Table;
 
 final class Account extends Table {

@@ -13,10 +13,12 @@ readonly class AttentionProfileSelect extends Component {
       <option value="">Navigation</option>
       <option value="home"> 🏠 Home </option>
       <option value="explore"> 🔎🔭 Explore-Search </option>
-      <option value="ap&id=1"> 👁Attention Profile 1 </option>
-      <option value="ap&id=2"> 👁Attention Profile 2 </option>
-      <option value="ap&id=3"> 👁Attention Profile 3 </option>
-
+      <option value="ap&id=1"> 👁Unsorted 1 (123 ✉️) 🟢</option>
+      <option value="ap&id=1"> 👁Fam & Friends (123 ✉️) 🟢</option>
+      <option value="ap&id=1"> 👁Dimantic (123 ✉️) 🟢</option>
+      <option value="ap&id=2"> 👁Gamedev ( 3 ✉️) 🟢</option>
+      <option value="ap&id=3"> 👁Sociology 3 </option>
+      <option value="ap&id=3"> 👁Chill Content 3 </option>
     </select>
     <?php
   }

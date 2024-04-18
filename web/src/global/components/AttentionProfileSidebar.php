@@ -33,22 +33,48 @@ readonly class AttentionProfileSidebar extends Component {
       $cubes = '<i  style="color:#639bff" class="fas fa-project-diagram"></i>';
       $cube = '<i style="color:blue" class="fas fa-cube"></i>';
       $super_space = '<i style="color:#7d00ff" class="fas fa-cubes"></i>';
+      $private_space = '<i class="fas fa-key"></i><i style="color:blue" class="fas fa-cube"></i>';
+      $my_space = '<i class="fas fa-crown"></i><i style="color:blue" class="fas fa-cube"></i>';
       ?>
       <hr>
 
+
+      <a class="sidebar-link" href="?p=space"> <?= $my_space ?> Mein space </a><br>
+      <a class="sidebar-link" href="?p=space"> <?= $my_space ?> Mein space </a><br>
+      <a class="sidebar-link" href="?p=space"> <?= $my_space ?> Mein space </a><br>
+
+      <hr>
+      <!--
+
+      The green dot is a signt that something relevant is new -> f.e. an interaction withou your content
+
+       -->
+      <a class="sidebar-link" href="?p=space"> <?= $private_space ?> Ein privater space </a><br>
+      <a class="sidebar-link" href="?p=space"> <?= $private_space ?> Ein privater space 🟢 </a><br>
+      <a class="sidebar-link" href="?p=space"> <?= $private_space ?> Ein privater space </a><br>
+      <a class="sidebar-link" href="?p=space"> <?= $private_space ?> Ein privater space 🟢 </a><br>
+      <a class="sidebar-link" href="?p=space"> <?= $private_space ?> Ein privater space </a><br>
+
+      <hr>
+
       <a class="sidebar-link" href="?p=space">  <?= $super_space ?> Super Space </a><br>
       <a class="sidebar-link" href="?p=space">  <?= $super_space ?> Super Space </a><br>
       <a class="sidebar-link" href="?p=space">  <?= $super_space ?> Super Space </a><br>
       <a class="sidebar-link" href="?p=space">  <?= $super_space ?> Super Space </a><br>
 
       <hr>
-
+      <!-- same here, but all non relavent interactiosn do NOT result in a green dot  -->
       <a class="sidebar-link" href="?p=space"> <?= $cube ?> Ein space dieses APs </a><br>
       <a class="sidebar-link" href="?p=space"> <?= $cube ?> Ein space dieses APs</a><br>
       <a class="sidebar-link" href="?p=space">  <?= $cube ?> Ein space dieses APs</a><br>
-      <a class="sidebar-link" href="?p=space">  <?= $cube ?> Ein space dieses APs</a><br>
+      <a class="sidebar-link" href="?p=space">  <?= $cube ?> Ein space dieses APs 🟢 </a><br>
       <a class="sidebar-link" href="?p=space">  <?= $cube ?> Ein space dieses APs</a><br>
       <a class="sidebar-link" href="?p=space">  <?= $cube ?> Ein space dieses APs </a>
+
+      <hr>
+
+
+
     </div>
     <?php
   }

@@ -1,6 +1,6 @@
 <?php
 
-namespace src\app\user\enums;
+namespace src\app\user\data\enums;
 
 
 enum AccountState: int {

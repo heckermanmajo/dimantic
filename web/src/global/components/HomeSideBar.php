@@ -35,21 +35,22 @@ readonly class HomeSideBar extends Component {
       $contract = '<i style="color:#ff00a6" class="fas fa-file-contract"></i>';
       ?>
 
-      <p> Possible Attention taks </p>
+      <p> Most Urgent Stuff 🟣 ​🟪​  🔴 🟥  </p>
 
       <hr>
 
+      <!--<a class="sidebar-link" href="?p=space"> <?= $contract ?> Ein Contract den ich erfüllen muss </a><br>
       <a class="sidebar-link" href="?p=space"> <?= $contract ?> Ein Contract den ich erfüllen muss </a><br>
       <a class="sidebar-link" href="?p=space"> <?= $contract ?> Ein Contract den ich erfüllen muss </a><br>
-      <a class="sidebar-link" href="?p=space"> <?= $contract ?> Ein Contract den ich erfüllen muss </a><br>
-      <a class="sidebar-link" href="?p=space"> <?= $contract ?> Ein Contract den ich erfüllen muss </a><br>
+      <a class="sidebar-link" href="?p=space"> <?= $contract ?> Ein Contract den ich erfüllen muss </a><br>-->
 
       <hr>
 
+     <!-- <a class="sidebar-link" href="?p=space"> <?= $cube ?> Ein space der mir gehört </a><br>
       <a class="sidebar-link" href="?p=space"> <?= $cube ?> Ein space der mir gehört </a><br>
       <a class="sidebar-link" href="?p=space"> <?= $cube ?> Ein space der mir gehört </a><br>
-      <a class="sidebar-link" href="?p=space"> <?= $cube ?> Ein space der mir gehört </a><br>
-      <a class="sidebar-link" href="?p=space"> <?= $cube ?> Ein space der mir gehört </a><br>
+      <a class="sidebar-link" href="?p=space"> <?= $cube ?> Ein space der mir gehört </a><br>-->
+
 
     </div>
     <?php

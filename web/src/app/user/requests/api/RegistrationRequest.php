@@ -4,9 +4,9 @@ namespace src\app\user\requests\api;
 
 use ReflectionException;
 use src\app\user\actions\LoginAction;
+use src\app\user\data\enums\AccountState;
 use src\app\user\data\tables\account\Account;
 use src\app\user\data\tables\account\AccountValidator;
-use src\app\user\enums\AccountState;
 use src\core\Component;
 use src\core\exceptions\BadRequest;
 use src\core\exceptions\BadValue;
