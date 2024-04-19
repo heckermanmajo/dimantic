@@ -12,7 +12,6 @@ readonly class AttentionProfileSelect extends Component {
       onchange="window.location.href = `?p=${this.value}`">
       <option value="">Navigation</option>
       <option value="home"> 🏠 Home </option>
-      <option value="explore"> 🔎🔭 Explore-Search </option>
       <option value="ap&id=1"> 👁Unsorted 1 (123 ✉️) 🟢</option>
       <option value="ap&id=1"> 👁Fam & Friends (123 ✉️) 🟢</option>
       <option value="ap&id=1"> 👁Dimantic (123 ✉️) 🟢</option>

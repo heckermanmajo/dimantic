@@ -5,8 +5,6 @@ namespace src\global\components\pages;
 use src\core\Component;
 use src\global\components\AttentionProfileSidebar;
 use src\global\components\MainNavigationBar;
-use src\global\components\SpaceSidebar;
-use src\global\components\View;
 
 readonly class AttentionProfilePage extends Component {
 
@@ -16,7 +14,8 @@ readonly class AttentionProfilePage extends Component {
         public function render(): void {
           ?>
           <a href="?p=ap&feed"> <i class="fas fa-bars"></i> Feed </a> &nbsp; &nbsp; | &nbsp; &nbsp;
-          <a href="?p=ap&feed"> <i class="fas fa-star"></i> Favs </a>
+          <a href="?p=ap&favs"> <i class="fas fa-star"></i> Favs </a>  &nbsp; &nbsp; | &nbsp; &nbsp;
+          <a href="?p=ap&history"> <i class="fas fa-user-clock"></i>History </a>
           <?php
         }
       },

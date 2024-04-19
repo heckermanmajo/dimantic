@@ -28,6 +28,10 @@ readonly class LandingPageOnline extends Component {
         $page = new ExplorePage();
         break;
 
+      case "tree":
+        $page = new TreePage();
+        break;
+
       default:
         $page = new HomePage();
     }

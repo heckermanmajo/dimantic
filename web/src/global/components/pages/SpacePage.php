@@ -2,6 +2,7 @@
 
 namespace src\global\components\pages;
 
+use src\app\tree\components\DefaultTreeOverview;
 use src\core\Component;
 use src\global\components\MainNavigationBar;
 use src\global\components\SpaceSidebar;
@@ -41,6 +42,8 @@ readonly class SpacePage extends Component {
         public function render(): void {
           # space settings -->
           ?>
+
+          <a href="?p=space&members"> <i class="fas fa-users"></i> Members </a> &nbsp;&nbsp;|&nbsp;&nbsp;
           <a href="?p=settings&id=123"> <i class="fas fa-tools"></i> Settings </a>
           <?php
         }
@@ -70,7 +73,16 @@ readonly class SpacePage extends Component {
           <?php
         } elseif (isset($_GET["discussion"])) {
           ?>
-          <h1>Discussion</h1>
+          <div class="w3-row">
+            <?php
+            $c = new DefaultTreeOverview();
+            for ($i = 0; $i < 9; $i++) {
+              echo "<div class='w3-third w3-padding'>";
+              $c->render();
+              echo "</div>";
+            }
+            ?>
+          </div>
           <?php
 
         } elseif (isset($_GET["archive"])) {
