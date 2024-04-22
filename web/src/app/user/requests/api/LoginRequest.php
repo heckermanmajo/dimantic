@@ -49,7 +49,7 @@ final class LoginRequest extends Request {
   function execute(): Component|string|array|null {
     $la = new LoginAction($this->account);
     $la->execute();
-    return "/index.php?p=home";
+    return "/index.php?p=a";
   }
 
 

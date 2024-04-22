@@ -4,6 +4,7 @@ namespace src\global\components\pages;
 
 use src\app\tree\components\DefaultTreeOverview;
 use src\core\Component;
+use src\global\components\AttentionBreadCrumbs;
 use src\global\components\MainNavigationBar;
 use src\global\components\SpaceSidebar;
 
@@ -49,6 +50,10 @@ readonly class SpacePage extends Component {
         }
       }
     );
+
+    $attention_bread_crumbs = new AttentionBreadCrumbs();
+
+
     $main_nav_bar->render();
 
     $side_bar = new SpaceSidebar();
@@ -104,6 +109,18 @@ readonly class SpacePage extends Component {
 
       </div>
     </div>
+
+    <!-- sticky footer -->
+    <footer
+      style="position: fixed;
+      left: 0; bottom: 0; width: 100%;
+       text-align: center;
+"
+      >
+
+      <?php $attention_bread_crumbs->render();?>
+
+    </footer>
     <?php
   }
 

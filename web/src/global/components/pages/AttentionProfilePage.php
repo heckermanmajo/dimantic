@@ -13,8 +13,9 @@ readonly class AttentionProfilePage extends Component {
       middle: new readonly class extends Component {
         public function render(): void {
           ?>
-          <a href="?p=ap&feed"> <i class="fas fa-bars"></i> Feed </a> &nbsp; &nbsp; | &nbsp; &nbsp;
-          <a href="?p=ap&favs"> <i class="fas fa-star"></i> Favs </a>  &nbsp; &nbsp; | &nbsp; &nbsp;
+          <a href="?p=ap"><i class="fas fa-eye"></i><i class="fas fa-project-diagram"></i> <i class="fas fa-mountain"></i> Overview </a> &nbsp; &nbsp; | &nbsp; &nbsp;
+          <a href="?p=ap&board"> <i class="fas fa-object-group"></i> Whiteboard </a>  &nbsp; &nbsp; | &nbsp; &nbsp;
+          <a href="?p=ap&explore"> <i class="fas fa-binoculars"></i> Explore </a>&nbsp; &nbsp; | &nbsp; &nbsp;
           <a href="?p=ap&history"> <i class="fas fa-user-clock"></i>History </a>
           <?php
         }
@@ -43,10 +44,10 @@ readonly class AttentionProfilePage extends Component {
 
         <?php if (isset($_GET["config"])): ?>
           <h1>Attention CONFIG</h1>
-          <p>Configure your attention feed</p>
+          <p>Configure your attention</p>
         <?php else: ?>
-          <h1>Attention FEED</h1>
-          <p>View your attention feed</p>
+          <h1>Attention Overview</h1>
+          <p>View your attention Overview</p>
 
           <pre>
 

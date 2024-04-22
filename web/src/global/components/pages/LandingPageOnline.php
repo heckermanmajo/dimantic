@@ -24,6 +24,10 @@ readonly class LandingPageOnline extends Component {
         $page = new AttentionProfilePage();
         break;
 
+      case "a":
+        $page = new AttentionPage();
+        break;
+
       case "explore":
         $page = new ExplorePage();
         break;
