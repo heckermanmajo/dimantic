@@ -92,7 +92,7 @@ abstract class Request {
     return $this->is_done;
   }
 
-  private static function encrypt_class_name(): string {
+  public static function encrypt_class_name(): string {
     $string = static::class;
     return $string; # todo: does not work ...
     $cipher = "aes-128-cbc";

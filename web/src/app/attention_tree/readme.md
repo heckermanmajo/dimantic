@@ -25,8 +25,22 @@ Can be generated from the system or mark a session.
   - f.e. attention opportunities
 - you can share parts of the attention tree with others
 - you can append parts of an attention tree to a post, etc.
+- relevance level so you can hide low relevance nodes
 
+### Quality 
+-> Tree postion is a quality indicator
+Was wertvoll ist werden die leute in ihren 
+geist baum packen.
+
+### mobile 
+-> man kann sachen an den baum in unsorted einfügen
+und später am pc sortieren
+
+### Zeit
+wo verbringe ich wie viel zeit
+wo interagiere ich wie
 
 ### Mobile solution
 -> you can not edit the tree, but display "feeds" from some 
    nodes you mark as "available for mobile".
+

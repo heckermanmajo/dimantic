@@ -15,11 +15,11 @@ try {
 
   $referring_page = $_SERVER["HTTP_REFERER"] ?? "";
 
-  $class = Request::decrypt_class_name($_POST["__request_id"]);
+  $class = Request::decrypt_class_name($_REQUEST["__request_id"]);
 
   /** @var Request $request */
   $request = new $class(
-    $_POST,
+    $_REQUEST,
     GetCurrentlyLoggedInAccount::get_account(),
     is_proxy_request: false
   );

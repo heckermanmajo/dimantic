@@ -31,6 +31,8 @@ readonly class AttentionPage extends Component {
     );
     #$main_nav_bar->render();
 
+    # https://stackoverflow.com/questions/73644744/break-line-if-node-text-exceeds-container-width
+
     $space_sidebar = new AttentionProfileSidebar();
     $bread_crumbs = new AttentionBreadCrumbs();
     $bread_crumbs->render();
@@ -40,6 +42,15 @@ readonly class AttentionPage extends Component {
       <div class="w3-half">
         <div id="jstree_demo_div"></div>
         <script>
+
+            /**
+             * UNSORTED NODE
+             *
+             * -> always will be created at my current postion
+             * where i add stuff from a space.
+             *
+             * -> we need open content as well as subscriber content.
+             */
 
             $(function () {
                 $('#jstree_demo_div').jstree(
@@ -51,6 +62,15 @@ readonly class AttentionPage extends Component {
                                     "text": "Root node",
                                     "state": {"opened": true},
                                     "children": [
+                                        {
+                                            "text": "Unsorted",
+                                            "a_attr": {"href": "/?p=space"},
+                                            "children": [
+                                                {"text": "Post whatever"},
+                                                {"text": "Space"},
+                                                {"text": "Sub-Conversation"}
+                                            ]
+                                        },
                                         {
                                             "text": "Soziologie",
                                             "a_attr": {"href": "/?p=space"},
