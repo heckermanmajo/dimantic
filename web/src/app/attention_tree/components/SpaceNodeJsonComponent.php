@@ -1,6 +1,6 @@
 <?php
 
-namespace src\app\attention_tree\data\components;
+namespace src\app\attention_tree\components;
 
 use src\app\attention_tree\data\dataclass\JSTreeNode;
 use src\app\attention_tree\data\tables\AttentionNode;

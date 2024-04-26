@@ -2,7 +2,7 @@
 
 namespace src\app\attention_tree\data\tables;
 
-use src\app\attention_tree\data\enums\NodeType;
+use src\app\attention_tree\data\enums\AttentionNodeType;
 use src\core\table\Table;
 
 /**
@@ -13,7 +13,7 @@ use src\core\table\Table;
  */
 class AttentionNode extends Table {
   var int $by_system_id;
-  var NodeType $node_type;
+  var AttentionNodeType $node_type;
   var int $reference_id;
   var string $note;
 }

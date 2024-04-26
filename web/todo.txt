@@ -1,0 +1,6 @@
+- Test-Infrastructure
+-  test api call mit curl und dann die DB checken
+-  set test mode in APP
+-  set test db name in settings file
+- create also one test for the table class -> table stress test
+- create tests for all compositions

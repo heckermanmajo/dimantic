@@ -2,7 +2,7 @@
 
 namespace src\app\attention_tree\data\enums;
 
-enum NodeType: int {
+enum AttentionNodeType: int {
   case SpaceNode = 1;
   case PostContentNode = 2;
   case ConversationNode = 3;
