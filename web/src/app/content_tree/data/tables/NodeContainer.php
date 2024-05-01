@@ -1,6 +1,6 @@
 <?php
 
-namespace src\app\tree\data\tables;
+namespace src\app\contenttree\data\tables;
 
 use src\core\table\Table;
 

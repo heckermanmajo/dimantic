@@ -2,7 +2,8 @@
 
 namespace src\global\components\pages;
 
-use src\app\tree\components\DefaultTreeOverview;
+use src\app\content_tree\components\DefaultTreeOverview;
+use src\app\space\components\SpaceNavigationBar;
 use src\core\Component;
 use src\global\components\AttentionBreadCrumbs;
 use src\global\components\MainNavigationBar;
@@ -27,7 +28,7 @@ readonly class SpacePage extends Component {
    */
 
   public function render(): void {
-    $main_nav_bar = new MainNavigationBar(
+    $main_nav_bar = new SpaceNavigationBar(
       middle: (new readonly class extends Component {
         public function render(): void {
           ?>
@@ -60,9 +61,10 @@ readonly class SpacePage extends Component {
 
     ?>
     <div class="w3-row">
-      <div class="w3-col " style="width: 350px">
-        <?php $side_bar->render() ?>
+      <!--<div class="w3-col " style="width: 350px">
+        <?php #$side_bar->render() ?>
       </div>
+      -->
       <div class="w3-rest">
 
         <?php

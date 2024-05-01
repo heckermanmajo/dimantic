@@ -7,7 +7,6 @@ use src\core\Action;
 class CreateAttentionContractAction extends Action {
 
   function __construct(
-    private readonly string $contract_text,
   ) { }
 
   function is_allowed(): bool {

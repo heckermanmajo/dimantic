@@ -1,10 +1,11 @@
 <?php
 
-namespace src\global\components;
+namespace src\app\space\components;
 
 use src\core\Component;
+use src\global\components\AttentionProfileSelect;
 
-readonly class MainNavigationBar extends Component {
+readonly class SpaceNavigationBar extends Component {
 
   function __construct(
     private readonly ?Component $middle = null,
@@ -21,9 +22,9 @@ readonly class MainNavigationBar extends Component {
 
       <div class="w3-left">
 
-        <?php (new AttentionProfileSelect())->render() ?>
+        <?php (new SuperAndSubSpaceSelect())->render() ?>
 
-        <?php (new UserAttentionCreditBalance())->render() ?>
+        <a href="?p=balance"> 124 <i style="color:green" class="fas fa-gem"></i> </a>
 
       </div>
 

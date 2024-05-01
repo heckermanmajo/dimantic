@@ -1,6 +1,8 @@
 <?php
 
 namespace src\app\statistics\data\tables;
-class Usage extends \Table {
+use src\core\table\Table;
+
+class Usage extends Table {
 
 }

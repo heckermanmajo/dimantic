@@ -3,7 +3,7 @@
 namespace src\global\components\pages;
 
 use src\core\Component;
-use src\global\components\MainNavigationBar;
+use src\global\components\MainNavigationBar;use src\global\components\UserAttentionCreditBalance;
 
 readonly class TreePage extends Component {
 
@@ -16,10 +16,7 @@ readonly class TreePage extends Component {
         style="margin-left: <?= $indent * 6 ?>px !important;"
         class="w3-card w3-margin w3-padding">
         <div>
-          <small> 🟠 Header: Author, attention cap, is opened for subscribers, create date, number of answers, etc.</small>
-          <div class="w3-right">
-            <button><i class="far fa-dot-circle"></i></button>
-          </div>
+          <small>             <button><i class="far fa-dot-circle"></i></button> 🟠 Header: Author, attention cap, is opened for subscribers, create date, number of answers, etc.</small>
         </div>
         <h3
           onclick="
@@ -86,6 +83,8 @@ readonly class TreePage extends Component {
         <button>🟠 Polls: 2</button>
         <button>Attachments: 7</button>
         <button>Links: 3</button>
+        <button><i class="fas fa-info-circle"></i> Context/members/info</button>
+        <button><i class="fas fa-tools"></i></button>
         <button> + </button>
       </div>
       <?php
@@ -110,23 +109,32 @@ readonly class TreePage extends Component {
         }
       }
     );
-    $main_nav_bar->render();
+    #$main_nav_bar->render();
     ?>
 
     <div class="w3-row">
 
-      <div class="w3-col l2 m2 s2">
+      <!--<div class="w3-col l2 m2 s2">
         <div class="w3-card w3-padding w3-margin">
           <h3>SIDEBAR</h3>
         </div>
-      </div>
+      </div>-->
 
       <div class="w3-rest">
 
         <div style="margin-top: 6px">
+          &nbsp;
+          <?php (new UserAttentionCreditBalance())->render()?>
+          &nbsp; | &nbsp;
           <a href=""> Top-Level-Post</a> <i class="fas fa-angle-double-right"></i>
           <a href="">Sub level post</a> <i class="fas fa-angle-double-right"></i>
           <a href="">direct parent</a> <i class="fas fa-angle-double-right"></i>
+          <!--<div class="w3-right">
+            <a href="?p=tree&members"> <i class="fas fa-users"></i> Members </a> &nbsp;&nbsp;|&nbsp;&nbsp;
+            <a href="?p=tree&settings&id=123"> <i class="fas fa-tools"></i> Settings </a>
+            &nbsp;&nbsp;&nbsp;
+          </div>-->
+
         </div>
 
         <?php
